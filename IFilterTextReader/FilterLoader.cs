@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32;
 
 namespace Email2Storage.Modules.Readers.IFilterTextReader
@@ -13,7 +12,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
     /// It then loads that dll, creates the appropriate COM object and returns 
     /// a pointer to an IFilter instance
     /// </summary>
-    internal static class FilterLoader
+    internal class FilterLoader
     {
         #region Private class CacheEntry
         private class CacheEntry
@@ -33,12 +32,14 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// <summary>
         /// Contains cached IFilter lookups
         /// </summary>
-        private static readonly Dictionary<string, CacheEntry> FilterCache = new Dictionary<string, CacheEntry>();
+        private readonly static Dictionary<string, CacheEntry> FilterCache = new Dictionary<string, CacheEntry>();
 
         /// <summary>
         /// The <see cref="ComHelpers"/> object
         /// </summary>
-        private static readonly ComHelpers ComHelpers = new ComHelpers();
+        private readonly static ComHelpers ComHelpers = new ComHelpers();
+
+        private static FileStream FilterStream;
         #endregion
 
         #region ReadFromHKLM
@@ -123,8 +124,8 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             var iPersistStream = filter as NativeMethods.IPersistStream;
             if (iPersistStream != null)
             {
-                var fileStream = new FileStream(fileName, FileMode.Open);
-                var streamWrapper = new StreamWrapper(fileStream);
+                FilterStream = new FileStream(fileName, FileMode.Open);
+                var streamWrapper = new StreamWrapper(FilterStream);
                 iPersistStream.Load(streamWrapper);
 
                 NativeMethods.IFILTER_FLAGS flags;
@@ -313,5 +314,11 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             return false;
         }
         #endregion
+
+        public static void Dispose()
+        {
+            if (FilterStream != null)
+                FilterStream.Dispose();
+        }
     }
 }
