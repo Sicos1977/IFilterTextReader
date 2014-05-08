@@ -26,14 +26,14 @@ namespace IFilterTextViewer
             // Process input if the user clicked OK.
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                SelectedFileLabel.Text = "File: " + openFileDialog1.FileName;
+
                 try
                 {
                     TextReader reader = new FilterReader(openFileDialog1.FileName);
                     using (reader)
-                    {
                         FilterTextBox.Text = reader.ReadToEnd();
-                        SelectedFileLabel.Text = "File: " + openFileDialog1.FileName;
-                    }
+                        
                 }
                 catch (Exception ex)
                 {

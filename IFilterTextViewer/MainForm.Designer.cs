@@ -36,17 +36,19 @@
             // FilterTextBox
             // 
             this.FilterTextBox.AcceptsReturn = true;
-            this.FilterTextBox.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.FilterTextBox.Location = new System.Drawing.Point(0, 114);
+            this.FilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.FilterTextBox.Location = new System.Drawing.Point(15, 108);
             this.FilterTextBox.Multiline = true;
             this.FilterTextBox.Name = "FilterTextBox";
-            this.FilterTextBox.Size = new System.Drawing.Size(1029, 696);
+            this.FilterTextBox.Size = new System.Drawing.Size(1002, 690);
             this.FilterTextBox.TabIndex = 0;
             // 
             // SelectedFileLabel
             // 
             this.SelectedFileLabel.AutoSize = true;
-            this.SelectedFileLabel.Location = new System.Drawing.Point(10, 70);
+            this.SelectedFileLabel.Location = new System.Drawing.Point(23, 80);
             this.SelectedFileLabel.Name = "SelectedFileLabel";
             this.SelectedFileLabel.Size = new System.Drawing.Size(0, 25);
             this.SelectedFileLabel.TabIndex = 1;
@@ -61,7 +63,7 @@
             this.SelectButton.UseVisualStyleBackColor = true;
             this.SelectButton.Click += new System.EventHandler(this.SelectButton_Click);
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -69,7 +71,7 @@
             this.Controls.Add(this.SelectButton);
             this.Controls.Add(this.SelectedFileLabel);
             this.Controls.Add(this.FilterTextBox);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "IFilter Text Viewer";
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -7,7 +7,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
     /// <summary>
     /// This class implements a TextReader that reads from an IFilter. 
     /// </summary>
-    public class FilterReader : System.IO.TextReader
+    public class FilterReader : TextReader
     {
         #region Fields
 
@@ -80,7 +80,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
 
         #region Read
         /// <summary>
-        /// Overrides the standard <see cref="Email2Storage.Modules.Readers.TextReader"/> read method
+        /// Overrides the standard <see cref="TextReader"/> read method
         /// </summary>
         /// <param name="buffer"></param>
         /// <param name="index"></param>

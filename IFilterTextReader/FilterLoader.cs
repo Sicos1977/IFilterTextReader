@@ -112,29 +112,24 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             if (filter == null)
                 return null;
 
-            var persistFile = (filter as IPersistFile);
-            if (persistFile != null)
+            const NativeMethods.IFILTER_INIT iflags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
+                                                      NativeMethods.IFILTER_INIT.CANON_PARAGRAPHS |
+                                                      NativeMethods.IFILTER_INIT.CANON_SPACES |
+                                                      NativeMethods.IFILTER_INIT.APPLY_INDEX_ATTRIBUTES |
+                                                      NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
+                                                      NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK;
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            var iPersistStream = filter as NativeMethods.IPersistStream;
+            if (iPersistStream != null)
             {
-                persistFile.Load(fileName, 0);
-                const NativeMethods.IFILTER_INIT iflags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
-                                                          NativeMethods.IFILTER_INIT.CANON_PARAGRAPHS |
-                                                          NativeMethods.IFILTER_INIT.CANON_SPACES |
-                                                          NativeMethods.IFILTER_INIT.APPLY_INDEX_ATTRIBUTES |
-                                                          NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
-                                                          NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK;
+                var fileStream = new FileStream(fileName, FileMode.Open);
+                var streamWrapper = new StreamWrapper(fileStream);
+                iPersistStream.Load(streamWrapper);
 
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                var iPersistStream = filter as NativeMethods.IPersistStream;
-                if (iPersistStream != null)
-                    using (Stream fileStream = new FileStream(fileName, FileMode.Open))
-                    {
-                        var streamWrapper = new StreamWrapper(fileStream);
-                        iPersistStream.Load(streamWrapper);
-
-                        NativeMethods.IFILTER_FLAGS flags;
-                        if (filter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
-                            return filter;
-                    }
+                NativeMethods.IFILTER_FLAGS flags;
+                if (filter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                    return filter;
             }
 
             // If we failed to retreive an IPersistFile interface or to initialize 
