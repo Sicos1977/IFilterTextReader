@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Email2Storage.Modules.Readers.TextReader
+namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
     /// <summary>
     /// This class implements a TextReader that reads from an IFilter. 

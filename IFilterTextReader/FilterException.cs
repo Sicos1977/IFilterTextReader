@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Email2Storage.Modules.Readers.TextReader
+namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
     /// <summary>
     /// Deze exceptie wordt geraised wanneer er een Filter gerelateerde foutmelding optreed

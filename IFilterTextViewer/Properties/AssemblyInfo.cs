@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Email2Storage.Modules.Readers.IFilterTextReader")]
+[assembly: AssemblyTitle("IFilterTextViewer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Email2Storage.Modules.Readers.IFilterTextReader")]
-[assembly: AssemblyCopyright("Copyright © 2014 - Kees van Spelde")]
+[assembly: AssemblyProduct("IFilterTextViewer")]
+[assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("11c6a8fb-07e1-427b-a024-297bd8003afe")]
+[assembly: Guid("e58c0f1a-c53d-4857-8046-accef8207c99")]
 
 // Version information for an assembly consists of the following four values:
 //

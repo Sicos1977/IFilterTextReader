@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32;
 
-namespace Email2Storage.Modules.Readers.TextReader
+namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
     /// <summary>
     /// FilterLoader finds the dll and ClassID of the COM object responsible  

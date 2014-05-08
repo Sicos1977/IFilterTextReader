@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Email2Storage.Modules.Readers.TextReader
+namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
 
     /// <summary>
