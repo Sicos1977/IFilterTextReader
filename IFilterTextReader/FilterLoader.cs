@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32;
 
 namespace Email2Storage.Modules.Readers.IFilterTextReader
@@ -38,8 +39,6 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// The <see cref="ComHelpers"/> object
         /// </summary>
         private readonly static ComHelpers ComHelpers = new ComHelpers();
-
-        private static FileStream FilterStream;
         #endregion
 
         #region ReadFromHKLM
@@ -120,13 +119,10 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                                                       NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
                                                       NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK;
 
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            var iPersistStream = filter as NativeMethods.IPersistStream;
-            if (iPersistStream != null)
+            var persistFile =(filter as IPersistFile);
+            if (persistFile!=null)
             {
-                FilterStream = new FileStream(fileName, FileMode.Open);
-                var streamWrapper = new StreamWrapper(FilterStream);
-                iPersistStream.Load(streamWrapper);
+                persistFile.Load(fileName, 0);
 
                 NativeMethods.IFILTER_FLAGS flags;
                 if (filter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
@@ -314,11 +310,5 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             return false;
         }
         #endregion
-
-        public static void Dispose()
-        {
-            if (FilterStream != null)
-                FilterStream.Dispose();
-        }
     }
 }
