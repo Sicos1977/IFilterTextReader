@@ -72,6 +72,8 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
             
+            FilterLoader.Dispose();
+
             base.Dispose(true);
 
             GC.SuppressFinalize(this);

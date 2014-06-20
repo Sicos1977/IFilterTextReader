@@ -134,7 +134,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                     return filter;
             }
 
-            // If we failed to retreive an IPersistFile interface or to initialize 
+            // If we failed to retreive an IPersistFile interface or to initialize
             // the filter, we release it and return null.
             Marshal.ReleaseComObject(filter);
             return null;
