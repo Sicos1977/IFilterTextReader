@@ -39,7 +39,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// </summary>
         private readonly static ComHelpers ComHelpers = new ComHelpers();
 
-        private static FileStream FilterStream;
+        private static FileStream _filterStream;
         #endregion
 
         #region ReadFromHKLM
@@ -58,6 +58,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// Read an key from the HKLM and returns it as an string
         /// </summary>
         /// <param name="key"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         private static string ReadFromHKLM(string key, string value)
         {
@@ -124,8 +125,8 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             var iPersistStream = filter as NativeMethods.IPersistStream;
             if (iPersistStream != null)
             {
-                FilterStream = new FileStream(fileName, FileMode.Open);
-                var streamWrapper = new StreamWrapper(FilterStream);
+                _filterStream = new FileStream(fileName, FileMode.Open);
+                var streamWrapper = new StreamWrapper(_filterStream);
                 iPersistStream.Load(streamWrapper);
 
                 NativeMethods.IFILTER_FLAGS flags;
@@ -315,10 +316,12 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         }
         #endregion
 
+        #region Dispose
         public static void Dispose()
         {
-            if (FilterStream != null)
-                FilterStream.Dispose();
+            if (_filterStream != null)
+                _filterStream.Dispose();
         }
+        #endregion
     }
 }

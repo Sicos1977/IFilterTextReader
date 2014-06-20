@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
     /// <summary>
-    /// This class implements a TextReader that reads from an IFilter. 
+    /// This class implements a TextReader that reads from an IFilter 
     /// </summary>
     public class FilterReader : TextReader
     {
