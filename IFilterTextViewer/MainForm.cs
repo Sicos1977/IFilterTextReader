@@ -50,8 +50,8 @@ namespace IFilterTextViewer
                     using (reader)
                     {
                         var text = reader.ReadToEnd();
-                        //MessageBox.Show(text);
-                        FilterTextBox.Text = text;
+                        var lines = text.Split('\n');
+                        FilterTextBox.Lines = lines;
                     }
 
                 }
