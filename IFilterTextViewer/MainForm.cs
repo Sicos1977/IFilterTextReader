@@ -48,8 +48,12 @@ namespace IFilterTextViewer
                 {
                     TextReader reader = new FilterReader(openFileDialog1.FileName);
                     using (reader)
-                        FilterTextBox.Text = reader.ReadToEnd();
-                        
+                    {
+                        var text = reader.ReadToEnd();
+                        //MessageBox.Show(text);
+                        FilterTextBox.Text = text;
+                    }
+
                 }
                 catch (Exception ex)
                 {

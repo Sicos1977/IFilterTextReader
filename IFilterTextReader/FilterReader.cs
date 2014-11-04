@@ -154,6 +154,16 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                         else
                             _charsLeftFromLastRead = null;
 
+                        for (var i = 0; i < read; i ++)
+                        {
+                            switch (buf[i])
+                            {
+                                case '\0':
+                                    buf[i] = '\n';
+                                    break;
+                            }
+                        }
+
                         Array.Copy(buf, 0, buffer, index + charsRead, read);
                         charsRead += read;
                     }
