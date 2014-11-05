@@ -173,6 +173,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                         _currentChunkValid = false;
                 }
             }
+
             return charsRead;
         }
         #endregion
