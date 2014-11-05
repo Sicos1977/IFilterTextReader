@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
-
     /// <summary>
     /// Utility class to get a Class Factory for a certain Class ID by loading the dll that implements that class
     /// </summary>

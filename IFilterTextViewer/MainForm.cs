@@ -3,6 +3,22 @@ using System.IO;
 using System.Windows.Forms;
 using Email2Storage.Modules.Readers.IFilterTextReader;
 
+/*
+   Copyright 2014 Kees van Spelde
+
+   Licensed under The Code Project Open License (CPOL) 1.02;
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.codeproject.com/info/cpol10.aspx
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 namespace IFilterTextViewer
 {
     public partial class MainForm : Form
@@ -32,6 +48,7 @@ namespace IFilterTextViewer
                 {
                     TextReader reader = new FilterReader(openFileDialog1.FileName);
                     using (reader)
+<<<<<<< HEAD
                         FilterTextBox.Text = reader.ReadToEnd();
 
                     var fileNameWithoutExtension = Path.GetFileName(openFileDialog1.FileName);
@@ -41,6 +58,14 @@ namespace IFilterTextViewer
                         MessageBox.Show("Gevonden");
 
                     File.WriteAllText(path + "\\" + fileNameWithoutExtension + ".txt", FilterTextBox.Text);
+=======
+                    {
+                        var text = reader.ReadToEnd();
+                        var lines = text.Split('\n');
+                        FilterTextBox.Lines = lines;
+                    }
+
+>>>>>>> origin/master
                 }
                 catch (Exception ex)
                 {

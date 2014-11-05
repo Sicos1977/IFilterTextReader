@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Email2Storage.Modules.Readers.IFilterTextReader
 {
     /// <summary>
-    /// This class implements a TextReader that reads from an IFilter. 
+    /// This class implements a TextReader that reads from an IFilter 
     /// </summary>
     public class FilterReader : TextReader
     {
@@ -72,6 +72,8 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
             
+            FilterLoader.Dispose();
+
             base.Dispose(true);
 
             GC.SuppressFinalize(this);
@@ -151,6 +153,16 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                         }
                         else
                             _charsLeftFromLastRead = null;
+
+                        for (var i = 0; i < read; i ++)
+                        {
+                            switch (buf[i])
+                            {
+                                case '\0':
+                                    buf[i] = '\n';
+                                    break;
+                            }
+                        }
 
                         Array.Copy(buf, 0, buffer, index + charsRead, read);
                         charsRead += read;

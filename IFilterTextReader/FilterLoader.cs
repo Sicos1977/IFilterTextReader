@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Win32;
 
 namespace Email2Storage.Modules.Readers.IFilterTextReader
@@ -39,6 +38,8 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// The <see cref="ComHelpers"/> object
         /// </summary>
         private readonly static ComHelpers ComHelpers = new ComHelpers();
+
+        private static FileStream _filterStream;
         #endregion
 
         #region ReadFromHKLM
@@ -57,6 +58,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// Read an key from the HKLM and returns it as an string
         /// </summary>
         /// <param name="key"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         private static string ReadFromHKLM(string key, string value)
         {
@@ -119,17 +121,20 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                                                       NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
                                                       NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK;
 
-            var persistFile =(filter as IPersistFile);
-            if (persistFile!=null)
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            var iPersistStream = filter as NativeMethods.IPersistStream;
+            if (iPersistStream != null)
             {
-                persistFile.Load(fileName, 0);
+                _filterStream = new FileStream(fileName, FileMode.Open);
+                var streamWrapper = new StreamWrapper(_filterStream);
+                iPersistStream.Load(streamWrapper);
 
                 NativeMethods.IFILTER_FLAGS flags;
                 if (filter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
                     return filter;
             }
 
-            // If we failed to retreive an IPersistFile interface or to initialize 
+            // If we failed to retreive an IPersistFile interface or to initialize
             // the filter, we release it and return null.
             Marshal.ReleaseComObject(filter);
             return null;
@@ -308,6 +313,14 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             dllName = null;
             filterPersistClass = null;
             return false;
+        }
+        #endregion
+
+        #region Dispose
+        public static void Dispose()
+        {
+            if (_filterStream != null)
+                _filterStream.Dispose();
         }
         #endregion
     }

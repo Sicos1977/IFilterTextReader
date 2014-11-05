@@ -380,7 +380,10 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         #endregion
 
         #region Struct PROPSPEC
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1900:ValueTypeFieldsShouldBePortable", MessageId = "lpwstr"), StructLayout(LayoutKind.Explicit)]
+        [
+            System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1900:ValueTypeFieldsShouldBePortable", MessageId = "lpwstr"), 
+            StructLayout(LayoutKind.Explicit)
+        ]
         public struct PROPSPEC
         {
             // 0 - string used; 1 - PROPID
@@ -508,8 +511,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             void GetClassID( /* [out] */ out Guid pClassID);
         };
 
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-        Guid("00000109-0000-0000-C000-000000000046")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("00000109-0000-0000-C000-000000000046")]
         public interface IPersistStream : IPersist
         {
             new void GetClassID(out Guid pClassID);
@@ -523,7 +525,10 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         #endregion
 
         #region DllImports
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"), DllImport("kernel32.dll", CharSet = CharSet.Ansi)]
+        [
+            System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"), 
+            DllImport("kernel32.dll", CharSet = CharSet.Ansi)
+        ]
         public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
