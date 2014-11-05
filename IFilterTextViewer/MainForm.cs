@@ -33,7 +33,14 @@ namespace IFilterTextViewer
                     TextReader reader = new FilterReader(openFileDialog1.FileName);
                     using (reader)
                         FilterTextBox.Text = reader.ReadToEnd();
-                        
+
+                    var fileNameWithoutExtension = Path.GetFileName(openFileDialog1.FileName);
+                    var path = Path.GetDirectoryName(openFileDialog1.FileName);
+
+                    if (FilterTextBox.Text.ToUpperInvariant().Contains("DATUM IN DIENST"))
+                        MessageBox.Show("Gevonden");
+
+                    File.WriteAllText(path + "\\" + fileNameWithoutExtension + ".txt", FilterTextBox.Text);
                 }
                 catch (Exception ex)
                 {

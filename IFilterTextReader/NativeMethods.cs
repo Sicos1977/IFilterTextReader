@@ -45,7 +45,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
 
             /// <summary>
             /// Soft returns, such as the newline character in Microsoft Word, should
-            /// be replaced by hard returnsLINE SEPARATOR (0x2028). Existing hard
+            /// be replaced by hard returns LINE SEPARATOR (0x2028). Existing hard
             /// returns can be doubled. A carriage return (0x000D), line feed (0x000A),
             /// or the carriage return and line feed in combination should be considered
             /// a hard return. The intent is to enable pattern-expression matches that
@@ -106,7 +106,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             SEARCH_LINKS = 128,
 
             /// <summary>
-            /// The content indexing process can return property values set by the  filter. 
+            /// The content indexing process can return property values set by the filter. 
             /// </summary>
             FILTER_OWNED_VALUE_OK = 512
         }
@@ -155,7 +155,6 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         #endregion
 
         #region Enum CHUNKSTATE
-
         [Flags]
         public enum CHUNKSTATE
         {
