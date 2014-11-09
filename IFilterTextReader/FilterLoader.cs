@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using IFilterTextReader.Exceptions;
 using Microsoft.Win32;
 
-namespace Email2Storage.Modules.Readers.IFilterTextReader
+namespace IFilterTextReader
 {
     /// <summary>
-    /// FilterLoader finds the dll and ClassID of the COM object responsible  
-    /// for filtering a specific file extension. 
-    /// It then loads that dll, creates the appropriate COM object and returns 
-    /// a pointer to an IFilter instance
+    /// FilterLoader finds the dll and ClassID of the COM object responsible for filtering a specific file extension. 
+    /// It then loads that dll, creates the appropriate COM object and returns a pointer to an IFilter instance
     /// </summary>
     internal class FilterLoader
     {
@@ -75,7 +74,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
 
         #region LoadAndInitFilter
         /// <summary>
-        /// Returns an  IFilter implementation for a file type or throws an <see cref="FilterException"/>
+        /// Returns an  IFilter implementation for a file type or throws an <see cref="IFFilterNotFound"/>
         /// when there is no filter available
         /// </summary>
         /// <param name="ext">The extension of the file</param>
@@ -91,7 +90,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         }
 
         /// <summary>
-        /// Returns an IFilter for the given <see cref="fileName"/> or raises an <see cref="FilterException"/> 
+        /// Returns an IFilter for the given <see cref="fileName"/> or raises an <see cref="IFFilterNotFound"/> 
         /// when there is no filter available
         /// </summary>
         /// <param name="fileName">The filename</param>
@@ -102,7 +101,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         }
 
         /// <summary>
-        /// Returns an IFilter for the given <see cref="fileName"/> or raises an <see cref="FilterException"/> 
+        /// Returns an IFilter for the given <see cref="fileName"/> or raises an <see cref="IFFilterNotFound"/> 
         /// when there is no filter available
         /// </summary>
         /// <param name="fileName">The filename</param>
@@ -165,7 +164,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
 
         #region GetFilterDll
         /// <summary>
-        /// Returns the filter dll based on the extension or throws an <see cref="FilterException"/> when not found
+        /// Returns the filter dll based on the extension or throws an <see cref="IFFilterNotFound"/> when not found
         /// </summary>
         /// <param name="extension"></param>
         /// <param name="dllName"></param>
@@ -181,7 +180,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             
             if (persistentHandlerClass != null)
                 if (!GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName, out filterPersistClass))
-                    throw new FilterException("Could not find an IFilter dll for a file with an '" + extension + "' extension");
+                    throw new IFFilterNotFound("Could not find an IFilter dll for a file with an '" + extension + "' extension");
 
             FilterCache.Add(extension.ToUpperInvariant(), new CacheEntry(dllName, filterPersistClass));
             return (dllName != null && filterPersistClass != null);

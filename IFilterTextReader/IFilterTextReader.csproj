@@ -7,8 +7,8 @@
     <ProjectGuid>{86693E2D-C3CB-4E16-9684-94445934A9D3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Email2Storage.Modules.Readers.IFilterTextReader</RootNamespace>
-    <AssemblyName>Email2Storage.Modules.Readers.IFilterTextReader</AssemblyName>
+    <RootNamespace>IFilterTextReader</RootNamespace>
+    <AssemblyName>IFilterTextReader</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -34,9 +34,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComHelpers.cs" />
-    <Compile Include="FilterException.cs" />
+    <Compile Include="Exceptions\IFAccesFailure.cs" />
+    <Compile Include="Exceptions\IFFileIsPasswordProtected.cs" />
+    <Compile Include="Exceptions\IFFilterNotFound.cs" />
+    <Compile Include="Exceptions\IFClassFactoryFailure.cs" />
+    <Compile Include="Exceptions\IFUnknownFormat.cs" />
     <Compile Include="FilterLoader.cs" />
     <Compile Include="FilterReader.cs" />
+    <Compile Include="FilterSearcher.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StreamWrapper.cs" />

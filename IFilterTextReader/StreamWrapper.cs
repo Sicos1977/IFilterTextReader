@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace Email2Storage.Modules.Readers.IFilterTextReader
+namespace IFilterTextReader
 {
     /// <summary>
     /// This class is used as a .NET wrapper around the <see cref="IStream"/> interface

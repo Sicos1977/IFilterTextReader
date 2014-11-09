@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using IFilterTextReader.Exceptions;
 
-namespace Email2Storage.Modules.Readers.IFilterTextReader
+namespace IFilterTextReader
 {
     /// <summary>
     /// This class implements a TextReader that reads from an IFilter 
@@ -10,7 +11,6 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
     public class FilterReader : TextReader
     {
         #region Fields
-
         /// <summary>
         /// The IFilter interface
         /// </summary>
@@ -31,8 +31,15 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// </summary>
         private bool _currentChunkValid;
 
+        /// <summary>
+        /// Holds the chars that are left from the last chunck read
+        /// </summary>
         private char[] _charsLeftFromLastRead;
 
+        /// <summary>
+        /// The file to read with an IFilter
+        /// </summary>
+        private readonly string _fileName;
         #endregion
 
         #region Constructor en Destructor
@@ -42,9 +49,10 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
         /// <param name="fileName"></param>
         public FilterReader(string fileName)
         {
+            _fileName = fileName;
             _filter = FilterLoader.LoadAndInitIFilter(fileName);
             if (_filter == null)
-                throw new FilterException("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+                throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
         }
         
         ~FilterReader()
@@ -79,6 +87,16 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             GC.SuppressFinalize(this);
         }
         #endregion
+
+        /// <summary>
+        /// Read
+        /// </summary>
+        /// <returns></returns>
+        public override string ReadLine()
+        {
+            var line = base.ReadLine();
+            return line;
+        }
 
         #region Read
         /// <summary>
@@ -134,38 +152,57 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
                 if (_currentChunkValid)
                 {
                     var bufLength = (uint) (count - charsRead);
-                    if (bufLength < 8192)
-                        bufLength = 8192; //Read ahead
+                    if (bufLength < 4096)
+                        bufLength = 4096; //Read ahead
 
                     var buf = new char[bufLength];
                     var result = _filter.GetText(ref bufLength, buf);
 
-                    if (result == NativeMethods.IFilterReturnCode.S_OK ||
-                        result == NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT)
+                    switch (result)
                     {
-                        var read = (int) bufLength;
-                        if (read + charsRead > count)
-                        {
-                            var charsLeft = (read + charsRead - count);
-                            _charsLeftFromLastRead = new char[charsLeft];
-                            Array.Copy(buf, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
-                            read -= charsLeft;
-                        }
-                        else
-                            _charsLeftFromLastRead = null;
+                        case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
+                            throw new IFFileIsPasswordProtected("The file '" + _fileName +
+                                                                "' or a file inside this file (e.g. in the case of a ZIP) is password protected");
 
-                        for (var i = 0; i < read; i ++)
-                        {
-                            switch (buf[i])
+                        case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
+                        case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
+                            throw new IFAccesFailure("Unable to acces the IFilter or file");
+
+                        case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
+                            throw new OutOfMemoryException("Not enough memory to proceed reading the file '" + _fileName +
+                                                           "'");
+
+                        case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
+                            throw new IFUnknownFormat("The file '" + _fileName +
+                                                      "' is not in the format the IFilter would expect it to be");
+
+                        case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
+                        case NativeMethods.IFilterReturnCode.S_OK:
+                            var read = (int) bufLength;
+                            if (read + charsRead > count)
                             {
-                                case '\0':
-                                    buf[i] = '\n';
-                                    break;
+                                var charsLeft = (read + charsRead - count);
+                                _charsLeftFromLastRead = new char[charsLeft];
+                                Array.Copy(buf, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
+                                read -= charsLeft;
                             }
-                        }
+                            else
+                                _charsLeftFromLastRead = null;
 
-                        Array.Copy(buf, 0, buffer, index + charsRead, read);
-                        charsRead += read;
+                            for (var i = 0; i < read; i ++)
+                            {
+                                switch (buf[i])
+                                {
+                                    case '\0':
+                                        buf[i] = '\n';
+                                        break;
+                                }
+                            }
+
+                            Array.Copy(buf, 0, buffer, index + charsRead, read+1);
+                            charsRead += read;
+
+                            break;
                     }
 
                     if (result == NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT ||

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
-using Email2Storage.Modules.Readers.IFilterTextReader;
 
 /*
    Copyright 2014 Kees van Spelde
@@ -18,6 +16,7 @@ using Email2Storage.Modules.Readers.IFilterTextReader;
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+using IFilterTextReader;
 
 namespace IFilterTextViewer
 {
@@ -42,7 +41,11 @@ namespace IFilterTextViewer
             // Process input if the user clicked OK.
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                SelectedFileLabel.Text = "File: " + openFileDialog1.FileName;
+                FileLabel.Text = openFileDialog1.FileName;
+                FindTextButton.Enabled = true;
+                TextToFindTextBox.Enabled = true;
+                FindWithRegexButton.Enabled = true;
+                TextToFindWithRegexTextBox.Enabled = true;
 
                 try
                 {
@@ -58,6 +61,21 @@ namespace IFilterTextViewer
                     FilterTextBox.Text = ex.Message;
                 }
             }
+        }
+
+        private void FindTextButton_Click(object sender, EventArgs e)
+        {
+            if (Reader.FileContainsText(FileLabel.Text, TextToFindTextBox.Text))
+                FilterTextBox.Text = "Text '" + TextToFindTextBox.Text + "' found inside the file";
+            else
+                FilterTextBox.Text = "Text '" + TextToFindTextBox.Text + "' not found inside the file";
+        }
+
+        private void FindWithRegexButton_Click(object sender, EventArgs e)
+        {
+            var matches = Reader.GetRegexMatchesFromFile(FileLabel.Text, TextToFindWithRegexTextBox.Text);
+            if (matches != null)
+                FilterTextBox.Lines = matches;
         }
     }
 }

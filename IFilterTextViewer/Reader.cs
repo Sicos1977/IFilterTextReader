@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Email2Storage.Modules.Readers.IFilterTextReader;
+using IFilterTextReader;
 
 namespace IFilterTextViewer
 {
     /// <summary>
-    /// This class contains helper methods to search for text
+    /// This class contains methods to search for text inside a file with the help of a IFilter
     /// </summary>
-    internal static class ReaderHelpers
+    public static class Reader
     {
         #region FileContainsText
         /// <summary>

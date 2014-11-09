@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using IFilterTextReader.Exceptions;
 
-namespace Email2Storage.Modules.Readers.IFilterTextReader
+namespace IFilterTextReader
 {
     /// <summary>
     /// Utility class to get a Class Factory for a certain Class ID by loading the dll that implements that class
@@ -51,7 +52,7 @@ namespace Email2Storage.Modules.Readers.IFilterTextReader
             // Get a pointer to the DllGetClassObject function
             var dllGetClassObjectPtr = NativeMethods.GetProcAddress(dllHandle, "DllGetClassObject");
             if (dllGetClassObjectPtr == IntPtr.Zero)
-                throw new FilterException("Could not get proc address from filter dll");
+                throw new IFClassFactoryFailure("Could not get proc address from filter dll");
 
             // Convert the function pointer to a .net delegate
             var dllGetClassObject =
