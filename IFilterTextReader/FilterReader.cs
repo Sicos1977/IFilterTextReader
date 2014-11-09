@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using IFilterTextReader.Exceptions;
 
@@ -40,6 +41,12 @@ namespace IFilterTextReader
         /// The file to read with an IFilter
         /// </summary>
         private readonly string _fileName;
+
+        private char[] _readLineBuffer = null;
+
+        private int _readLinePosition;
+
+        private int _readLineCharsRead;
         #endregion
 
         #region Constructor en Destructor
@@ -94,8 +101,39 @@ namespace IFilterTextReader
         /// <returns></returns>
         public override string ReadLine()
         {
-            var line = base.ReadLine();
-            return line;
+            string line = null;
+
+            while (true)
+            {
+                if (_readLineBuffer == null)
+                {
+                    _readLineBuffer = new char[4096];
+                    _readLineCharsRead = Read(_readLineBuffer, 0, 4096);
+                    _readLinePosition = 0;
+                }
+
+                for (var i = _readLinePosition; i < _readLineCharsRead; i++)
+                {
+                    var chr = _readLineBuffer[i];
+
+                    switch (chr)
+                    {
+                        case '\n':
+                            _readLinePosition = i;
+                            return line;
+
+                        case '\r':
+                            // ignore
+                            break;
+
+                        default:
+                            line += chr;
+                            break;
+                    }
+                }
+
+                _readLineBuffer = null;
+            }
         }
 
         #region Read
