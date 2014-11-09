@@ -46,8 +46,7 @@ namespace IFilterTextViewer
 
                 try
                 {
-                    TextReader reader = new FilterReader(openFileDialog1.FileName);
-                    using (reader)
+                    using (var reader = new FilterReader(openFileDialog1.FileName))
                     {
                         var text = reader.ReadToEnd();
                         var lines = text.Split('\n');
