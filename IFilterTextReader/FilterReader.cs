@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -135,7 +136,7 @@ namespace IFilterTextReader
                 _readLineBuffer = null;
             }
         }
-
+        private bool breakAdded = false;
         #region Read
         /// <summary>
         /// Overrides the standard <see cref="TextReader"/> read method
@@ -146,6 +147,18 @@ namespace IFilterTextReader
         /// <returns></returns>
         public override int Read(char[] buffer, int index, int count)
         {
+            if (buffer == null)
+                throw new ArgumentNullException("buffer");
+
+            if (buffer.Length - index < count)
+                throw new ArgumentException("The buffer is to small");
+
+            if (index < 0)
+                throw new ArgumentOutOfRangeException("index");
+
+            if (count < 0)
+                throw new ArgumentOutOfRangeException("count");
+
             var endOfChunksCount = 0;
             var charsRead = 0;
 
@@ -190,11 +203,11 @@ namespace IFilterTextReader
                 if (_currentChunkValid)
                 {
                     var bufLength = (uint) (count - charsRead);
-                    if (bufLength < 4096)
-                        bufLength = 4096; //Read ahead
+                    //if (bufLength < 4094)
+                    //    bufLength = 4094; //Read ahead
 
-                    var buf = new char[bufLength];
-                    var result = _filter.GetText(ref bufLength, buf);
+                    var getTextBuf = new char[bufLength + 2];
+                    var result = _filter.GetText(ref bufLength, getTextBuf);
 
                     switch (result)
                     {
@@ -214,32 +227,84 @@ namespace IFilterTextReader
                             throw new IFUnknownFormat("The file '" + _fileName +
                                                       "' is not in the format the IFilter would expect it to be");
 
+                        case NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_TEXT:
+                            try
+                            {
+                                if(charsRead != 0 && charsRead != count - 1 && !breakAdded)
+                                {
+                                    if (buffer[charsRead - 1] != ' ')
+                                    {
+                                        buffer[charsRead + 0] = '\r';
+                                        buffer[charsRead + 1] = '\n';
+                                        charsRead += 2;
+                                    }
+                                }
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
+
+                            break;
+
                         case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
                         case NativeMethods.IFilterReturnCode.S_OK:
+                            // Remove any null terminated chars
+                            for (var i = bufLength - 1; i > 0; i--)
+                            {
+                                switch (getTextBuf[i])
+                                {
+                                    case '\0':
+                                        bufLength--;
+                                        break;
+                                }
+                            }
+
+                            switch (_currentChunk.breakType)
+                            {
+                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
+                                    break;
+
+                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
+                                    if (getTextBuf[bufLength - 1] != ' ')
+                                    {
+                                        getTextBuf[bufLength] = ' ';
+                                        bufLength += 1;
+                                    }
+                                    break;
+
+                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
+                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
+                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
+                                    if (getTextBuf[bufLength - 1] != ' ')
+                                    {
+                                        getTextBuf[bufLength + 0] = '\r';
+                                        getTextBuf[bufLength + 1] = '\n';
+                                        bufLength += 2;
+                                        breakAdded = true;
+                                    }
+                                    else
+                                    {
+                                        breakAdded = false;
+                                    }
+                                    break;
+                            }
+
                             var read = (int) bufLength;
                             if (read + charsRead > count)
                             {
                                 var charsLeft = (read + charsRead - count);
                                 _charsLeftFromLastRead = new char[charsLeft];
-                                Array.Copy(buf, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
+                                Array.Copy(getTextBuf, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
                                 read -= charsLeft;
                             }
                             else
                                 _charsLeftFromLastRead = null;
+                           
 
-                            for (var i = 0; i < read; i ++)
-                            {
-                                switch (buf[i])
-                                {
-                                    case '\0':
-                                        buf[i] = '\n';
-                                        break;
-                                }
-                            }
-
-                            Array.Copy(buf, 0, buffer, index + charsRead, read+1);
+                            Array.Copy(getTextBuf, 0, buffer, index + charsRead, read);
                             charsRead += read;
-
                             break;
                     }
 
