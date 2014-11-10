@@ -52,8 +52,7 @@ namespace IFilterTextViewer
                     using (var reader = new FilterReader(openFileDialog1.FileName))
                     {
                         var text = reader.ReadToEnd();
-                        var lines = text.Split('\n');
-                        FilterTextBox.Lines = lines;
+                        FilterTextBox.Text = text;
                     }
                 }
                 catch (Exception ex)

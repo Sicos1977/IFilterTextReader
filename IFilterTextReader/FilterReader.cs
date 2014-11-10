@@ -136,7 +136,7 @@ namespace IFilterTextReader
                 _readLineBuffer = null;
             }
         }
-        private bool breakAdded = false;
+
         #region Read
         /// <summary>
         /// Overrides the standard <see cref="TextReader"/> read method
@@ -203,9 +203,6 @@ namespace IFilterTextReader
                 if (_currentChunkValid)
                 {
                     var bufLength = (uint) (count - charsRead);
-                    //if (bufLength < 4094)
-                    //    bufLength = 4094; //Read ahead
-
                     var getTextBuf = new char[bufLength + 2];
                     var result = _filter.GetText(ref bufLength, getTextBuf);
 
@@ -227,27 +224,6 @@ namespace IFilterTextReader
                             throw new IFUnknownFormat("The file '" + _fileName +
                                                       "' is not in the format the IFilter would expect it to be");
 
-                        case NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_TEXT:
-                            try
-                            {
-                                if(charsRead != 0 && charsRead != count - 1 && !breakAdded)
-                                {
-                                    if (buffer[charsRead - 1] != ' ')
-                                    {
-                                        buffer[charsRead + 0] = '\r';
-                                        buffer[charsRead + 1] = '\n';
-                                        charsRead += 2;
-                                    }
-                                }
-                            }
-                            catch (Exception)
-                            {
-
-                                throw;
-                            }
-
-                            break;
-
                         case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
                         case NativeMethods.IFilterReturnCode.S_OK:
                             // Remove any null terminated chars
@@ -265,7 +241,7 @@ namespace IFilterTextReader
                             {
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
                                     break;
-
+                                
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
                                     if (getTextBuf[bufLength - 1] != ' ')
                                     {
@@ -282,11 +258,6 @@ namespace IFilterTextReader
                                         getTextBuf[bufLength + 0] = '\r';
                                         getTextBuf[bufLength + 1] = '\n';
                                         bufLength += 2;
-                                        breakAdded = true;
-                                    }
-                                    else
-                                    {
-                                        breakAdded = false;
                                     }
                                     break;
                             }
