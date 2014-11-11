@@ -216,6 +216,10 @@ namespace IFilterTextReader
                         case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
                             throw new IFAccesFailure("Unable to acces the IFilter or file");
 
+                        case NativeMethods.IFilterReturnCode.FILTER_E_EMBEDDING_UNAVAILABLE:
+                        case NativeMethods.IFilterReturnCode.FILTER_E_LINK_UNAVAILABLE:
+                            continue;
+
                         case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
                             throw new OutOfMemoryException("Not enough memory to proceed reading the file '" + _fileName +
                                                            "'");
@@ -253,12 +257,12 @@ namespace IFilterTextReader
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                    if (getTextBuf[bufLength - 1] != ' ')
-                                    {
-                                        getTextBuf[bufLength + 0] = '\r';
-                                        getTextBuf[bufLength + 1] = '\n';
-                                        bufLength += 2;
-                                    }
+                                    //if (getTextBuf[bufLength - 1] != ' ')
+                                    //{
+                                        getTextBuf[0] = '\r';
+                                        getTextBuf[1] = '\n';
+                                    //    bufLength += 2;
+                                    //}
                                     break;
                             }
 

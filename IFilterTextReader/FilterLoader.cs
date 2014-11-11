@@ -120,6 +120,7 @@ namespace IFilterTextReader
                                                       NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
                                                       NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK;
 
+
             // ReSharper disable once SuspiciousTypeConversion.Global
             var iPersistStream = filter as NativeMethods.IPersistStream;
             if (iPersistStream != null)
