@@ -34,14 +34,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComHelpers.cs" />
-    <Compile Include="Exceptions\IFAccesFailure.cs" />
+    <Compile Include="Exceptions\IFAccessFailure.cs" />
     <Compile Include="Exceptions\IFFileIsPasswordProtected.cs" />
-    <Compile Include="Exceptions\IFFilterNotFound.cs" />
     <Compile Include="Exceptions\IFClassFactoryFailure.cs" />
+    <Compile Include="Exceptions\IFFilterNotFound.cs" />
     <Compile Include="Exceptions\IFUnknownFormat.cs" />
     <Compile Include="FilterLoader.cs" />
     <Compile Include="FilterReader.cs" />
-    <Compile Include="FilterSearcher.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StreamWrapper.cs" />
