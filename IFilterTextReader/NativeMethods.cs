@@ -381,21 +381,34 @@ namespace IFilterTextReader
 
         #region Struct PROPSPEC
         [
-            System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1900:ValueTypeFieldsShouldBePortable", MessageId = "lpwstr"), 
             StructLayout(LayoutKind.Explicit)
         ]
         public struct PROPSPEC
         {
             // 0 - string used; 1 - PROPID
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
             [FieldOffset(0)]
             public int ulKind;
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
             [FieldOffset(4)]
             public int propid;
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
             [FieldOffset(4)]
             public IntPtr lpwstr;
+        }
+        #endregion
+
+        #region PropVariant
+        [StructLayout(LayoutKind.Explicit, Size = 16)]
+        public struct PropVariant
+        {
+            /// <summary>
+            /// VT_LPWSTR is decimal 31
+            /// </summary>
+            [FieldOffset(0)] public short variantType;
+
+            [FieldOffset(8)] public IntPtr pointerValue;
+            [FieldOffset(8)] public byte byteValue;
+            [FieldOffset(8)] public long longValue;
+            [FieldOffset(8)] public double dateValue;
+            [FieldOffset(8)] public short boolValue;
         }
         #endregion
 
@@ -409,7 +422,7 @@ namespace IFilterTextReader
             /// </summary>
             [PreserveSig]
             IFilterReturnCode Init(
-                //[in] Flag settings from the IFILTER_INIT enumeration for
+                // [in] Flag settings from the IFILTER_INIT enumeration for
                 // controlling text standardization, property output, embedding
                 // scope, and IFilter access patterns. 
                 IFILTER_INIT grfFlags,
@@ -430,7 +443,7 @@ namespace IFilterTextReader
                 // Property Sets. 
                 int cAttributes,
 
-                //[in] Array of pointers to FULLPROPSPEC structures for the
+                // [in] Array of pointers to FULLPROPSPEC structures for the
                 // requested properties. 
                 // When cAttributes is nonzero, only the properties in aAttributes
                 // are returned. 
@@ -478,9 +491,9 @@ namespace IFilterTextReader
                 // structures contain pointers, which can be freed by calling the
                 // PropVariantClear function. 
                 // It is up to the caller of the GetValue method to call the
-                //   PropVariantClear method.            
+                // PropVariantClear method.            
                 // ref IntPtr ppPropValue
-                // [MarshalAs(UnmanagedType.Struct)]
+                [MarshalAs(UnmanagedType.Struct)]
                 ref IntPtr PropVal);
 
             /// <summary>

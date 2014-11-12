@@ -1,7 +1,5 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using IFilterTextReader.Exceptions;
 
@@ -159,7 +157,6 @@ namespace IFilterTextReader
             if (count < 0)
                 throw new ArgumentOutOfRangeException("count");
 
-            var endOfChunksCount = 0;
             var charsRead = 0;
 
             while (!_done && charsRead < count)
@@ -189,14 +186,10 @@ namespace IFilterTextReader
                 if (!_currentChunkValid)
                 {
                     var result = _filter.GetChunk(out _currentChunk);
-                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK) &&
-                                         ((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
+                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK);// &&
+                                        //((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
 
                     if (result == NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS)
-                        endOfChunksCount++;
-
-                    // There are no more chunks
-                    if (endOfChunksCount > 1)
                         _done = true;
                 }
 
@@ -205,7 +198,8 @@ namespace IFilterTextReader
                     var bufLength = (uint) (count - charsRead);
                     var getTextBuf = new char[bufLength + 2];
                     var result = _filter.GetText(ref bufLength, getTextBuf);
-
+                    http://www.tech-archive.net/Archive/Development/microsoft.public.win32.programmer.ole/2006-12/msg00099.html
+                    _filter.GetValue()
                     switch (result)
                     {
                         case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
@@ -257,12 +251,12 @@ namespace IFilterTextReader
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                    //if (getTextBuf[bufLength - 1] != ' ')
-                                    //{
-                                        getTextBuf[0] = '\r';
-                                        getTextBuf[1] = '\n';
-                                    //    bufLength += 2;
-                                    //}
+                                    if (getTextBuf[bufLength - 1] != ' ')
+                                    {
+                                        getTextBuf[bufLength] = '\r';
+                                        getTextBuf[bufLength + 1] = '\n';
+                                        bufLength += 2;
+                                    }
                                     break;
                             }
 
