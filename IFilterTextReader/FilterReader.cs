@@ -198,8 +198,7 @@ namespace IFilterTextReader
                     var bufLength = (uint) (count - charsRead);
                     var getTextBuf = new char[bufLength + 2];
                     var result = _filter.GetText(ref bufLength, getTextBuf);
-                    http://www.tech-archive.net/Archive/Development/microsoft.public.win32.programmer.ole/2006-12/msg00099.html
-                    _filter.GetValue()
+
                     switch (result)
                     {
                         case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
