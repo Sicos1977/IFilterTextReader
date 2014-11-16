@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 /*
@@ -51,10 +52,8 @@ namespace IFilterTextViewer
                 {
                     using (var reader = new FilterReader(openFileDialog1.FileName))
                     {
-                        //var r = new char[8192];
-                        //var test = reader.ReadBlock(r, 0, 11);
-                        //test = reader.Read(r, test, 1);
                         var text = reader.ReadToEnd();
+                        File.WriteAllText("d:\\output.txt", text);
                         FilterTextBox.Text = text;
                     }
                 }

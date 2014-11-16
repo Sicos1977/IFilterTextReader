@@ -94,47 +94,6 @@ namespace IFilterTextReader
         }
         #endregion
 
-        /// <summary>
-        /// Read
-        /// </summary>
-        /// <returns></returns>
-        public override string ReadLine()
-        {
-            string line = null;
-
-            while (true)
-            {
-                if (_readLineBuffer == null)
-                {
-                    _readLineBuffer = new char[4096];
-                    _readLineCharsRead = Read(_readLineBuffer, 0, 4096);
-                    _readLinePosition = 0;
-                }
-
-                for (var i = _readLinePosition; i < _readLineCharsRead; i++)
-                {
-                    var chr = _readLineBuffer[i];
-
-                    switch (chr)
-                    {
-                        case '\n':
-                            _readLinePosition = i;
-                            return line;
-
-                        case '\r':
-                            // ignore
-                            break;
-
-                        default:
-                            line += chr;
-                            break;
-                    }
-                }
-
-                _readLineBuffer = null;
-            }
-        }
-
         #region Read
         /// <summary>
         /// Overrides the standard <see cref="TextReader"/> read method
@@ -186,8 +145,8 @@ namespace IFilterTextReader
                 if (!_currentChunkValid)
                 {
                     var result = _filter.GetChunk(out _currentChunk);
-                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK);// &&
-                                        //((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
+                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK) &&
+                                         ((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
 
                     if (result == NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS)
                         _done = true;
@@ -240,11 +199,6 @@ namespace IFilterTextReader
                                     break;
                                 
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
-                                    if (getTextBuf[bufLength - 1] != ' ')
-                                    {
-                                        getTextBuf[bufLength] = ' ';
-                                        bufLength += 1;
-                                    }
                                     break;
 
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
@@ -252,9 +206,8 @@ namespace IFilterTextReader
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
                                     if (getTextBuf[bufLength - 1] != ' ')
                                     {
-                                        getTextBuf[bufLength] = '\r';
-                                        getTextBuf[bufLength + 1] = '\n';
-                                        bufLength += 2;
+                                        getTextBuf[bufLength] = ' ';
+                                        bufLength += 1;
                                     }
                                     break;
                             }
@@ -269,7 +222,6 @@ namespace IFilterTextReader
                             }
                             else
                                 _charsLeftFromLastRead = null;
-                           
 
                             Array.Copy(getTextBuf, 0, buffer, index + charsRead, read);
                             charsRead += read;
