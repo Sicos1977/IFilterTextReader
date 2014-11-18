@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using IFilterTextReader.Exceptions;
 
 namespace IFilterTextReader
@@ -41,11 +42,7 @@ namespace IFilterTextReader
         /// </summary>
         private readonly string _fileName;
 
-        private char[] _readLineBuffer = null;
-
-        private int _readLinePosition;
-
-        private int _readLineCharsRead;
+        private bool _carriageReturnFound;
         #endregion
 
         #region Constructor en Destructor
@@ -68,40 +65,109 @@ namespace IFilterTextReader
 
         #endregion
 
-        #region Close
-        public override void Close()
-        {
-            Dispose(true);
-        }
-        #endregion
-
-        #region Dispose
+        #region ReadLine
         /// <summary>
-        /// Disposes this object
+        ///  Reads a line of characters from the text reader and returns the data as a string.
         /// </summary>
-        /// <param name="disposing"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
-        protected override void Dispose(bool disposing)
+        /// <returns>The next line from the reader, or null if all characters have been read.</returns>
+        public override string ReadLine()
         {
-            if (_filter != null)
-                Marshal.ReleaseComObject(_filter);
-            
-            FilterLoader.Dispose();
+            var buffer = new char[1024];
+            var stringBuilder = new StringBuilder();
+            var done = false;
 
-            base.Dispose(true);
+            while (!done)
+            {
+                var charsRead = Read(buffer, 0, 1024);
 
-            GC.SuppressFinalize(this);
+                if (charsRead == 0)
+                {
+                    if (stringBuilder.Length != 0)
+                        done = true;
+                    else
+                        return null;
+                }
+
+                for (var i = 0; i < charsRead; i++)
+                {
+                    var chr = buffer[i];
+
+                    switch (chr)
+                    {
+                        case '\r':
+                            _carriageReturnFound = true;
+                            done = true;
+                            break;
+
+                        case '\n':
+                            if (!_carriageReturnFound)
+                                done = true;
+                                
+                            break;
+
+                        default:
+                            _carriageReturnFound = false;
+                            stringBuilder.Append(buffer[i]);
+                            break;
+                    }
+
+                    if (done)
+                    {
+                        i++;
+                        if (i < charsRead)
+                        {
+                            if (_charsLeftFromLastRead == null)
+                            {
+                                _charsLeftFromLastRead = new char[charsRead - i];
+                                Array.Copy(buffer, i, _charsLeftFromLastRead, 0, charsRead - i);
+                            }
+                            else
+                            {
+                                var charsLeft = charsRead - i;
+                                var temp = new char[_charsLeftFromLastRead.Length + charsLeft];
+                                Array.Copy(buffer, i, temp, 0, charsLeft);
+                                _charsLeftFromLastRead.CopyTo(temp, charsLeft);
+                                _charsLeftFromLastRead = temp;
+                            }
+                        }
+
+                        _done = false;
+                        break;
+                    }
+                }
+            }
+
+            return stringBuilder.Length == 0 ? string.Empty : stringBuilder.ToString();
         }
         #endregion
 
         #region Read
         /// <summary>
-        /// Overrides the standard <see cref="TextReader"/> read method
+        /// Reads the next character from the text reader and advances the character position by one character.
         /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
+        /// <returns>The next character from the text reader, or -1 if no more characters are available.</returns>
+        public override int Read()
+        {
+            var chr = new char[0];
+            var read = Read(chr, 0, 1);
+            if (read == 1)
+                return chr[0];
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Reads a specified maximum number of characters from the current reader and writes the data to a buffer, 
+        /// beginning at the specified index
+        /// </summary>
+        /// <param name="buffer">When this method returns, contains the specified character array with the values 
+        /// between index and (index + count - 1) replaced by the characters read from the current source. </param>
+        /// <param name="index">The position in buffer at which to begin writing. </param>
+        /// <param name="count">The maximum number of characters to read. If the end of the reader is reached before 
+        /// the specified number of characters is read into the buffer, the method returns. </param>
+        /// <returns>The number of characters that have been read. The number will be less than or equal to count, 
+        /// depending on whether the data is available within the reader.  This method returns 0 (zero) if it is called
+        /// when no more characters are left to read</returns>
         public override int Read(char[] buffer, int index, int count)
         {
             if (buffer == null)
@@ -154,7 +220,10 @@ namespace IFilterTextReader
 
                 if (_currentChunkValid)
                 {
-                    var bufLength = (uint) (count - charsRead);
+                    var bufLength = (uint)(count - charsRead);
+                    if (bufLength < 8192)
+                        bufLength = 8192;
+
                     var getTextBuf = new char[bufLength + 2];
                     var result = _filter.GetText(ref bufLength, getTextBuf);
 
@@ -197,7 +266,7 @@ namespace IFilterTextReader
                             {
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
                                     break;
-                                
+
                                 case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
                                     break;
 
@@ -212,7 +281,7 @@ namespace IFilterTextReader
                                     break;
                             }
 
-                            var read = (int) bufLength;
+                            var read = (int)bufLength;
                             if (read + charsRead > count)
                             {
                                 var charsLeft = (read + charsRead - count);
@@ -235,6 +304,32 @@ namespace IFilterTextReader
             }
 
             return charsRead;
+        }
+        #endregion
+
+        #region Close
+        public override void Close()
+        {
+            Dispose(true);
+        }
+        #endregion
+
+        #region Dispose
+        /// <summary>
+        /// Disposes this object
+        /// </summary>
+        /// <param name="disposing"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
+        protected override void Dispose(bool disposing)
+        {
+            if (_filter != null)
+                Marshal.ReleaseComObject(_filter);
+            
+            FilterLoader.Dispose();
+
+            base.Dispose(true);
+
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

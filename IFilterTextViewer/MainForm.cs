@@ -52,9 +52,14 @@ namespace IFilterTextViewer
                 {
                     using (var reader = new FilterReader(openFileDialog1.FileName))
                     {
-                        var text = reader.ReadToEnd();
-                        File.WriteAllText("d:\\output.txt", text);
-                        FilterTextBox.Text = text;
+                        string line;
+                        var text = string.Empty;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            text += line + Environment.NewLine;
+                        }
+                        File.WriteAllText("d:\\output.txt", text.ToString());
+                        FilterTextBox.Text = text.ToString();
                     }
                 }
                 catch (Exception ex)
