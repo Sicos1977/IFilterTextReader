@@ -24,19 +24,22 @@ namespace IFilterTextViewer
         {
             using (var reader = new FilterReader(fileName))
             {
-                var line = reader.ReadLine();
-                if (string.IsNullOrEmpty(line))
-                    return false;
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrEmpty(line))
+                        return false;
 
-                if (ignoreCase)
-                {
-                    if (line.IndexOf(textToFind, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                        return true;
-                }
-                else
-                {
-                    if (line.IndexOf(textToFind, StringComparison.InvariantCulture) >= 0)
-                        return true;
+                    if (ignoreCase)
+                    {
+                        if (line.IndexOf(textToFind, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                            return true;
+                    }
+                    else
+                    {
+                        if (line.IndexOf(textToFind, StringComparison.InvariantCulture) >= 0)
+                            return true;
+                    }
                 }
             }
 
@@ -62,8 +65,15 @@ namespace IFilterTextViewer
                 if (ignoreCase)
                     line = line.ToUpperInvariant();
 
-                if (textToFind.Any(text => line.Contains(text)))
-                    return true;
+                foreach (var text in textToFind)
+                {
+                    var temp = text;
+                    if (ignoreCase)
+                        temp = text.ToUpperInvariant();
+
+                    if (line.Contains(temp))
+                        return true;
+                }
             }
 
             return false;
@@ -84,12 +94,15 @@ namespace IFilterTextViewer
             var regex = new Regex(regularExpression, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
             using (var reader = new FilterReader(fileName))
             {
-                var line = reader.ReadLine();
-                if (string.IsNullOrEmpty(line))
-                    return false;
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrEmpty(line))
+                        return false;
 
-                if (regex.IsMatch(line))
-                    return true;
+                    if (regex.IsMatch(line))
+                        return true;
+                }
             }
 
             return false;
