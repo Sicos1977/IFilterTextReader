@@ -1,15 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.ServiceModel;
 using System.Text.RegularExpressions;
 using IFilterTextReader;
 
 namespace IFilterTextViewer
 {
+    [ServiceContract]
+    public interface IReader
+    {
+        [OperationContract]
+        bool FileContainsText(string fileName, string textToFind, bool ignoreCase = true);
+        [OperationContract]
+        bool FileContainsText(string fileName, string[] textToFind, bool ignoreCase = true);
+        [OperationContract]
+        bool FileContainsRegexMatch(string fileName, string regularExpression, bool ignoreCase = true);
+        [OperationContract]
+        string[] GetRegexMatchesFromFile(string fileName, string regularExpression, bool ignoreCase = true);
+    }
+
     /// <summary>
     /// This class contains methods to search for text inside a file with the help of a IFilter
     /// </summary>
-    public static class Reader
+    [DataContract]
+    public class Reader : IReader
     {
         #region FileContainsText
         /// <summary>
@@ -20,7 +36,7 @@ namespace IFilterTextViewer
         /// <param name="textToFind">The text to find</param>
         /// <param name="ignoreCase">Set to false to search case sensitive</param>
         /// <returns></returns>
-        public static bool FileContainsText(string fileName, string textToFind, bool ignoreCase = true)
+        public bool FileContainsText(string fileName, string textToFind, bool ignoreCase = true)
         {
             using (var reader = new FilterReader(fileName))
             {
@@ -54,7 +70,7 @@ namespace IFilterTextViewer
         /// <param name="textToFind">The array with one or more text to find</param>
         /// <param name="ignoreCase">Set to false to search case sensitive</param>
         /// <returns></returns>
-        public static bool FileContainsText(string fileName, string[] textToFind, bool ignoreCase = true)
+        public bool FileContainsText(string fileName, string[] textToFind, bool ignoreCase = true)
         {
             using (var reader = new FilterReader(fileName))
             {
@@ -89,7 +105,7 @@ namespace IFilterTextViewer
         /// <param name="regularExpression">The regular expression to use</param>
         /// <param name="ignoreCase">Set to false to search case sensitive</param>
         /// <returns></returns>
-        public static bool FileContainsRegexMatch(string fileName, string regularExpression, bool ignoreCase = true)
+        public bool FileContainsRegexMatch(string fileName, string regularExpression, bool ignoreCase = true)
         {
             var regex = new Regex(regularExpression, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
             using (var reader = new FilterReader(fileName))
@@ -117,7 +133,7 @@ namespace IFilterTextViewer
         /// <param name="regularExpression">The regular expression to use</param>
         /// <param name="ignoreCase">Set to false to search case sensitive</param>
         /// <returns></returns>
-        public static string[] GetRegexMatchesFromFile(string fileName, string regularExpression, bool ignoreCase = true)
+        public string[] GetRegexMatchesFromFile(string fileName, string regularExpression, bool ignoreCase = true)
         {
             var regex = new Regex(regularExpression, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
             var result = new List<string>();
