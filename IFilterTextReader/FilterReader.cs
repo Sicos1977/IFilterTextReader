@@ -8,8 +8,14 @@ using IFilterTextReader.Exceptions;
 namespace IFilterTextReader
 {
     /// <summary>
-    /// This class implements a TextReader that reads from an IFilter 
+    /// This class is a <see cref="TextReader"/> wrapper around an IFilter. This way a file can be processed 
+    /// like if it is a dead normal text file
     /// </summary>
+    /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
+    /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+    /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
+    /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+    /// (e.g. files with a wrong extension)</exception>
     public class FilterReader : TextReader
     {
         #region Fields
@@ -68,7 +74,7 @@ namespace IFilterTextReader
 
         #region ReadLine
         /// <summary>
-        ///  Reads a line of characters from the text reader and returns the data as a string.
+        /// Reads a line of characters from the text reader and returns the data as a string.
         /// </summary>
         /// <returns>The next line from the reader, or null if all characters have been read.</returns>
         public override string ReadLine()
@@ -338,6 +344,7 @@ namespace IFilterTextReader
                         buffer[i] = ' ';
                         break;
 
+                    case 0x000C: // page break char
                     case 0x00A0: // non breaking space
                     case 0x00B6: // pilcro
                     case 0x2028: // line seperator

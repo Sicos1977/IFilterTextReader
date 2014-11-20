@@ -90,16 +90,13 @@ namespace IFilterTextViewer
             //try
             //{
             //    var baseAddress = new Uri("http://localhost:8000/RecognitionService");
-
-            //    using (var serviceHost = new ServiceHost(typeof(Reader), baseAddress))
-            //    {
-            //        serviceHost.AddServiceEndpoint(typeof(IReader), new BasicHttpBinding(), "ReaderService");
-            //        serviceHost.Open();
-            //    }
+            //    var serviceHost = new ServiceHost(typeof (Reader), baseAddress);
+            //    serviceHost.AddServiceEndpoint(typeof(IReader), new BasicHttpBinding(), "ReaderService");
+            //    serviceHost.Open();
             //}
-            //catch (Exception)
+            //catch (Exception exception)
             //{
-            //    throw;
+            //    MessageBox.Show(exception.Message);
             //}
         }
     }

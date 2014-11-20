@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 namespace IFilterTextReader
 {
@@ -31,7 +32,7 @@ namespace IFilterTextReader
         /// instance.
         /// </summary>
         [Flags]
-        internal enum IFILTER_INIT
+        internal enum IFILTER_INIT : uint
         {
             NONE = 0,
 
@@ -90,7 +91,22 @@ namespace IFilterTextReader
             /// <summary>
             /// The content indexing process can return property values set by the filter. 
             /// </summary>
-            FILTER_OWNED_VALUE_OK = 512
+            FILTER_OWNED_VALUE_OK = 512,
+
+            /// <summary>
+            /// Text should be broken in chunks more aggressively than normal. 
+            /// </summary>
+            FILTER_AGGRESSIVE_BREAK	= 1024,
+
+            /// <summary>
+            /// The IFilter should not return chunks from embedded content. 
+            /// </summary>
+	        DISABLE_EMBEDDED = 2048,
+
+            /// <summary>
+            /// The IFilter should emit formatting info.
+            /// </summary>
+	        EMIT_FORMATTING	= 4096
         }
         #endregion
 
@@ -99,7 +115,7 @@ namespace IFilterTextReader
         /// Enumerates the different breaking types that occur between 
         /// chunks of text read out by the FileFilter.
         /// </summary>
-        public enum CHUNK_BREAKTYPE
+        public enum CHUNK_BREAKTYPE : uint
         {
             /// <summary>
             /// No break is placed between the current chunk and the previous chunk. The chunks are glued together. 
@@ -131,7 +147,7 @@ namespace IFilterTextReader
 
         #region Enum CHUNKSTATE
         [Flags]
-        public enum CHUNKSTATE
+        public enum CHUNKSTATE : uint
         {
             /// <summary>
             /// The current chunk is a text-type property.
@@ -358,6 +374,7 @@ namespace IFilterTextReader
             IFilterReturnCode Init(
                 // [in] Flag settings from the IFILTER_INIT enumeration for controlling text standardization, property output, embedding
                 // scope, and IFilter access patterns. 
+                [MarshalAs(UnmanagedType.U4)]
                 IFILTER_INIT grfFlags,
 
                 // [in] The size of the attributes array. When nonzero, cAttributes takes precedence over attributes specified in grfFlags. 

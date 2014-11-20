@@ -48,6 +48,7 @@
             this.FilterTextBox.Location = new System.Drawing.Point(15, 183);
             this.FilterTextBox.Multiline = true;
             this.FilterTextBox.Name = "FilterTextBox";
+            this.FilterTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.FilterTextBox.Size = new System.Drawing.Size(1042, 515);
             this.FilterTextBox.TabIndex = 0;
             // 
