@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.ServiceModel;
 using System.Windows.Forms;
 
 /*
@@ -71,7 +72,7 @@ namespace IFilterTextViewer
 
         private void FindTextButton_Click(object sender, EventArgs e)
         {
-            if (Reader.FileContainsText(FileLabel.Text, TextToFindTextBox.Text))
+            if (new Reader().FileContainsText(FileLabel.Text, TextToFindTextBox.Text))
                 FilterTextBox.Text = "Text '" + TextToFindTextBox.Text + "' found inside the file";
             else
                 FilterTextBox.Text = "Text '" + TextToFindTextBox.Text + "' not found inside the file";
@@ -79,9 +80,27 @@ namespace IFilterTextViewer
 
         private void FindWithRegexButton_Click(object sender, EventArgs e)
         {
-            var matches = Reader.GetRegexMatchesFromFile(FileLabel.Text, TextToFindWithRegexTextBox.Text);
+            var matches = new Reader().GetRegexMatchesFromFile(FileLabel.Text, TextToFindWithRegexTextBox.Text);
             if (matches != null)
                 FilterTextBox.Lines = matches;
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            //try
+            //{
+            //    var baseAddress = new Uri("http://localhost:8000/RecognitionService");
+
+            //    using (var serviceHost = new ServiceHost(typeof(Reader), baseAddress))
+            //    {
+            //        serviceHost.AddServiceEndpoint(typeof(IReader), new BasicHttpBinding(), "ReaderService");
+            //        serviceHost.Open();
+            //    }
+            //}
+            //catch (Exception)
+            //{
+            //    throw;
+            //}
         }
     }
 }

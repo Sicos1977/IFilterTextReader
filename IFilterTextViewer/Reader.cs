@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text.RegularExpressions;
 using IFilterTextReader;
@@ -12,11 +11,17 @@ namespace IFilterTextViewer
     public interface IReader
     {
         [OperationContract]
-        bool FileContainsText(string fileName, string textToFind, bool ignoreCase = true);
+        string GetAllText(string fileName);
+
         [OperationContract]
-        bool FileContainsText(string fileName, string[] textToFind, bool ignoreCase = true);
+        bool FileContainsText(string fileName, string textToFind, bool ignoreCase = true);
+
+        [OperationContract]
+        bool FileContainsTextFromArray(string fileName, string[] textToFind, bool ignoreCase = true);
+
         [OperationContract]
         bool FileContainsRegexMatch(string fileName, string regularExpression, bool ignoreCase = true);
+
         [OperationContract]
         string[] GetRegexMatchesFromFile(string fileName, string regularExpression, bool ignoreCase = true);
     }
@@ -24,9 +29,21 @@ namespace IFilterTextViewer
     /// <summary>
     /// This class contains methods to search for text inside a file with the help of a IFilter
     /// </summary>
-    [DataContract]
     public class Reader : IReader
     {
+        #region GetAllText
+        /// <summary>
+        /// Returns all the text that is inside the <paramref name="fileName"/>
+        /// </summary>
+        /// <param name="fileName">The file to read</param>
+        /// <returns></returns>
+        public string GetAllText(string fileName)
+        {
+            using (var reader = new FilterReader(fileName))
+                return reader.ReadToEnd();
+        }
+        #endregion
+        
         #region FileContainsText
         /// <summary>
         /// Returns true when the <paramref name="textToFind"/> is found in the 
@@ -70,7 +87,7 @@ namespace IFilterTextViewer
         /// <param name="textToFind">The array with one or more text to find</param>
         /// <param name="ignoreCase">Set to false to search case sensitive</param>
         /// <returns></returns>
-        public bool FileContainsText(string fileName, string[] textToFind, bool ignoreCase = true)
+        public bool FileContainsTextFromArray(string fileName, string[] textToFind, bool ignoreCase = true)
         {
             using (var reader = new FilterReader(fileName))
             {
