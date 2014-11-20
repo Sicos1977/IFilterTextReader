@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.ServiceModel;
 using System.Windows.Forms;
 
 /*
@@ -56,11 +54,8 @@ namespace IFilterTextViewer
                         string line;
                         var text = string.Empty;
                         while ((line = reader.ReadLine()) != null)
-                        {
                             text += line + Environment.NewLine;
-                        }
-                        File.WriteAllText("d:\\output.txt", text.ToString());
-                        FilterTextBox.Text = text.ToString();
+                        FilterTextBox.Text = text;
                     }
                 }
                 catch (Exception ex)
@@ -73,9 +68,9 @@ namespace IFilterTextViewer
         private void FindTextButton_Click(object sender, EventArgs e)
         {
             if (new Reader().FileContainsText(FileLabel.Text, TextToFindTextBox.Text))
-                FilterTextBox.Text = "Text '" + TextToFindTextBox.Text + "' found inside the file";
+                MessageBox.Show("Text '" + TextToFindTextBox.Text + "' found inside the file");
             else
-                FilterTextBox.Text = "Text '" + TextToFindTextBox.Text + "' not found inside the file";
+                MessageBox.Show("Text '" + TextToFindTextBox.Text + "' not found inside the file");
         }
 
         private void FindWithRegexButton_Click(object sender, EventArgs e)

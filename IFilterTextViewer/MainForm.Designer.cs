@@ -120,10 +120,9 @@
             // 
             // FileLabel
             // 
-            this.FileLabel.AutoSize = true;
             this.FileLabel.Location = new System.Drawing.Point(182, 21);
             this.FileLabel.Name = "FileLabel";
-            this.FileLabel.Size = new System.Drawing.Size(234, 25);
+            this.FileLabel.Size = new System.Drawing.Size(875, 33);
             this.FileLabel.TabIndex = 9;
             this.FileLabel.Text = "Please select a file first";
             // 

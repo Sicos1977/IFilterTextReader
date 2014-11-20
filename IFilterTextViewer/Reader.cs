@@ -61,7 +61,7 @@ namespace IFilterTextViewer
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (string.IsNullOrEmpty(line))
-                        return false;
+                        continue;
 
                     if (ignoreCase)
                     {
@@ -91,21 +91,24 @@ namespace IFilterTextViewer
         {
             using (var reader = new FilterReader(fileName))
             {
-                var line = reader.ReadLine();
-                if (string.IsNullOrEmpty(line))
-                    return false;
-
-                if (ignoreCase)
-                    line = line.ToUpperInvariant();
-
-                foreach (var text in textToFind)
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    var temp = text;
-                    if (ignoreCase)
-                        temp = text.ToUpperInvariant();
+                    if (string.IsNullOrEmpty(line))
+                        continue;
 
-                    if (line.Contains(temp))
-                        return true;
+                    if (ignoreCase)
+                        line = line.ToUpperInvariant();
+
+                    foreach (var text in textToFind)
+                    {
+                        var temp = text;
+                        if (ignoreCase)
+                            temp = text.ToUpperInvariant();
+
+                        if (line.Contains(temp))
+                            return true;
+                    }
                 }
             }
 
@@ -131,7 +134,7 @@ namespace IFilterTextViewer
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (string.IsNullOrEmpty(line))
-                        return false;
+                        continue;
 
                     if (regex.IsMatch(line))
                         return true;
