@@ -80,20 +80,5 @@ namespace IFilterTextViewer
             if (matches != null)
                 FilterTextBox.Lines = matches;
         }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            //try
-            //{
-            //    var baseAddress = new Uri("http://localhost:8000/RecognitionService");
-            //    var serviceHost = new ServiceHost(typeof (Reader), baseAddress);
-            //    serviceHost.AddServiceEndpoint(typeof(IReader), new BasicHttpBinding(), "ReaderService");
-            //    serviceHost.Open();
-            //}
-            //catch (Exception exception)
-            //{
-            //    MessageBox.Show(exception.Message);
-            //}
-        }
     }
 }
