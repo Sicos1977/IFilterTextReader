@@ -1,35 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Text.RegularExpressions;
 using IFilterTextReader;
 
 namespace IFilterTextViewer
 {
-    [ServiceContract]
-    public interface IReader
-    {
-        [OperationContract]
-        string GetAllText(string fileName);
-
-        [OperationContract]
-        bool FileContainsText(string fileName, string textToFind, bool ignoreCase = true);
-
-        [OperationContract]
-        bool FileContainsTextFromArray(string fileName, string[] textToFind, bool ignoreCase = true);
-
-        [OperationContract]
-        bool FileContainsRegexMatch(string fileName, string regularExpression, bool ignoreCase = true);
-
-        [OperationContract]
-        string[] GetRegexMatchesFromFile(string fileName, string regularExpression, bool ignoreCase = true);
-    }
-
     /// <summary>
     /// This class contains methods to search for text inside a file with the help of a IFilter
     /// </summary>
-    public class Reader : IReader
+    public class Reader
     {
         #region GetAllText
         /// <summary>

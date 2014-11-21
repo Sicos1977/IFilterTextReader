@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 
 namespace IFilterTextReader
 {
@@ -10,10 +9,22 @@ namespace IFilterTextReader
     /// </summary>
     internal static class NativeMethods
     {
-        // DllGetClassObject fuction pointer signature
-        public delegate int DllGetClassObject(ref Guid classId, ref Guid interfaceId, [Out, MarshalAs(UnmanagedType.Interface)] out object ppunk);
-
         // ReSharper disable InconsistentNaming
+        // ReSharper disable UnusedField.Compiler
+        // ReSharper disable UnassignedField.Compiler
+
+        /// <summary>
+        /// DllGetClassObject fuction pointer signature
+        /// </summary>
+        /// <param name="classId"></param>
+        /// <param name="interfaceId"></param>
+        /// <param name="ppunk"></param>
+        /// <returns></returns>
+        public delegate int DllGetClassObject(ref Guid classId, 
+                                              ref Guid interfaceId, 
+                                              [Out, MarshalAs(UnmanagedType.Interface)] 
+                                              out object ppunk);
+
         #region Enum IFILTER_FLAGS
         [Flags]
         internal enum IFILTER_FLAGS
@@ -477,6 +488,9 @@ namespace IFilterTextReader
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern IntPtr LoadLibrary(string lpFileName);
         #endregion
+
+        // ReSharper restore UnassignedField.Compiler
+        // ReSharper restore UnusedField.Compiler
         // ReSharper restore InconsistentNaming
     }
 }

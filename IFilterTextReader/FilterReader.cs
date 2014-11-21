@@ -49,6 +49,9 @@ namespace IFilterTextReader
         /// </summary>
         private readonly string _fileName;
 
+        /// <summary>
+        /// Indicates when true that a carriage return was found on the previous line
+        /// </summary>
         private bool _carriageReturnFound;
         #endregion
 
