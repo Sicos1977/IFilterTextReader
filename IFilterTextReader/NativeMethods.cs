@@ -28,6 +28,9 @@ namespace IFilterTextReader
         // ReSharper disable InconsistentNaming
         // ReSharper disable UnusedField.Compiler
         // ReSharper disable UnassignedField.Compiler
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable FieldCanBeMadeReadOnly.Global
+        // ReSharper disable UnusedMember.Global
 
         /// <summary>
         /// DllGetClassObject fuction pointer signature
@@ -36,7 +39,7 @@ namespace IFilterTextReader
         /// <param name="interfaceId"></param>
         /// <param name="ppunk"></param>
         /// <returns></returns>
-        public delegate int DllGetClassObject(ref Guid classId, 
+        internal delegate int DllGetClassObject(ref Guid classId, 
                                               ref Guid interfaceId, 
                                               [Out, MarshalAs(UnmanagedType.Interface)] 
                                               out object ppunk);
@@ -55,11 +58,10 @@ namespace IFilterTextReader
 
         #region Enum IFILTER_INIT
         /// <summary>
-        /// Flags controlling the operation of the FileFilter
-        /// instance.
+        /// Flags controlling the operation of the <see cref="IFilter"/>
         /// </summary>
         [Flags]
-        internal enum IFILTER_INIT : uint
+        internal enum IFILTER_INIT
         {
             NONE = 0,
 
@@ -139,10 +141,9 @@ namespace IFilterTextReader
 
         #region Enum CHUNK_BREAKTYPE
         /// <summary>
-        /// Enumerates the different breaking types that occur between 
-        /// chunks of text read out by the FileFilter.
+        /// Enumerates the different breaking types that occur between chunks of text read out by the <see cref="IFilter"/>.
         /// </summary>
-        public enum CHUNK_BREAKTYPE : uint
+        internal enum CHUNK_BREAKTYPE
         {
             /// <summary>
             /// No break is placed between the current chunk and the previous chunk. The chunks are glued together. 
@@ -173,8 +174,11 @@ namespace IFilterTextReader
         #endregion
 
         #region Enum CHUNKSTATE
+        /// <summary>
+        /// The state of the chunck that has been read bij the <see cref="IFilter"/>
+        /// </summary>
         [Flags]
-        public enum CHUNKSTATE : uint
+        internal enum CHUNKSTATE
         {
             /// <summary>
             /// The current chunk is a text-type property.
@@ -193,7 +197,141 @@ namespace IFilterTextReader
         }
         #endregion
 
+        #region Enum PROPSPECKIND
+        /// <summary>
+        /// Types of properties returned by the <see cref="IFilter"/>
+        /// </summary>
+        internal enum PROPSPECKIND
+        {
+            /// <summary>
+            /// The property's name is a string
+            /// </summary>
+            PRSPEC_LPWSTR = 0,
+
+            /// <summary>
+            /// The property's name is a well known property id
+            /// </summary>
+            PRSPEC_PROPID = 1
+        }
+        #endregion
+
+        #region Enum PROPID
+        /// <summary>
+        /// Standard property id definitions, from OLE2 documentation.   
+        /// </summary>
+        internal enum PROPID : long
+        {
+            /// <summary>
+            /// The Id is unknown
+            /// </summary>
+            PID_UNKNOWN = -1,
+
+            /// <summary>
+            /// Integer count + array of entries
+            /// </summary>
+            PID_DICTIONARY = 0,
+
+            /// <summary>
+            /// Document Code Page, short integer
+            /// </summary>
+            PID_CODEPAGE = 1,
+
+            /// <summary>
+            /// Document title, string
+            /// </summary>
+            PID_TITLE = 2,
+
+            /// <summary>
+            /// Subject, string
+            /// </summary>
+            PID_SUBJECT = 3,
+
+            /// <summary>
+            /// Author, string
+            /// </summary>
+            PID_AUTHOR = 4,
+
+            /// <summary>
+            /// Keywords, string
+            /// </summary>
+            PID_KEYWORDS = 5,
+
+            /// <summary>
+            /// Comments, string
+            /// </summary>
+            PID_COMMENTS = 6,
+
+            /// <summary>
+            /// Template name, string
+            /// </summary>
+            PID_TEMPLATE = 7,
+
+            /// <summary>
+            /// Last Author, string
+            /// </summary>
+            PID_LASTAUTHOR = 8,
+
+            /// <summary>
+            ///  Revision Number, string
+            /// </summary>
+            PID_REVNUMBER = 9,
+            
+            /// <summary>
+            /// Edit Date Time, DateTime
+            /// </summary>
+            PID_EDITTIME = 10,
+
+            /// <summary>
+            /// Last Printed, DateTime
+            /// </summary>
+            PID_LASTPRINTED = 11,
+
+            /// <summary>
+            /// Create date time, DateTime
+            /// </summary>
+            PID_CREATE_DTM = 12,
+
+            /// <summary>
+            /// Last save date time, DateTime
+            /// </summary>
+            PID_LASTSAVE_DTM = 13,
+
+            /// <summary>
+            /// Page count, integer
+            /// </summary>
+            PID_PAGECOUNT = 14,
+
+            /// <summary>
+            /// Word count, integer
+            /// </summary>
+            PID_WORDCOUNT = 15,
+
+            /// <summary>
+            ///  Character count, integer
+            /// </summary>
+            PID_CHARCOUNT = 16,
+
+            /// <summary>
+            /// Thumbnail, clipboard format + metafile/bitmap (not supported)
+            /// </summary>
+            PID_THUMBNAIL = 17,
+
+            /// <summary>
+            /// App used for creation, string
+            /// </summary>
+            PID_APPNAME = 18,
+
+            /// <summary>
+            /// Security, integer
+            /// </summary>
+            PID_SECURITY = 19
+        }
+        #endregion
+
         #region Enum IFilterReturnCode
+        /// <summary>
+        /// The return codes used by the <see cref="IFilter"/>
+        /// </summary>
         internal enum IFilterReturnCode : uint
         {
             /// <summary>
@@ -257,6 +395,11 @@ namespace IFilterTextReader
             FILTER_E_NO_MORE_TEXT = 0x80041701,
 
             /// <summary>
+            /// The file contains no values
+            /// </summary>
+            FILTER_E_NO_VALUES = 0x80041706,
+
+            /// <summary>
             /// No more property values available in chunk
             /// </summary>
             FILTER_E_NO_MORE_VALUES = 0x80041702,
@@ -294,7 +437,7 @@ namespace IFilterTextReader
         #endregion
 
         #region Struct STAT_CHUNK
-        public struct STAT_CHUNK
+        internal struct STAT_CHUNK
         {
             /// <summary>
             /// The chunk identifier. Chunk identifiers must be unique for the current instance of the IFilter interface. 
@@ -355,16 +498,7 @@ namespace IFilterTextReader
             public int cwcLenSource;
         }
         #endregion
-
-        #region Struct FULLPROPSPEC
-        [StructLayout(LayoutKind.Sequential)]
-        public struct FULLPROPSPEC
-        {
-            public Guid guidPropSet;
-            public PROPSPEC psProperty;
-        }
-        #endregion
-
+       
         #region Struct FILTERREGION
         [StructLayout(LayoutKind.Sequential)]
         internal struct FILTERREGION
@@ -375,24 +509,297 @@ namespace IFilterTextReader
         }
         #endregion
 
-        #region Struct PROPSPEC
-        [StructLayout(LayoutKind.Explicit)]
-        public struct PROPSPEC
+        #region FULLPROPSPEC
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct FULLPROPSPEC
         {
-            // 0 - string used; 1 - PROPID
-            [FieldOffset(0)]
-            public int ulKind;
-            [FieldOffset(4)]
-            public int propid;
-            [FieldOffset(4)]
-            public IntPtr lpwstr;
+            public Guid guidPropSet;
+            public PROPSPEC psProperty;
+        }
+        #endregion
+
+        #region Struct PROPSPEC
+        [StructLayoutAttribute(LayoutKind.Sequential)]
+        internal struct PROPSPEC
+        {
+            [MarshalAs(UnmanagedType.U4)] 
+            public PROPSPECKIND ulKind; // PRSPEC_LPWSTR or PRSPEC_PROPID
+            public IntPtr data;
+        }
+        #endregion
+
+        #region Struct PROPVARIANT
+        /// <summary>
+        /// Represents the OLE struct PROPVARIANT.
+        /// </summary>
+        /// <remarks>
+        /// Must call Clear when finished to avoid memory leaks. If you get the value of
+        /// a VT_UNKNOWN prop, an implicit AddRef is called, thus your reference will
+        /// be active even after the PropVariant struct is cleared.
+        /// </remarks>
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct PROPVARIANT
+        {
+            #region Struct fields
+            // The layout of these elements needs to be maintained.
+            //
+            // NOTE: We could use LayoutKind.Explicit, but we want
+            //       to maintain that the IntPtr may be 8 bytes on
+            //       64-bit architectures, so we'll let the CLR keep
+            //       us aligned.
+            //
+            // NOTE: In order to allow x64 compat, we need to allow for
+            //       expansion of the IntPtr. However, the BLOB struct
+            //       uses a 4-byte int, followed by an IntPtr, so
+            //       although the p field catches most pointer values,
+            //       we need an additional 4-bytes to get the BLOB
+            //       pointer. The p2 field provides this, as well as
+            //       the last 4-bytes of an 8-byte value on 32-bit
+            //       architectures.
+
+            // This is actually a VarEnum value, but the VarEnum type
+            // shifts the layout of the struct by 4 bytes instead of the
+            // expected 2.
+            private ushort vt;
+            private ushort wReserved1;
+            private ushort wReserved2;
+            private ushort wReserved3;
+            private IntPtr p;
+            private int p2;
+            #endregion // struct fields
+
+            #region Union members
+            private sbyte cVal // CHAR cVal;
+            {
+                get { return (sbyte) GetDataBytes()[0]; }
+            }
+
+            private byte bVal // UCHAR bVal;
+            {
+                get { return GetDataBytes()[0]; }
+            }
+
+            private short iVal // SHORT iVal;
+            {
+                get { return BitConverter.ToInt16(GetDataBytes(), 0); }
+            }
+
+            private ushort uiVal // USHORT uiVal;
+            {
+                get { return BitConverter.ToUInt16(GetDataBytes(), 0); }
+            }
+
+            private int lVal // LONG lVal;
+            {
+                get { return BitConverter.ToInt32(GetDataBytes(), 0); }
+            }
+
+            private uint ulVal // ULONG ulVal;
+            {
+                get { return BitConverter.ToUInt32(GetDataBytes(), 0); }
+            }
+
+            private long hVal // LARGE_INTEGER hVal;
+            {
+                get { return BitConverter.ToInt64(GetDataBytes(), 0); }
+            }
+
+            private ulong uhVal // ULARGE_INTEGER uhVal;
+            {
+                get { return BitConverter.ToUInt64(GetDataBytes(), 0); }
+            }
+
+            private float fltVal // FLOAT fltVal;
+            {
+                get { return BitConverter.ToSingle(GetDataBytes(), 0); }
+            }
+
+            private double dblVal // DOUBLE dblVal;
+            {
+                get { return BitConverter.ToDouble(GetDataBytes(), 0); }
+            }
+
+            private bool boolVal // VARIANT_BOOL boolVal;
+            {
+                get { return (iVal != 0); }
+            }
+
+            private int scode // SCODE scode;
+            {
+                get { return lVal; }
+            }
+
+            private decimal cyVal // CY cyVal;
+            {
+                get { return decimal.FromOACurrency(hVal); }
+            }
+
+            private DateTime date // DATE date;
+            {
+                get { return DateTime.FromOADate(dblVal); }
+            }
+            #endregion // union members
+
+            #region Helper methods
+            /// <summary>
+            /// Gets a byte array containing the data bits of the struct.
+            /// </summary>
+            /// <returns>A byte array that is the combined size of the data bits.</returns>
+            private byte[] GetDataBytes()
+            {
+                var ret = new byte[IntPtr.Size + sizeof (int)];
+                switch (IntPtr.Size)
+                {
+                    case 4:
+                        BitConverter.GetBytes(p.ToInt32()).CopyTo(ret, 0);
+                        break;
+                    case 8:
+                        BitConverter.GetBytes(p.ToInt64()).CopyTo(ret, 0);
+                        break;
+                }
+                BitConverter.GetBytes(p2).CopyTo(ret, IntPtr.Size);
+                return ret;
+            }
+
+            /// <summary>
+            /// Called to properly clean up the memory referenced by a PropVariant instance.
+            /// </summary>
+            [DllImport("ole32.dll")]
+            private static extern int PropVariantClear(ref PROPVARIANT pvar);
+
+            /// <summary>
+            /// Called to clear the PropVariant's referenced and local memory.
+            /// </summary>
+            /// <remarks>
+            /// You must call Clear to avoid memory leaks.
+            /// </remarks>
+            public void Clear()
+            {
+                // Can't pass "this" by ref, so make a copy to call PropVariantClear with
+                var var = this;
+                PropVariantClear(ref var);
+
+                // Since we couldn't pass "this" by ref, we need to clear the member fields manually
+                // NOTE: PropVariantClear already freed heap data for us, so we are just setting
+                //       our references to null.
+                vt = (ushort) VarEnum.VT_EMPTY;
+                wReserved1 = wReserved2 = wReserved3 = 0;
+                p = IntPtr.Zero;
+                p2 = 0;
+            }
+
+            /// <summary>
+            /// Gets the variant type.
+            /// </summary>
+            public VarEnum Type
+            {
+                get { return (VarEnum) vt; }
+            }
+
+            /// <summary>
+            /// Gets the variant value.
+            /// </summary>
+            public object Value
+            {
+                get
+                {
+                    // TODO: Add support for reference types (ie. VT_REF | VT_I1)
+                    // TODO: Add support for safe arrays
+
+                    switch ((VarEnum) vt)
+                    {
+                        case VarEnum.VT_I1:
+                            return cVal;
+
+                        case VarEnum.VT_UI1:
+                            return bVal;
+
+                        case VarEnum.VT_I2:
+                            return iVal;
+
+                        case VarEnum.VT_UI2:
+                            return uiVal;
+
+                        case VarEnum.VT_I4:
+                        case VarEnum.VT_INT:
+                            return lVal;
+
+                        case VarEnum.VT_UI4:
+                        case VarEnum.VT_UINT:
+                            return ulVal;
+
+                        case VarEnum.VT_I8:
+                            return hVal;
+
+                        case VarEnum.VT_UI8:
+                            return uhVal;
+
+                        case VarEnum.VT_R4:
+                            return fltVal;
+
+                        case VarEnum.VT_R8:
+                            return dblVal;
+
+                        case VarEnum.VT_BOOL:
+                            return boolVal;
+
+                        case VarEnum.VT_ERROR:
+                            return scode;
+
+                        case VarEnum.VT_CY:
+                            return cyVal;
+
+                        case VarEnum.VT_DATE:
+                            return date;
+
+                        case VarEnum.VT_FILETIME:
+                            return DateTime.FromFileTime(hVal);
+
+                        case VarEnum.VT_BSTR:
+                            return Marshal.PtrToStringBSTR(p);
+
+                        case VarEnum.VT_BLOB:
+                            var blobData = new byte[lVal];
+                            IntPtr pBlobData;
+                            switch (IntPtr.Size)
+                            {
+                                case 4:
+                                    pBlobData = new IntPtr(p2);
+                                    break;
+                                case 8:
+                                    pBlobData = new IntPtr(BitConverter.ToInt64(GetDataBytes(), sizeof (int)));
+                                    break;
+                                default:
+                                    throw new NotSupportedException();
+                            }
+                            Marshal.Copy(pBlobData, blobData, 0, lVal);
+                            return blobData;
+
+                        case VarEnum.VT_LPSTR:
+                            return Marshal.PtrToStringAnsi(p);
+
+                        case VarEnum.VT_LPWSTR:
+                            return Marshal.PtrToStringUni(p);
+
+                        case VarEnum.VT_UNKNOWN:
+                            return Marshal.GetObjectForIUnknown(p);
+
+                        case VarEnum.VT_DISPATCH:
+                            return p;
+
+                        default:
+                            return string.Empty;
+                    }
+                }
+            }
+            #endregion
         }
         #endregion
 
         #region Interface IFilter
         [ComImport, Guid("89BCB740-6119-101A-BCB7-00DD010655AF")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IFilter
+        internal interface IFilter
         {
             /// <summary>
             /// The IFilter::Init method initializes a filtering session.
@@ -443,12 +850,12 @@ namespace IFilterTextReader
             /// which must have a CHUNKSTATE enumeration value of CHUNK_VALUE.
             /// </summary>
             [PreserveSig]
-            int GetValue(
+            IFilterReturnCode GetValue(
                 // Allocate the PROPVARIANT structure with CoTaskMemAlloc. Some PROPVARIANT structures contain pointers, 
                 // which can be freed by calling the PropVariantClear function. It is up to the caller of the GetValue method 
                 // to call the PropVariantClear method.            
-                [MarshalAs(UnmanagedType.Struct)]
-                ref IntPtr PropVal);
+                ref IntPtr pval);
+                //[Out, MarshalAs(UnmanagedType.Struct)] out PROPVARIANT pval);
 
             /// <summary>
             /// The IFilter::BindRegion method retrieves an interface representing the specified portion of the object. 
@@ -461,9 +868,8 @@ namespace IFilterTextReader
         #endregion
 
         #region Interface IClassFactory
-        [ComVisible(false)]
         [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("00000001-0000-0000-C000-000000000046")]
-        public interface IClassFactory
+        internal interface IClassFactory
         {
             void CreateInstance([MarshalAs(UnmanagedType.Interface)] object pUnkOuter, ref Guid refiid, [MarshalAs(UnmanagedType.Interface)] out object ppunk);
             void LockServer(bool fLock);
@@ -472,7 +878,7 @@ namespace IFilterTextReader
 
         #region Interface IPersist
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("0000010c-0000-0000-C000-000000000046")]
-        public interface IPersist
+        internal interface IPersist
         {
             void GetClassID( /* [out] */ out Guid pClassID);
         };
@@ -505,6 +911,9 @@ namespace IFilterTextReader
         public static extern IntPtr LoadLibrary(string lpFileName);
         #endregion
 
+        // ReSharper restore UnusedMember.Global
+        // ReSharper restore FieldCanBeMadeReadOnly.Global
+        // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore UnassignedField.Compiler
         // ReSharper restore UnusedField.Compiler
         // ReSharper restore InconsistentNaming

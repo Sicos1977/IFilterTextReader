@@ -84,6 +84,18 @@ namespace IFilterTextReader
                 throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
         }
         
+        /// <summary>
+        /// Creates an TextReader object for the given <see cref="fileName"/>
+        /// </summary>
+        /// <param name="fileName"></param>
+        public FilterReader(string fileName, bool include)
+        {
+            _fileName = fileName;
+            _filter = FilterLoader.LoadAndInitIFilter(fileName);
+            if (_filter == null)
+                throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+        }
+                
         ~FilterReader()
         {
             Dispose(false);
@@ -182,6 +194,7 @@ namespace IFilterTextReader
             return -1;
         }
 
+
         /// <summary>
         /// Reads a specified maximum number of characters from the current reader and writes the data to a buffer, 
         /// beginning at the specified index
@@ -237,8 +250,8 @@ namespace IFilterTextReader
                 if (!_currentChunkValid)
                 {
                     var result = _filter.GetChunk(out _currentChunk);
-                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK) &&
-                                         ((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
+                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK); //&&
+                                         //((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
 
                     if (result == NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS)
                         _done = true;
@@ -246,78 +259,137 @@ namespace IFilterTextReader
 
                 if (_currentChunkValid)
                 {
-                    var length = (uint) (count - charsRead);
-                    if (length < 8192)
-                        length = 8192;
-
-                    var textBuffer = new char[length + 1];
-                    var result = _filter.GetText(ref length, textBuffer);
-
-                    switch (result)
+                    switch (_currentChunk.flags)
                     {
-                        case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
-                            throw new IFFileIsPasswordProtected("The file '" + _fileName +
-                                                                "' or a file inside this file (e.g. in the case of a ZIP) is password protected");
+                        case NativeMethods.CHUNKSTATE.CHUNK_FILTER_OWNED_VALUE:
+                            break;
 
-                        case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
-                        case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
-                            throw new IFAccesFailure("Unable to acces the IFilter or file");
+                        case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
 
-                        case NativeMethods.IFilterReturnCode.FILTER_E_EMBEDDING_UNAVAILABLE:
-                        case NativeMethods.IFilterReturnCode.FILTER_E_LINK_UNAVAILABLE:
-                            continue;
-
-                        case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
-                            throw new OutOfMemoryException("Not enough memory to proceed reading the file '" + _fileName +
-                                                           "'");
-
-                        case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
-                            throw new IFUnknownFormat("The file '" + _fileName +
-                                                      "' is not in the format the IFilter would expect it to be");
-
-                        case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
-                        case NativeMethods.IFilterReturnCode.S_OK:
-                            // Remove junk from the buffer
-                            CleanUpCharacters(length, textBuffer);
-
-                            switch (_currentChunk.breakType)
+                            var valuePtr = IntPtr.Zero;
+                            var valueResult = _filter.GetValue(ref valuePtr);
+                            switch (valueResult)
                             {
-                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
-                                    break;
+                                case NativeMethods.IFilterReturnCode.S_OK:
+                                case NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES:
+                                    var property =
+                                        (NativeMethods.PROPVARIANT)
+                                            Marshal.PtrToStructure(valuePtr, typeof (NativeMethods.PROPVARIANT));
 
-                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
-                                    break;
-
-                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
-                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
-                                case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                    if (textBuffer[length - 1] != ' ' && textBuffer[length - 1] != '\n')
+                                    if (_currentChunk.attribute.psProperty.ulKind ==
+                                        NativeMethods.PROPSPECKIND.PRSPEC_LPWSTR)
                                     {
-                                        textBuffer[length] = ' ';
-                                        length += 1;
+                                        var propertyString = Marshal.PtrToStringUni(_currentChunk.attribute.psProperty.data);
+                                        File.AppendAllText("d:\\test.txt",
+                                            "PropertyID " + propertyString + ":" + property.Value + Environment.NewLine);
+                                        property.Clear();
                                     }
+                                    else
+                                    {
+                                        var propId = (long) _currentChunk.attribute.psProperty.data;
+                                        if (Enum.IsDefined(typeof(NativeMethods.PROPID), propId))
+                                        {
+                                            var propertyId =
+                                                (NativeMethods.PROPID) ((int) _currentChunk.attribute.psProperty.data);
+                                            File.AppendAllText("d:\\test.txt",
+                                                "PropertyID " + propertyId + ":" + property.Value + Environment.NewLine);
+                                            property.Clear();
+                                        }
+                                        else
+                                        {
+                                            File.AppendAllText("d:\\test.txt",
+                                                "PropertyID " + propId + ":" + property.Value + Environment.NewLine);                                            
+                                        }
+                                    }
+
                                     break;
                             }
 
-                            var read = (int)length;
-                            if (read + charsRead > count)
-                            {
-                                var charsLeft = (read + charsRead - count);
-                                _charsLeftFromLastRead = new char[charsLeft];
-                                Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
-                                read -= charsLeft;
-                            }
-                            else
-                                _charsLeftFromLastRead = null;
+                            if (valueResult == NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_VALUES ||
+                                valueResult == NativeMethods.IFilterReturnCode.FILTER_E_NO_VALUES ||
+                                valueResult == NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES)
+                                _currentChunkValid = false;
+                            
+                            break;
 
-                            Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
-                            charsRead += read;
+                        case NativeMethods.CHUNKSTATE.CHUNK_TEXT:
+
+                            var length = (uint) (count - charsRead);
+                            if (length < 8192)
+                                length = 8192;
+
+                            var textBuffer = new char[length + 1];
+                            var result = _filter.GetText(ref length, textBuffer);
+
+                            switch (result)
+                            {
+                                case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
+                                    throw new IFFileIsPasswordProtected("The file '" + _fileName +
+                                                                        "' or a file inside this file (e.g. in the case of a ZIP) is password protected");
+
+                                case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
+                                case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
+                                    throw new IFAccesFailure("Unable to acces the IFilter or file");
+
+                                case NativeMethods.IFilterReturnCode.FILTER_E_EMBEDDING_UNAVAILABLE:
+                                case NativeMethods.IFilterReturnCode.FILTER_E_LINK_UNAVAILABLE:
+                                    continue;
+
+                                case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
+                                    throw new OutOfMemoryException("Not enough memory to proceed reading the file '" +
+                                                                   _fileName +
+                                                                   "'");
+
+                                case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
+                                    throw new IFUnknownFormat("The file '" + _fileName +
+                                                              "' is not in the format the IFilter would expect it to be");
+
+                                case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
+                                case NativeMethods.IFilterReturnCode.S_OK:
+                                    // Remove junk from the buffer
+                                    CleanUpCharacters(length, textBuffer);
+
+                                    switch (_currentChunk.breakType)
+                                    {
+                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
+                                            break;
+
+                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
+                                            break;
+
+                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
+                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
+                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
+                                            if (textBuffer[length - 1] != ' ' && textBuffer[length - 1] != '\n')
+                                            {
+                                                textBuffer[length] = ' ';
+                                                length += 1;
+                                            }
+                                            break;
+                                    }
+
+                                    var read = (int) length;
+                                    if (read + charsRead > count)
+                                    {
+                                        var charsLeft = (read + charsRead - count);
+                                        _charsLeftFromLastRead = new char[charsLeft];
+                                        Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
+                                        read -= charsLeft;
+                                    }
+                                    else
+                                        _charsLeftFromLastRead = null;
+
+                                    Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
+                                    charsRead += read;
+                                    break;
+                            }
+
+                            if (result == NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT ||
+                                result == NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_TEXT)
+                                _currentChunkValid = false;
+
                             break;
                     }
-
-                    if (result == NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT ||
-                        result == NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_TEXT)
-                        _currentChunkValid = false;
                 }
             }
 
