@@ -50,7 +50,7 @@ namespace IFilterTextViewer
 
                 try
                 {
-                    using (var reader = new FilterReader(openFileDialog1.FileName))
+                    using (var reader = new FilterReader(openFileDialog1.FileName, string.Empty, IncludePropertiesCheckBox.Checked))
                     {
                         string line;
                         var text = string.Empty;

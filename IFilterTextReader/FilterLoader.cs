@@ -27,14 +27,22 @@ namespace IFilterTextReader
     /// FilterLoader finds the dll and ClassID of the COM object responsible for filtering a specific file extension. 
     /// It then loads that dll, creates the appropriate COM object and returns a pointer to an IFilter instance
     /// </summary>
-    internal class FilterLoader
+    internal static class FilterLoader
     {
         #region Private class CacheEntry
+        /// <summary>
+        /// Used to cache the <see cref="NativeMethods.IFilter">IFilter's</see>
+        /// </summary>
         private class CacheEntry
         {
             public string DllName { get; private set; }
             public string ClassName { get; private set; }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="dllName">The name of the <see cref="NativeMethods.IFilter"/> DL</param>
+            /// <param name="className">The name of the <see cref="NativeMethods.IFilter"/> class</param>
             public CacheEntry(string dllName, string className)
             {
                 DllName = dllName;
@@ -53,8 +61,6 @@ namespace IFilterTextReader
         /// The <see cref="ComHelpers"/> object
         /// </summary>
         private readonly static ComHelpers ComHelpers = new ComHelpers();
-
-        private static FileStream _filterStream;
         #endregion
 
         #region ReadFromHKLM
@@ -88,45 +94,23 @@ namespace IFilterTextReader
         }
         #endregion
 
-        #region LoadAndInitFilter
+        #region LoadAndInitIFilter
         /// <summary>
-        /// Returns an  IFilter implementation for a file type or throws an <see cref="IFFilterNotFound"/>
+        /// Returns an IFilter for the given <see cref="stream"/>
         /// when there is no filter available
         /// </summary>
-        /// <param name="ext">The extension of the file</param>
-        /// <returns></returns>
-        private static NativeMethods.IFilter LoadIFilter(string ext)
+        /// <param name="stream">An <see cref="Stream"/></param>
+        /// <param name="extension">The file extension</param>
+        /// <returns><see cref="NativeMethods.IFilter"/> or null when no IFilter DLL is</returns>
+        public static NativeMethods.IFilter LoadAndInitIFilter(Stream stream, string extension)
         {
             string dllName, filterPersistClass;
 
             // Find the dll and ClassID
-            return GetFilterDllAndClass(ext, out dllName, out filterPersistClass)
-                ? LoadFilterFromDll(dllName, filterPersistClass)
-                : null;
-        }
+            GetFilterDllAndClass(extension, out dllName, out filterPersistClass);
+            var iFilter = LoadFilterFromDll(dllName, filterPersistClass);
 
-        /// <summary>
-        /// Returns an IFilter for the given <see cref="fileName"/> or raises an <see cref="IFFilterNotFound"/> 
-        /// when there is no filter available
-        /// </summary>
-        /// <param name="fileName">The filename</param>
-        /// <returns></returns>
-        public static NativeMethods.IFilter LoadAndInitIFilter(string fileName)
-        {
-            return LoadAndInitIFilter(fileName, Path.GetExtension(fileName));
-        }
-
-        /// <summary>
-        /// Returns an IFilter for the given <see cref="fileName"/> or raises an <see cref="IFFilterNotFound"/> 
-        /// when there is no filter available
-        /// </summary>
-        /// <param name="fileName">The filename</param>
-        /// <param name="extension">The file extension</param>
-        /// <returns></returns>
-        internal static NativeMethods.IFilter LoadAndInitIFilter(string fileName, string extension)
-        {
-            var filter = LoadIFilter(extension);
-            if (filter == null)
+            if (iFilter == null)
                 return null;
 
             const NativeMethods.IFILTER_INIT iflags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
@@ -138,21 +122,19 @@ namespace IFilterTextReader
                                                       NativeMethods.IFILTER_INIT.EMIT_FORMATTING;
 
             // ReSharper disable once SuspiciousTypeConversion.Global
-            var iPersistStream = filter as NativeMethods.IPersistStream;
+            var iPersistStream = iFilter as NativeMethods.IPersistStream;
             if (iPersistStream != null)
             {
-                _filterStream = new FileStream(fileName, FileMode.Open);
-                var streamWrapper = new StreamWrapper(_filterStream);
-                iPersistStream.Load(streamWrapper);
+                iPersistStream.Load(new IStreamWrapper(stream));
 
                 NativeMethods.IFILTER_FLAGS flags;
-                if (filter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
-                    return filter;
+                if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                    return iFilter;
             }
 
             // If we failed to retreive an IPersistFile interface or to initialize
             // the filter, we release it and return null.
-            Marshal.ReleaseComObject(filter);
+            Marshal.ReleaseComObject(iFilter);
             return null;
         }
         #endregion
@@ -181,26 +163,27 @@ namespace IFilterTextReader
 
         #region GetFilterDll
         /// <summary>
-        /// Returns the filter dll based on the extension or throws an <see cref="IFFilterNotFound"/> when not found
+        /// Loads the IFilter for the given <paramref name="extension"/>
         /// </summary>
-        /// <param name="extension"></param>
+        /// <param name="extension">The file extension</param>
         /// <param name="dllName"></param>
         /// <param name="filterPersistClass"></param>
-        /// <returns></returns>
-        private static bool GetFilterDllAndClass(string extension, out string dllName, out string filterPersistClass)
+        /// <returns>True when an <see cref="NativeMethods.IFilter"/> dll has been loaded for the given <see cref="extension"/></returns>
+        /// <exception cref="IFFilterNotFound">Raised when no IFilter dll could be found for the given <see cref="extension"/></exception>
+        private static void GetFilterDllAndClass(string extension, out string dllName, out string filterPersistClass)
         {
             // Try to get the filter from the cache
-            if (GetFilterDllAndClassFromCache(extension, out dllName, out filterPersistClass))
-                return (dllName != null && filterPersistClass != null);
-            
+            if (GetFilterDllAndClassFromCache(extension, out dllName, out filterPersistClass)) return;
             var persistentHandlerClass = GetPersistentHandlerClass(extension, true);
-            
+
             if (persistentHandlerClass != null)
-                if (!GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName, out filterPersistClass))
-                    throw new IFFilterNotFound("Could not find an IFilter dll for a file with an '" + extension + "' extension");
+                if (
+                    !GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName,
+                        out filterPersistClass))
+                    throw new IFFilterNotFound("Could not find an IFilter dll for a file with an '" + extension +
+                                               "' extension");
 
             FilterCache.Add(extension.ToUpperInvariant(), new CacheEntry(dllName, filterPersistClass));
-            return (dllName != null && filterPersistClass != null);
         }
 
         /// <summary>
@@ -232,21 +215,21 @@ namespace IFilterTextReader
         /// <summary>
         /// Returns an persistant handler class
         /// </summary>
-        /// <param name="ext"></param>
+        /// <param name="extension">The file extension</param>
         /// <param name="searchContentType"></param>
         /// <returns></returns>
-        private static string GetPersistentHandlerClass(string ext, bool searchContentType)
+        private static string GetPersistentHandlerClass(string extension, bool searchContentType)
         {
             // Try getting the info from the file extension
-            var persistentHandlerClass = GetPersistentHandlerClassFromExtension(ext);
+            var persistentHandlerClass = GetPersistentHandlerClassFromExtension(extension);
 
             // Try getting the info from the document type 
-            if (String.IsNullOrEmpty(persistentHandlerClass))
-                persistentHandlerClass = GetPersistentHandlerClassFromDocumentType(ext);
+            if (string.IsNullOrEmpty(persistentHandlerClass))
+                persistentHandlerClass = GetPersistentHandlerClassFromDocumentType(extension);
 
             //Try getting the info from the Content Type
-            if (searchContentType && String.IsNullOrEmpty(persistentHandlerClass))
-                persistentHandlerClass = GetPersistentHandlerClassFromContentType(ext);
+            if (searchContentType && string.IsNullOrEmpty(persistentHandlerClass))
+                persistentHandlerClass = GetPersistentHandlerClassFromContentType(extension);
 
             return persistentHandlerClass;
         }
@@ -256,17 +239,17 @@ namespace IFilterTextReader
         /// <summary>
         /// Returns an persistant handler class based on the contenttype of the file
         /// </summary>
-        /// <param name="ext"></param>
+        /// <param name="extension"></param>
         /// <returns></returns>
-        private static string GetPersistentHandlerClassFromContentType(string ext)
+        private static string GetPersistentHandlerClassFromContentType(string extension)
         {
-            var contentType = ReadFromHKLM(@"Software\Classes\" + ext, "Content Type");
-            if (String.IsNullOrEmpty(contentType))
+            var contentType = ReadFromHKLM(@"Software\Classes\" + extension, "Content Type");
+            if (string.IsNullOrEmpty(contentType))
                 return null;
 
             var contentTypeExtension = ReadFromHKLM(@"Software\Classes\MIME\Database\Content Type\" + contentType, "Extension");
 
-            return ext.Equals(contentTypeExtension, StringComparison.CurrentCultureIgnoreCase)
+            return extension.Equals(contentTypeExtension, StringComparison.CurrentCultureIgnoreCase)
                 ? null
                 : GetPersistentHandlerClass(contentTypeExtension, false);
         }
@@ -276,21 +259,22 @@ namespace IFilterTextReader
         /// <summary>
         /// Returns an persistant handler class based on the document type
         /// </summary>
-        /// <param name="ext"></param>
+        /// <param name="extension">The file extension</param>
         /// <returns></returns>
-        private static string GetPersistentHandlerClassFromDocumentType(string ext)
+        private static string GetPersistentHandlerClassFromDocumentType(string extension)
         {
             // Get the DocumentType of this file extension
-            var docType = ReadFromHKLM(@"Software\Classes\" + ext);
-            if (String.IsNullOrEmpty(docType))
+            var documentType = ReadFromHKLM(@"Software\Classes\" + extension);
+            if (String.IsNullOrEmpty(documentType))
                 return null;
 
             // Get the Class ID for this document type
-            var docClass = ReadFromHKLM(@"Software\Classes\" + docType + @"\CLSID");
-            return String.IsNullOrEmpty(docType)
+            var docClass = ReadFromHKLM(@"Software\Classes\" + documentType + @"\CLSID");
+           
+            // Now get the PersistentHandler for that Class ID
+            return string.IsNullOrEmpty(documentType)
                 ? null
                 : ReadFromHKLM(@"Software\Classes\CLSID\" + docClass + @"\PersistentHandler");
-                // Now get the PersistentHandler for that Class ID
         }
         #endregion
 
@@ -298,11 +282,11 @@ namespace IFilterTextReader
         /// <summary>
         /// Returns an persistant handler class based on the extension of the file
         /// </summary>
-        /// <param name="ext"></param>
+        /// <param name="extension">The file extension</param>
         /// <returns></returns>
-        private static string GetPersistentHandlerClassFromExtension(string ext)
+        private static string GetPersistentHandlerClassFromExtension(string extension)
         {
-            return ReadFromHKLM(@"Software\Classes\" + ext + @"\PersistentHandler");
+            return ReadFromHKLM(@"Software\Classes\" + extension + @"\PersistentHandler");
         }
         #endregion
 
@@ -310,11 +294,13 @@ namespace IFilterTextReader
         /// <summary>
         /// Checks if the DLL lookup is already in the cache and if so returns the cached entry
         /// </summary>
-        /// <param name="extension"></param>
-        /// <param name="dllName"></param>
-        /// <param name="filterPersistClass"></param>
-        /// <returns></returns>
-        private static bool GetFilterDllAndClassFromCache(string extension, out string dllName, out string filterPersistClass)
+        /// <param name="extension">The file extension</param>
+        /// <param name="dllName">The name of the <see cref="NativeMethods.IFilter"/> DLL</param>
+        /// <param name="filterPersistClass">The class of the <see cref="NativeMethods.IFilter"/> DLL</param>
+        /// <returns>True when the cached entry has been found, otherwise false</returns>
+        private static bool GetFilterDllAndClassFromCache(string extension, 
+                                                          out string dllName, 
+                                                          out string filterPersistClass)
         {
             var ext = extension.ToUpperInvariant();
 
@@ -329,14 +315,6 @@ namespace IFilterTextReader
             dllName = null;
             filterPersistClass = null;
             return false;
-        }
-        #endregion
-
-        #region Dispose
-        public static void Dispose()
-        {
-            if (_filterStream != null)
-                _filterStream.Dispose();
         }
         #endregion
     }

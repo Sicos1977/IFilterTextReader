@@ -24,7 +24,8 @@ namespace IFilterTextReader
     /// <summary>
     /// This class is used as a .NET wrapper around the <see cref="IStream"/> interface
     /// </summary>
-    internal class StreamWrapper : IStream
+    // ReSharper disable once InconsistentNaming
+    internal class IStreamWrapper : IStream
     {
         #region Fields
         private readonly Stream _stream;
@@ -35,7 +36,7 @@ namespace IFilterTextReader
         /// Creates a <see cref="Stream"/> wrapper around an <see cref="IStream"/>
         /// </summary>
         /// <param name="stream"></param>
-        public StreamWrapper(Stream stream)
+        public IStreamWrapper(Stream stream)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream", "Can't wrap null stream.");

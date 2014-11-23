@@ -30,13 +30,14 @@
         {
             this.FilterTextBox = new System.Windows.Forms.TextBox();
             this.SelectButton = new System.Windows.Forms.Button();
-            this.TextToFindTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.FindTextButton = new System.Windows.Forms.Button();
             this.FindWithRegexButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.TextToFindWithRegexTextBox = new System.Windows.Forms.TextBox();
             this.FileLabel = new System.Windows.Forms.Label();
+            this.IncludePropertiesCheckBox = new System.Windows.Forms.CheckBox();
+            this.TextToFindTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // FilterTextBox
@@ -45,11 +46,11 @@
             this.FilterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.FilterTextBox.Location = new System.Drawing.Point(15, 183);
+            this.FilterTextBox.Location = new System.Drawing.Point(15, 220);
             this.FilterTextBox.Multiline = true;
             this.FilterTextBox.Name = "FilterTextBox";
             this.FilterTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.FilterTextBox.Size = new System.Drawing.Size(1042, 515);
+            this.FilterTextBox.Size = new System.Drawing.Size(1042, 594);
             this.FilterTextBox.TabIndex = 0;
             // 
             // SelectButton
@@ -62,18 +63,10 @@
             this.SelectButton.UseVisualStyleBackColor = true;
             this.SelectButton.Click += new System.EventHandler(this.SelectButton_Click);
             // 
-            // TextToFindTextBox
-            // 
-            this.TextToFindTextBox.Enabled = false;
-            this.TextToFindTextBox.Location = new System.Drawing.Point(255, 77);
-            this.TextToFindTextBox.Name = "TextToFindTextBox";
-            this.TextToFindTextBox.Size = new System.Drawing.Size(668, 31);
-            this.TextToFindTextBox.TabIndex = 3;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(124, 80);
+            this.label1.Location = new System.Drawing.Point(123, 123);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(125, 25);
             this.label1.TabIndex = 4;
@@ -82,7 +75,7 @@
             // FindTextButton
             // 
             this.FindTextButton.Enabled = false;
-            this.FindTextButton.Location = new System.Drawing.Point(929, 73);
+            this.FindTextButton.Location = new System.Drawing.Point(928, 116);
             this.FindTextButton.Name = "FindTextButton";
             this.FindTextButton.Size = new System.Drawing.Size(128, 39);
             this.FindTextButton.TabIndex = 5;
@@ -93,7 +86,7 @@
             // FindWithRegexButton
             // 
             this.FindWithRegexButton.Enabled = false;
-            this.FindWithRegexButton.Location = new System.Drawing.Point(929, 121);
+            this.FindWithRegexButton.Location = new System.Drawing.Point(928, 164);
             this.FindWithRegexButton.Name = "FindWithRegexButton";
             this.FindWithRegexButton.Size = new System.Drawing.Size(128, 39);
             this.FindWithRegexButton.TabIndex = 8;
@@ -104,7 +97,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(20, 128);
+            this.label2.Location = new System.Drawing.Point(19, 171);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(229, 25);
             this.label2.TabIndex = 7;
@@ -112,11 +105,13 @@
             // 
             // TextToFindWithRegexTextBox
             // 
+            this.TextToFindWithRegexTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::IFilterTextViewer.Properties.Settings.Default, "TextToFindWithRegex", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.TextToFindWithRegexTextBox.Enabled = false;
-            this.TextToFindWithRegexTextBox.Location = new System.Drawing.Point(255, 122);
+            this.TextToFindWithRegexTextBox.Location = new System.Drawing.Point(254, 165);
             this.TextToFindWithRegexTextBox.Name = "TextToFindWithRegexTextBox";
             this.TextToFindWithRegexTextBox.Size = new System.Drawing.Size(668, 31);
             this.TextToFindWithRegexTextBox.TabIndex = 6;
+            this.TextToFindWithRegexTextBox.Text = global::IFilterTextViewer.Properties.Settings.Default.TextToFindWithRegex;
             // 
             // FileLabel
             // 
@@ -126,11 +121,34 @@
             this.FileLabel.TabIndex = 9;
             this.FileLabel.Text = "Please select a file first";
             // 
+            // IncludePropertiesCheckBox
+            // 
+            this.IncludePropertiesCheckBox.AutoSize = true;
+            this.IncludePropertiesCheckBox.Checked = global::IFilterTextViewer.Properties.Settings.Default.IncludeProperties;
+            this.IncludePropertiesCheckBox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::IFilterTextViewer.Properties.Settings.Default, "IncludeProperties", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.IncludePropertiesCheckBox.Location = new System.Drawing.Point(254, 74);
+            this.IncludePropertiesCheckBox.Name = "IncludePropertiesCheckBox";
+            this.IncludePropertiesCheckBox.Size = new System.Drawing.Size(215, 29);
+            this.IncludePropertiesCheckBox.TabIndex = 10;
+            this.IncludePropertiesCheckBox.Text = "Include properties";
+            this.IncludePropertiesCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // TextToFindTextBox
+            // 
+            this.TextToFindTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::IFilterTextViewer.Properties.Settings.Default, "TextToFind", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.TextToFindTextBox.Enabled = false;
+            this.TextToFindTextBox.Location = new System.Drawing.Point(254, 120);
+            this.TextToFindTextBox.Name = "TextToFindTextBox";
+            this.TextToFindTextBox.Size = new System.Drawing.Size(668, 31);
+            this.TextToFindTextBox.TabIndex = 3;
+            this.TextToFindTextBox.Text = global::IFilterTextViewer.Properties.Settings.Default.TextToFind;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1069, 710);
+            this.ClientSize = new System.Drawing.Size(1069, 835);
+            this.Controls.Add(this.IncludePropertiesCheckBox);
             this.Controls.Add(this.FileLabel);
             this.Controls.Add(this.FindWithRegexButton);
             this.Controls.Add(this.label2);
@@ -144,6 +162,7 @@
             this.Text = "IFilter Text Viewer";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -157,6 +176,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox TextToFindWithRegexTextBox;
         private System.Windows.Forms.Label FileLabel;
+        private System.Windows.Forms.CheckBox IncludePropertiesCheckBox;
     }
 }
 

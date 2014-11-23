@@ -36,6 +36,16 @@ namespace IFilterTextReader
     {
         #region Fields
         /// <summary>
+        /// The file to read with an IFilter
+        /// </summary>
+        private readonly string _fileName;
+
+        /// <summary>
+        /// The <see cref="_fileName"/> as a <see cref="Stream"/>
+        /// </summary>
+        private readonly Stream _fileStream;
+
+        /// <summary>
         /// The IFilter interface
         /// </summary>
         private readonly NativeMethods.IFilter _filter;
@@ -43,17 +53,17 @@ namespace IFilterTextReader
         /// <summary>
         /// Contains the chunk that we are reading from the <see cref="NativeMethods.IFilter"/> interface
         /// </summary>
-        private NativeMethods.STAT_CHUNK _currentChunk;
+        private NativeMethods.STAT_CHUNK _chunk;
 
         /// <summary>
-        /// Indicates that we are done with reading
+        /// Indicates if the <see cref="_chunk"/> is valid
+        /// </summary>
+        private bool _chunkValid;
+        
+        /// <summary>
+        /// Indicates that we are done with reading <see cref="_chunk">chunks</see>
         /// </summary>
         private bool _done;
-
-        /// <summary>
-        /// Indicates if the current chunk is valid
-        /// </summary>
-        private bool _currentChunkValid;
 
         /// <summary>
         /// Holds the chars that are left from the last chunck read
@@ -61,10 +71,10 @@ namespace IFilterTextReader
         private char[] _charsLeftFromLastRead;
 
         /// <summary>
-        /// The file to read with an IFilter
+        /// When set to true all available properties will also be read with the <see cref="NativeMethods.IFilter.GetValue"/> method
         /// </summary>
-        private readonly string _fileName;
-
+        private readonly bool _includeProperties;
+        
         /// <summary>
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
@@ -75,32 +85,60 @@ namespace IFilterTextReader
         /// <summary>
         /// Creates an TextReader object for the given <see cref="fileName"/>
         /// </summary>
-        /// <param name="fileName"></param>
-        public FilterReader(string fileName)
+        /// <param name="fileName">The file to read</param>
+        /// <param name="extension">Overrides the file extension</param>
+        /// <param name="includeProperties">Set to true to also read any available 
+        /// properties (e.g summary properties in a Word document)</param>
+        public FilterReader(string fileName, 
+                            string extension = "", 
+                            bool includeProperties = false)
         {
             _fileName = fileName;
-            _filter = FilterLoader.LoadAndInitIFilter(fileName);
+            _fileStream = File.OpenRead(fileName);
+
+            if (string.IsNullOrWhiteSpace(extension))
+                extension = Path.GetExtension(fileName);
+
+            _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension);
+
             if (_filter == null)
-                throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+            {
+                if (string.IsNullOrWhiteSpace(extension))
+                    throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+
+                throw new IFFilterNotFound("There is no IFilter installed for the extension '" + extension + "'");
+            }
+
+            _includeProperties = includeProperties;
         }
-        
+
         /// <summary>
-        /// Creates an TextReader object for the given <see cref="fileName"/>
+        /// Creates an TextReader object for the given <see cref="Stream"/>
         /// </summary>
-        /// <param name="fileName"></param>
-        public FilterReader(string fileName, bool include)
+        /// <param name="stream">The file stream to read</param>
+        /// <param name="extension">The extension for the <see cref="stream"/></param>
+        /// <param name="includeProperties">Set to true to also read any available 
+        /// properties (e.g summary properties in a Word document)</param>
+        /// <exception cref="ArgumentException">Raised when the <see cref="extension"/> argument is null or empty</exception>
+        public FilterReader(Stream stream,
+                            string extension,
+                            bool includeProperties = false)
         {
-            _fileName = fileName;
-            _filter = FilterLoader.LoadAndInitIFilter(fileName);
+            if (string.IsNullOrWhiteSpace(extension))
+                throw new ArgumentException("The extension cannot be empty", "extension");
+
+            _filter = FilterLoader.LoadAndInitIFilter(stream, extension);
+
             if (_filter == null)
-                throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+                throw new IFFilterNotFound("There is no IFilter installed for the stream with the extension '" + extension + "'");
+
+            _includeProperties = includeProperties;
         }
-                
+
         ~FilterReader()
         {
             Dispose(false);
         }
-
         #endregion
 
         #region ReadLine
@@ -110,7 +148,7 @@ namespace IFilterTextReader
         /// <returns>The next line from the reader, or null if all characters have been read.</returns>
         public override string ReadLine()
         {
-            var buffer = new char[1024];
+            var buffer = new char[2048];
             var stringBuilder = new StringBuilder();
             var done = false;
 
@@ -194,7 +232,6 @@ namespace IFilterTextReader
             return -1;
         }
 
-
         /// <summary>
         /// Reads a specified maximum number of characters from the current reader and writes the data to a buffer, 
         /// beginning at the specified index
@@ -247,149 +284,132 @@ namespace IFilterTextReader
                     continue;
                 }
 
-                if (!_currentChunkValid)
+                // If we don't have a valid chunck anymore then read a new chunck
+                if (!_chunkValid)
                 {
-                    var result = _filter.GetChunk(out _currentChunk);
-                    _currentChunkValid = (result == NativeMethods.IFilterReturnCode.S_OK); //&&
-                                         //((_currentChunk.flags & NativeMethods.CHUNKSTATE.CHUNK_TEXT) != 0);
-
+                    var result = _filter.GetChunk(out _chunk);
+                    _chunkValid = result == NativeMethods.IFilterReturnCode.S_OK;
                     if (result == NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS)
                         _done = true;
+
+                    // If the read chunk isn't valid then continue
+                    if (!_chunkValid) continue;
                 }
 
-                if (_currentChunkValid)
+                var textLength = (uint)(count - charsRead);
+                if (textLength < 8192)
+                    textLength = 8192;
+
+                var textBuffer = new char[textLength + 1];
+                var textRead = false;
+
+                switch (_chunk.flags)
                 {
-                    switch (_currentChunk.flags)
+                    case NativeMethods.CHUNKSTATE.CHUNK_FILTER_OWNED_VALUE:
+                        // No support for filter owned values so this chunk is always invalid
+                        _chunkValid = false;
+                        continue;
+
+                    case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
+
+                        if (!_includeProperties)
+                        {
+                            _chunkValid = false;
+                            continue;
+                        }
+
+                        var valuePtr = IntPtr.Zero;
+                        var valueResult = _filter.GetValue(ref valuePtr);
+                        CheckResult(valueResult);
+
+                        switch (valueResult)
+                        {
+                            case NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_VALUES:
+                            case NativeMethods.IFilterReturnCode.FILTER_E_NO_VALUES:
+                                _chunkValid = false;
+                                break;
+
+                            case NativeMethods.IFilterReturnCode.S_OK:
+                            case NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES:
+                                var temp = GetPropertyNameAndValue(valuePtr);
+                                if (!string.IsNullOrEmpty(temp))
+                                {
+                                    textBuffer = temp.ToCharArray();
+                                    textLength = (uint) textBuffer.Length;
+                                    textRead = true;
+                                }
+    
+                                _chunkValid = false;
+                                break;
+                        }
+
+                        break;
+
+                    case NativeMethods.CHUNKSTATE.CHUNK_TEXT:
+
+                        var textResult = _filter.GetText(ref textLength, textBuffer);
+                        CheckResult(textResult);
+
+                        switch (textResult)
+                        {
+                            case NativeMethods.IFilterReturnCode.FILTER_E_EMBEDDING_UNAVAILABLE:
+                            case NativeMethods.IFilterReturnCode.FILTER_E_LINK_UNAVAILABLE:
+                            case NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_TEXT:
+                                _chunkValid = false;
+                                break;
+
+                            case NativeMethods.IFilterReturnCode.S_OK:
+                            case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
+
+                                textRead = true;
+                                // Remove junk from the buffer
+                                CleanUpCharacters(textLength, textBuffer);
+
+                                // Check the break type
+                                switch (_chunk.breakType)
+                                {
+                                    case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
+                                        break;
+
+                                    case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
+                                        break;
+
+                                    case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
+                                    case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
+                                    case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
+                                        if (textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
+                                        {
+                                            textBuffer[textLength] = ' ';
+                                            textLength += 1;
+                                        }
+                                        break;
+                                }
+
+                                if (textResult == NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT)
+                                    _chunkValid = false;
+
+                                break;
+                        }
+
+                        break;
+                }
+
+                if (textRead)
+                {
+
+                    var read = (int)textLength;
+                    if (read + charsRead > count)
                     {
-                        case NativeMethods.CHUNKSTATE.CHUNK_FILTER_OWNED_VALUE:
-                            break;
-
-                        case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
-
-                            var valuePtr = IntPtr.Zero;
-                            var valueResult = _filter.GetValue(ref valuePtr);
-                            switch (valueResult)
-                            {
-                                case NativeMethods.IFilterReturnCode.S_OK:
-                                case NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES:
-                                    var property =
-                                        (NativeMethods.PROPVARIANT)
-                                            Marshal.PtrToStructure(valuePtr, typeof (NativeMethods.PROPVARIANT));
-
-                                    if (_currentChunk.attribute.psProperty.ulKind ==
-                                        NativeMethods.PROPSPECKIND.PRSPEC_LPWSTR)
-                                    {
-                                        var propertyString = Marshal.PtrToStringUni(_currentChunk.attribute.psProperty.data);
-                                        File.AppendAllText("d:\\test.txt",
-                                            "PropertyID " + propertyString + ":" + property.Value + Environment.NewLine);
-                                        property.Clear();
-                                    }
-                                    else
-                                    {
-                                        var propId = (long) _currentChunk.attribute.psProperty.data;
-                                        if (Enum.IsDefined(typeof(NativeMethods.PROPID), propId))
-                                        {
-                                            var propertyId =
-                                                (NativeMethods.PROPID) ((int) _currentChunk.attribute.psProperty.data);
-                                            File.AppendAllText("d:\\test.txt",
-                                                "PropertyID " + propertyId + ":" + property.Value + Environment.NewLine);
-                                            property.Clear();
-                                        }
-                                        else
-                                        {
-                                            File.AppendAllText("d:\\test.txt",
-                                                "PropertyID " + propId + ":" + property.Value + Environment.NewLine);                                            
-                                        }
-                                    }
-
-                                    break;
-                            }
-
-                            if (valueResult == NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_VALUES ||
-                                valueResult == NativeMethods.IFilterReturnCode.FILTER_E_NO_VALUES ||
-                                valueResult == NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES)
-                                _currentChunkValid = false;
-                            
-                            break;
-
-                        case NativeMethods.CHUNKSTATE.CHUNK_TEXT:
-
-                            var length = (uint) (count - charsRead);
-                            if (length < 8192)
-                                length = 8192;
-
-                            var textBuffer = new char[length + 1];
-                            var result = _filter.GetText(ref length, textBuffer);
-
-                            switch (result)
-                            {
-                                case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
-                                    throw new IFFileIsPasswordProtected("The file '" + _fileName +
-                                                                        "' or a file inside this file (e.g. in the case of a ZIP) is password protected");
-
-                                case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
-                                case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
-                                    throw new IFAccesFailure("Unable to acces the IFilter or file");
-
-                                case NativeMethods.IFilterReturnCode.FILTER_E_EMBEDDING_UNAVAILABLE:
-                                case NativeMethods.IFilterReturnCode.FILTER_E_LINK_UNAVAILABLE:
-                                    continue;
-
-                                case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
-                                    throw new OutOfMemoryException("Not enough memory to proceed reading the file '" +
-                                                                   _fileName +
-                                                                   "'");
-
-                                case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
-                                    throw new IFUnknownFormat("The file '" + _fileName +
-                                                              "' is not in the format the IFilter would expect it to be");
-
-                                case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
-                                case NativeMethods.IFilterReturnCode.S_OK:
-                                    // Remove junk from the buffer
-                                    CleanUpCharacters(length, textBuffer);
-
-                                    switch (_currentChunk.breakType)
-                                    {
-                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
-                                            break;
-
-                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
-                                            break;
-
-                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
-                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
-                                        case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                            if (textBuffer[length - 1] != ' ' && textBuffer[length - 1] != '\n')
-                                            {
-                                                textBuffer[length] = ' ';
-                                                length += 1;
-                                            }
-                                            break;
-                                    }
-
-                                    var read = (int) length;
-                                    if (read + charsRead > count)
-                                    {
-                                        var charsLeft = (read + charsRead - count);
-                                        _charsLeftFromLastRead = new char[charsLeft];
-                                        Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
-                                        read -= charsLeft;
-                                    }
-                                    else
-                                        _charsLeftFromLastRead = null;
-
-                                    Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
-                                    charsRead += read;
-                                    break;
-                            }
-
-                            if (result == NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT ||
-                                result == NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_TEXT)
-                                _currentChunkValid = false;
-
-                            break;
+                        var charsLeft = (read + charsRead - count);
+                        _charsLeftFromLastRead = new char[charsLeft];
+                        Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
+                        read -= charsLeft;
                     }
+                    else
+                        _charsLeftFromLastRead = null;
+
+                    Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
+                    charsRead += read;
                 }
             }
 
@@ -397,6 +417,83 @@ namespace IFilterTextReader
         }
         #endregion
 
+        #region CheckResult
+        /// <summary>
+        /// Validates the <paramref name="result"/> return by the <see cref="NativeMethods.IFilter.GetText"/>
+        /// or <see cref="NativeMethods.IFilter.GetValue"/> method
+        /// </summary>
+        /// <param name="result">The <see cref="NativeMethods.IFilterReturnCode"/></param>
+        private void CheckResult(NativeMethods.IFilterReturnCode result)
+        {
+            switch (result)
+            {
+                case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
+                    throw new IFFileIsPasswordProtected("The file '" + _fileName +
+                                                        "' or a file inside this file (e.g. in the case of a ZIP) is password protected");
+
+                case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
+                case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
+                    throw new IFAccesFailure("Unable to acces the IFilter or file");
+
+                case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
+                    throw new OutOfMemoryException("Not enough memory to proceed reading the file '" +
+                                                   _fileName +
+                                                   "'");
+
+                case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
+                    throw new IFUnknownFormat("The file '" + _fileName +
+                                              "' is not in the format the IFilter would expect it to be");
+            }
+        }
+        #endregion
+
+        #region GetPropertyNameAndValue
+        /// <summary>
+        /// This method will handle the <see cref="IntPtr">pointer</see> that has been returned by the
+        /// <see cref="NativeMethods.IFilter.GetValue"/> method. It tries to return a string with the name 
+        /// of the property and it's value (e.g. Titel : this is a title)
+        /// </summary>
+        /// <param name="valuePtr">The <see cref="IntPtr"/></param>
+        /// <returns>Name and value of the property or null when the property is empty</returns>
+        private string GetPropertyNameAndValue(IntPtr valuePtr)
+        {
+            var propertyVariant = (NativeMethods.PROPVARIANT)
+                Marshal.PtrToStructure(valuePtr, typeof(NativeMethods.PROPVARIANT));
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(propertyVariant.Value.ToString()))
+                    return null;
+
+                if (_chunk.attribute.psProperty.ulKind == NativeMethods.PROPSPECKIND.PRSPEC_LPWSTR)
+                {
+                    var propertyNameString = Marshal.PtrToStringUni(_chunk.attribute.psProperty.data);
+                    return propertyNameString + " : " + propertyVariant.Value + "\n";
+                }
+                else
+                {
+                    var propertyKey = new NativeMethods.PROPERTYKEY
+                    {
+                        fmtid = new Guid(_chunk.attribute.guidPropSet.ToString()),
+                        pid = (long) _chunk.attribute.psProperty.data
+                    };
+
+                    string propertyName;
+                    var result = NativeMethods.PSGetNameFromPropertyKey(ref propertyKey, out propertyName);
+                    if (result == 0)
+                        return propertyName + " : " + propertyVariant.Value + "\n";
+                    else
+                        return _chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data + " : " +
+                               propertyVariant.Value + "\n";
+                }
+            }
+            finally
+            {
+                propertyVariant.Clear();
+            }
+        }
+        #endregion
+        
         #region CleanUpCharacters
         /// <summary>
         /// Remove junk from the <paramref name="buffer"/>
@@ -842,9 +939,10 @@ namespace IFilterTextReader
         {
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
-            
-            FilterLoader.Dispose();
 
+            if (_fileStream != null)
+                _fileStream.Dispose(); 
+            
             base.Dispose(true);
 
             GC.SuppressFinalize(this);

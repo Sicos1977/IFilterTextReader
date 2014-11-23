@@ -138,196 +138,7 @@ namespace IFilterTextReader
 	        EMIT_FORMATTING	= 4096
         }
         #endregion
-
-        #region Enum CHUNK_BREAKTYPE
-        /// <summary>
-        /// Enumerates the different breaking types that occur between chunks of text read out by the <see cref="IFilter"/>.
-        /// </summary>
-        internal enum CHUNK_BREAKTYPE
-        {
-            /// <summary>
-            /// No break is placed between the current chunk and the previous chunk. The chunks are glued together. 
-            /// </summary>
-            CHUNK_NO_BREAK = 0,
-
-            /// <summary>
-            /// A word break is placed between this chunk and the previous chunk that had the same attribute. 
-            /// Use of CHUNK_EOW should be minimized because the choice of word breaks is language-dependent, 
-            /// so determining word breaks is best left to the search engine. /// </summary>
-            CHUNK_EOW = 1,
-
-            /// <summary>
-            /// A sentence break is placed between this chunk and the previous chunk that had the same attribute. 
-            /// </summary>
-            CHUNK_EOS = 2,
-
-            /// <summary>
-            /// A paragraph break is placed between this chunk and the previous chunk that had the same attribute.
-            /// </summary>     
-            CHUNK_EOP = 3,
-
-            /// <summary>
-            /// A chapter break is placed between this chunk and the previous chunk that had the same attribute. 
-            /// </summary>
-            CHUNK_EOC = 4
-        }
-        #endregion
-
-        #region Enum CHUNKSTATE
-        /// <summary>
-        /// The state of the chunck that has been read bij the <see cref="IFilter"/>
-        /// </summary>
-        [Flags]
-        internal enum CHUNKSTATE
-        {
-            /// <summary>
-            /// The current chunk is a text-type property.
-            /// </summary>
-            CHUNK_TEXT = 0x1,
-
-            /// <summary>
-            /// The current chunk is a value-type property. 
-            /// </summary>
-            CHUNK_VALUE = 0x2,
-
-            /// <summary>
-            /// Reserved
-            /// </summary>
-            CHUNK_FILTER_OWNED_VALUE = 0x4
-        }
-        #endregion
-
-        #region Enum PROPSPECKIND
-        /// <summary>
-        /// Types of properties returned by the <see cref="IFilter"/>
-        /// </summary>
-        internal enum PROPSPECKIND
-        {
-            /// <summary>
-            /// The property's name is a string
-            /// </summary>
-            PRSPEC_LPWSTR = 0,
-
-            /// <summary>
-            /// The property's name is a well known property id
-            /// </summary>
-            PRSPEC_PROPID = 1
-        }
-        #endregion
-
-        #region Enum PROPID
-        /// <summary>
-        /// Standard property id definitions, from OLE2 documentation.   
-        /// </summary>
-        internal enum PROPID : long
-        {
-            /// <summary>
-            /// The Id is unknown
-            /// </summary>
-            PID_UNKNOWN = -1,
-
-            /// <summary>
-            /// Integer count + array of entries
-            /// </summary>
-            PID_DICTIONARY = 0,
-
-            /// <summary>
-            /// Document Code Page, short integer
-            /// </summary>
-            PID_CODEPAGE = 1,
-
-            /// <summary>
-            /// Document title, string
-            /// </summary>
-            PID_TITLE = 2,
-
-            /// <summary>
-            /// Subject, string
-            /// </summary>
-            PID_SUBJECT = 3,
-
-            /// <summary>
-            /// Author, string
-            /// </summary>
-            PID_AUTHOR = 4,
-
-            /// <summary>
-            /// Keywords, string
-            /// </summary>
-            PID_KEYWORDS = 5,
-
-            /// <summary>
-            /// Comments, string
-            /// </summary>
-            PID_COMMENTS = 6,
-
-            /// <summary>
-            /// Template name, string
-            /// </summary>
-            PID_TEMPLATE = 7,
-
-            /// <summary>
-            /// Last Author, string
-            /// </summary>
-            PID_LASTAUTHOR = 8,
-
-            /// <summary>
-            ///  Revision Number, string
-            /// </summary>
-            PID_REVNUMBER = 9,
-            
-            /// <summary>
-            /// Edit Date Time, DateTime
-            /// </summary>
-            PID_EDITTIME = 10,
-
-            /// <summary>
-            /// Last Printed, DateTime
-            /// </summary>
-            PID_LASTPRINTED = 11,
-
-            /// <summary>
-            /// Create date time, DateTime
-            /// </summary>
-            PID_CREATE_DTM = 12,
-
-            /// <summary>
-            /// Last save date time, DateTime
-            /// </summary>
-            PID_LASTSAVE_DTM = 13,
-
-            /// <summary>
-            /// Page count, integer
-            /// </summary>
-            PID_PAGECOUNT = 14,
-
-            /// <summary>
-            /// Word count, integer
-            /// </summary>
-            PID_WORDCOUNT = 15,
-
-            /// <summary>
-            ///  Character count, integer
-            /// </summary>
-            PID_CHARCOUNT = 16,
-
-            /// <summary>
-            /// Thumbnail, clipboard format + metafile/bitmap (not supported)
-            /// </summary>
-            PID_THUMBNAIL = 17,
-
-            /// <summary>
-            /// App used for creation, string
-            /// </summary>
-            PID_APPNAME = 18,
-
-            /// <summary>
-            /// Security, integer
-            /// </summary>
-            PID_SECURITY = 19
-        }
-        #endregion
-
+        
         #region Enum IFilterReturnCode
         /// <summary>
         /// The return codes used by the <see cref="IFilter"/>
@@ -436,6 +247,82 @@ namespace IFilterTextReader
         }
         #endregion
 
+        #region Enum CHUNK_BREAKTYPE
+        /// <summary>
+        /// Enumerates the different breaking types that occur between chunks of text read out by the <see cref="IFilter"/>.
+        /// </summary>
+        internal enum CHUNK_BREAKTYPE
+        {
+            /// <summary>
+            /// No break is placed between the current chunk and the previous chunk. The chunks are glued together. 
+            /// </summary>
+            CHUNK_NO_BREAK = 0,
+
+            /// <summary>
+            /// A word break is placed between this chunk and the previous chunk that had the same attribute. 
+            /// Use of CHUNK_EOW should be minimized because the choice of word breaks is language-dependent, 
+            /// so determining word breaks is best left to the search engine. /// </summary>
+            CHUNK_EOW = 1,
+
+            /// <summary>
+            /// A sentence break is placed between this chunk and the previous chunk that had the same attribute. 
+            /// </summary>
+            CHUNK_EOS = 2,
+
+            /// <summary>
+            /// A paragraph break is placed between this chunk and the previous chunk that had the same attribute.
+            /// </summary>     
+            CHUNK_EOP = 3,
+
+            /// <summary>
+            /// A chapter break is placed between this chunk and the previous chunk that had the same attribute. 
+            /// </summary>
+            CHUNK_EOC = 4
+        }
+        #endregion
+
+        #region Enum CHUNKSTATE
+        /// <summary>
+        /// The state of the chunck that has been read bij the <see cref="IFilter"/>
+        /// </summary>
+        [Flags]
+        internal enum CHUNKSTATE
+        {
+            /// <summary>
+            /// The current chunk is a text-type property.
+            /// </summary>
+            CHUNK_TEXT = 0x1,
+
+            /// <summary>
+            /// The current chunk is a value-type property. 
+            /// </summary>
+            CHUNK_VALUE = 0x2,
+
+            /// <summary>
+            /// Reserved
+            /// </summary>
+            CHUNK_FILTER_OWNED_VALUE = 0x4
+        }
+        #endregion
+
+        #region Enum PROPSPECKIND
+        /// <summary>
+        /// Types of properties returned by the <see cref="IFilter"/>
+        /// </summary>
+        internal enum PROPSPECKIND
+        {
+            /// <summary>
+            /// The property's name is a string
+            /// </summary>
+            PRSPEC_LPWSTR = 0,
+
+            /// <summary>
+            /// The property's name is a well known property id
+            /// </summary>
+            PRSPEC_PROPID = 1
+        }
+        #endregion
+        
         #region Struct STAT_CHUNK
         internal struct STAT_CHUNK
         {
@@ -509,7 +396,7 @@ namespace IFilterTextReader
         }
         #endregion
 
-        #region FULLPROPSPEC
+        #region Struct FULLPROPSPEC
         [StructLayout(LayoutKind.Sequential)]
         internal struct FULLPROPSPEC
         {
@@ -796,6 +683,15 @@ namespace IFilterTextReader
         }
         #endregion
 
+        #region Struct PROPERTYKEY
+        [StructLayout(LayoutKind.Sequential, Pack = 4)]
+        internal struct PROPERTYKEY
+        {
+            public Guid fmtid;
+            public long pid;
+        }
+        #endregion
+
         #region Interface IFilter
         [ComImport, Guid("89BCB740-6119-101A-BCB7-00DD010655AF")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -884,7 +780,7 @@ namespace IFilterTextReader
         };
 
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("00000109-0000-0000-C000-000000000046")]
-        public interface IPersistStream : IPersist
+        internal interface IPersistStream : IPersist
         {
             new void GetClassID(out Guid pClassID);
 
@@ -901,14 +797,19 @@ namespace IFilterTextReader
             System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"), 
             DllImport("kernel32.dll", CharSet = CharSet.Ansi)
         ]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+        internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FreeLibrary([In] IntPtr hModule);
+        internal static extern bool FreeLibrary([In] IntPtr hModule);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        public static extern IntPtr LoadLibrary(string lpFileName);
+        internal static extern IntPtr LoadLibrary(string lpFileName);
+
+        [DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern uint PSGetNameFromPropertyKey(
+            ref PROPERTYKEY propkey,
+            [Out, MarshalAs(UnmanagedType.LPWStr)] out string ppszCanonicalName);
         #endregion
 
         // ReSharper restore UnusedMember.Global
