@@ -34,6 +34,15 @@ namespace IFilterTextReader
     /// (e.g. files with a wrong extension)</exception>
     public class FilterReader : TextReader
     {
+        #region Delegate
+        /// <summary>
+        /// Raised when an unmapped property has been retrieved with the <see cref="NativeMethods.IFilter.GetValue"/> method
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"><see cref="UnmappedPropertyEventArgs"/></param>
+        public delegate void UnmappedPropertyEventHandler(Object sender, UnmappedPropertyEventArgs e);
+        #endregion
+
         #region Fields
         /// <summary>
         /// The file to read with an IFilter

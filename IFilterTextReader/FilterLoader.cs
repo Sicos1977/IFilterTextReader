@@ -117,6 +117,7 @@ namespace IFilterTextReader
                                                       NativeMethods.IFILTER_INIT.CANON_PARAGRAPHS |
                                                       NativeMethods.IFILTER_INIT.CANON_SPACES |
                                                       NativeMethods.IFILTER_INIT.APPLY_INDEX_ATTRIBUTES |
+                                                      NativeMethods.IFILTER_INIT.APPLY_CRAWL_ATTRIBUTES |
                                                       NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
                                                       NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK |
                                                       NativeMethods.IFILTER_INIT.EMIT_FORMATTING;
