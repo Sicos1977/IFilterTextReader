@@ -13,12 +13,12 @@ namespace IFilterTextReader
         public Guid PropertySetGuid { get; private set; }
 
         /// <summary>
-        /// The id of the property
+        /// The name/id of the property
         /// </summary>
         public string PropertyName { get; private set; }
 
         /// <summary>
-        /// The canonical name for the property, null when not found
+        /// The canonical name for the property when found in the system, null when not found
         /// </summary>
         public string CanonicalName { get; private set; }
 
@@ -32,7 +32,7 @@ namespace IFilterTextReader
         /// Creates this objects and sets its properties
         /// </summary>
         /// <param name="propertySetGuid">The <see cref="Guid"/> to which property set the unmapped property belongs</param>
-        /// <param name="propertyName">The name of the property</param>
+        /// <param name="propertyName">The name/id of the property</param>
         /// <param name="canonicalName">The canonical name for the property, null when not found</param>
         /// <param name="value"></param>
         internal UnmappedPropertyEventArgs(Guid propertySetGuid,
