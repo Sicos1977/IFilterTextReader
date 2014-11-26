@@ -322,7 +322,20 @@ namespace IFilterTextReader
             PRSPEC_PROPID = 1
         }
         #endregion
-        
+
+        #region JobObjectInfoType
+        internal enum JobObjectInfoType
+        {
+            AssociateCompletionPortInformation = 7,
+            BasicLimitInformation = 2,
+            BasicUIRestrictions = 4,
+            EndOfJobTimeInformation = 6,
+            ExtendedLimitInformation = 9,
+            SecurityLimitInformation = 5,
+            GroupInformation = 11
+        }
+        #endregion
+
         #region Struct STAT_CHUNK
         internal struct STAT_CHUNK
         {
@@ -692,6 +705,58 @@ namespace IFilterTextReader
         }
         #endregion
 
+        #region IO_COUNTERS
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct IO_COUNTERS
+        {
+            public UInt64 ReadOperationCount;
+            public UInt64 WriteOperationCount;
+            public UInt64 OtherOperationCount;
+            public UInt64 ReadTransferCount;
+            public UInt64 WriteTransferCount;
+            public UInt64 OtherTransferCount;
+        }
+        #endregion
+
+        #region JOBOBJECT_BASIC_LIMIT_INFORMATION
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct JOBOBJECT_BASIC_LIMIT_INFORMATION
+        {
+            public Int64 PerProcessUserTimeLimit;
+            public Int64 PerJobUserTimeLimit;
+            public UInt32 LimitFlags;
+            public UIntPtr MinimumWorkingSetSize;
+            public UIntPtr MaximumWorkingSetSize;
+            public UInt32 ActiveProcessLimit;
+            public UIntPtr Affinity;
+            public UInt32 PriorityClass;
+            public UInt32 SchedulingClass;
+        }
+        #endregion
+
+        #region Struct SECURITY_ATTRIBUTES
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct SECURITY_ATTRIBUTES
+        {
+            public UInt32 nLength;
+            public IntPtr lpSecurityDescriptor;
+            public Int32 bInheritHandle;
+        }
+        #endregion
+
+        #region Struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+        {
+            public JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
+            public IO_COUNTERS IoInfo;
+            public UIntPtr ProcessMemoryLimit;
+            public UIntPtr JobMemoryLimit;
+            public UIntPtr PeakProcessMemoryUsed;
+            public UIntPtr PeakJobMemoryUsed;
+        }
+        #endregion
+
         #region Interface IFilter
         [ComImport, Guid("89BCB740-6119-101A-BCB7-00DD010655AF")]
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -794,22 +859,34 @@ namespace IFilterTextReader
 
         #region DllImports
         [
-            System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"), 
-            DllImport("kernel32.dll", CharSet = CharSet.Ansi)
+            System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"),
+            DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)
         ]
         internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool FreeLibrary([In] IntPtr hModule);
+        internal static extern bool FreeLibrary(IntPtr hModule);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern IntPtr LoadLibrary(string lpFileName);
 
         [DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern uint PSGetNameFromPropertyKey(
             ref PROPERTYKEY propkey,
             [Out, MarshalAs(UnmanagedType.LPWStr)] out string ppszCanonicalName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        internal static extern IntPtr CreateJobObject(IntPtr a, string lpName);
+
+        [DllImport("kernel32.dll")]
+        internal static extern bool SetInformationJobObject(IntPtr hJob, JobObjectInfoType infoType, IntPtr lpJobObjectInfo, UInt32 cbJobObjectInfoLength);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool CloseHandle(IntPtr hObject);
         #endregion
 
         // ReSharper restore UnusedMember.Global

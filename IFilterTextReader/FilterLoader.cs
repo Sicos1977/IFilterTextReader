@@ -149,16 +149,25 @@ namespace IFilterTextReader
         /// <returns></returns>
         private static NativeMethods.IFilter LoadFilterFromDll(string dllName, string filterPersistClass)
         {
-            // Get a classFactory for our classID
-            var classFactory = ComHelpers.GetClassFactory(dllName, filterPersistClass);
-            if (classFactory == null)
-                return null;
+            try
+            {
+                // Get a classFactory for our classID
+                var classFactory = ComHelpers.GetClassFactory(dllName, filterPersistClass);
+                if (classFactory == null)
+                    return null;
 
-            // And create an IFilter instance using that class factory
-            var filterGuid = new Guid("89BCB740-6119-101A-BCB7-00DD010655AF");
-            Object ppunk;
-            classFactory.CreateInstance(null, ref filterGuid, out ppunk);
-            return (ppunk as NativeMethods.IFilter);
+                // And create an IFilter instance using that class factory
+                var filterGuid = new Guid("89BCB740-6119-101A-BCB7-00DD010655AF");
+                Object ppunk;
+                classFactory.CreateInstance(null, ref filterGuid, out ppunk);
+                return (ppunk as NativeMethods.IFilter);
+
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("DLL name: '" + dllName + "'" + Environment.NewLine +
+                                    "Class: " + filterPersistClass + "'", exception);
+            }
         }
         #endregion
 

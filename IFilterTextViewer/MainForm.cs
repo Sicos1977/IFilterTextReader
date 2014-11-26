@@ -23,6 +23,24 @@ namespace IFilterTextViewer
 {
     public partial class MainForm : Form
     {
+        #region GetInnerException
+        /// <summary>
+        /// Geeft de volledige inner exceptie
+        /// </summary>
+        /// <param name="exception">exceptie object</param>
+        /// <returns>inhoud van de inner exceptie</returns>
+        public static string GetInnerException(Exception exception)
+        {
+            var result = string.Empty;
+
+            if (exception == null) return result;
+            result = exception.Message + Environment.NewLine;
+            if (exception.InnerException != null)
+                result += GetInnerException(exception.InnerException);
+            return result;
+        }
+        #endregion
+
         public MainForm()
         {
             InitializeComponent();
@@ -50,7 +68,9 @@ namespace IFilterTextViewer
 
                 try
                 {
-                    using (var reader = new FilterReader(openFileDialog1.FileName, string.Empty, IncludePropertiesCheckBox.Checked))
+                    using (
+                        var reader = new FilterReader(openFileDialog1.FileName, string.Empty,
+                            IncludePropertiesCheckBox.Checked))
                     {
                         string line;
                         var text = string.Empty;
@@ -59,12 +79,14 @@ namespace IFilterTextViewer
                         FilterTextBox.Text = text;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    FilterTextBox.Text = ex.Message;
+                    FilterTextBox.Text = exception.StackTrace + Environment.NewLine + GetInnerException(exception);
                 }
             }
         }
+
+
 
         private void FindTextButton_Click(object sender, EventArgs e)
         {
