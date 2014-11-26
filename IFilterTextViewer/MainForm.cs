@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 /*
@@ -23,6 +24,13 @@ namespace IFilterTextViewer
 {
     public partial class MainForm : Form
     {
+        #region Fields
+        /// <summary>
+        /// Make a job object to sandbox the IFilter code
+        /// </summary>
+        private readonly Job _job = new Job();
+        #endregion
+
         #region GetInnerException
         /// <summary>
         /// Geeft de volledige inner exceptie
@@ -44,6 +52,9 @@ namespace IFilterTextViewer
         public MainForm()
         {
             InitializeComponent();
+
+            // Add the current process to the sandbox
+            _job.AddProcess(Process.GetCurrentProcess().Handle);
         }
 
         private void SelectButton_Click(object sender, EventArgs e)
@@ -85,8 +96,6 @@ namespace IFilterTextViewer
                 }
             }
         }
-
-
 
         private void FindTextButton_Click(object sender, EventArgs e)
         {

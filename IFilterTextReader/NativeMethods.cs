@@ -323,7 +323,7 @@ namespace IFilterTextReader
         }
         #endregion
 
-        #region JobObjectInfoType
+        #region Enum JobObjectInfoType
         internal enum JobObjectInfoType
         {
             AssociateCompletionPortInformation = 7,
@@ -705,7 +705,7 @@ namespace IFilterTextReader
         }
         #endregion
 
-        #region IO_COUNTERS
+        #region Struct IO_COUNTERS
         [StructLayout(LayoutKind.Sequential)]
         internal struct IO_COUNTERS
         {
@@ -718,7 +718,7 @@ namespace IFilterTextReader
         }
         #endregion
 
-        #region JOBOBJECT_BASIC_LIMIT_INFORMATION
+        #region Struct JOBOBJECT_BASIC_LIMIT_INFORMATION
         [StructLayout(LayoutKind.Sequential)]
         internal struct JOBOBJECT_BASIC_LIMIT_INFORMATION
         {

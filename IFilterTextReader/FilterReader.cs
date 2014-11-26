@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mime;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using IFilterTextReader.Exceptions;
 
 /*
@@ -58,7 +60,7 @@ namespace IFilterTextReader
         /// <summary>
         /// The IFilter interface
         /// </summary>
-        private NativeMethods.IFilter _filter;
+        private readonly NativeMethods.IFilter _filter;
 
         /// <summary>
         /// Contains the chunk that we are reading from the <see cref="NativeMethods.IFilter"/> interface
@@ -90,8 +92,10 @@ namespace IFilterTextReader
         /// </summary>
         private bool _carriageReturnFound;
 
-        [ThreadStatic]
-        private static IntPtr _jobHandle;
+        /// <summary>
+        /// Contains a list with <see cref="MetadataProperty"/>
+        /// </summary>
+        private static List<MetadataProperty> _metadataProperties; 
         #endregion
 
         #region Constructor en Destructor
@@ -111,8 +115,6 @@ namespace IFilterTextReader
 
             if (string.IsNullOrWhiteSpace(extension))
                 extension = Path.GetExtension(fileName);
-
-            CreateJob();
 
             _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension);
 
@@ -142,8 +144,6 @@ namespace IFilterTextReader
             if (string.IsNullOrWhiteSpace(extension))
                 throw new ArgumentException("The extension cannot be empty", "extension");
 
-            CreateJob();
-
             _filter = FilterLoader.LoadAndInitIFilter(stream, extension);
 
             if (_filter == null)
@@ -155,37 +155,6 @@ namespace IFilterTextReader
         ~FilterReader()
         {
             Dispose(false);
-        }
-        #endregion
-
-        #region CreateJob
-        /// <summary>
-        /// Creates a new job object
-        /// </summary>
-        private void CreateJob()
-        {
-            if (_jobHandle != IntPtr.Zero)
-                return;
-
-            _jobHandle = NativeMethods.CreateJobObject(IntPtr.Zero, null);
-            NativeMethods.AssignProcessToJobObject(_jobHandle, Process.GetCurrentProcess().Handle);
-
-            var info = new NativeMethods.JOBOBJECT_BASIC_LIMIT_INFORMATION
-            {
-                LimitFlags = 0x2000
-            };
-
-            var extendedInfo = new NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-            {
-                BasicLimitInformation = info
-            };
-
-            var length = Marshal.SizeOf(typeof(NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
-            var extendedInfoPtr = Marshal.AllocHGlobal(length);
-            Marshal.StructureToPtr(extendedInfo, extendedInfoPtr, false);
-
-            if (!NativeMethods.SetInformationJobObject(_jobHandle, NativeMethods.JobObjectInfoType.ExtendedLimitInformation, extendedInfoPtr, (uint)length))
-                throw new Exception(string.Format("Unable to set information.  Error: {0}", Marshal.GetLastWin32Error()));
         }
         #endregion
 
