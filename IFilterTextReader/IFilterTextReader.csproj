@@ -38,6 +38,7 @@
     <Compile Include="Exceptions\IFFileIsPasswordProtected.cs" />
     <Compile Include="Exceptions\IFClassFactoryFailure.cs" />
     <Compile Include="Exceptions\IFFilterNotFound.cs" />
+    <Compile Include="Exceptions\IFOldFilterFormat.cs" />
     <Compile Include="Exceptions\IFUnknownFormat.cs" />
     <Compile Include="FilterLoader.cs" />
     <Compile Include="FilterReader.cs" />

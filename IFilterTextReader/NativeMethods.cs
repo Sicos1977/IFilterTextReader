@@ -823,8 +823,7 @@ namespace IFilterTextReader
             /// Currently reserved for future use.
             /// </summary>
             [PreserveSig]
-            int BindRegion(ref FILTERREGION origPos,
-                ref Guid riid, ref object ppunk);
+            int BindRegion(ref FILTERREGION origPos, ref Guid riid, ref object ppunk);
         }
         #endregion
 

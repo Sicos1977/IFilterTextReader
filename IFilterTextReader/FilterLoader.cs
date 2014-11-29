@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using IFilterTextReader.Exceptions;
 using Microsoft.Win32;
 
@@ -88,9 +89,7 @@ namespace IFilterTextReader
                 return null;
 
             using (registryKey)
-            {
                 return (string) registryKey.GetValue(value);
-            }
         }
         #endregion
 
@@ -101,13 +100,17 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="stream">An <see cref="Stream"/></param>
         /// <param name="extension">The file extension</param>
+        /// <param name="fileName">The name of the file</param>
         /// <returns><see cref="NativeMethods.IFilter"/> or null when no IFilter DLL is</returns>
-        public static NativeMethods.IFilter LoadAndInitIFilter(Stream stream, string extension)
+        public static NativeMethods.IFilter LoadAndInitIFilter(Stream stream, 
+                                                               string extension,
+                                                               string fileName = "")
         {
             string dllName, filterPersistClass;
 
             // Find the dll and ClassID
             GetFilterDllAndClass(extension, out dllName, out filterPersistClass);
+            
             var iFilter = LoadFilterFromDll(dllName, filterPersistClass);
 
             if (iFilter == null)
@@ -124,13 +127,29 @@ namespace IFilterTextReader
 
             // ReSharper disable once SuspiciousTypeConversion.Global
             var iPersistStream = iFilter as NativeMethods.IPersistStream;
+
+            // IPersistStream is asumed on 64 bits systems
             if (iPersistStream != null)
             {
                 iPersistStream.Load(new IStreamWrapper(stream));
-
                 NativeMethods.IFILTER_FLAGS flags;
                 if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
                     return iFilter;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(fileName))
+                    throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
+
+                // If we get here we probably are using an old IFilter so try to load it the old way
+                var persistFile = iFilter as IPersistFile;
+                if (persistFile != null)
+                {
+                    persistFile.Load(fileName, 0);
+                    NativeMethods.IFILTER_FLAGS flags;
+                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                        return iFilter;
+                }
             }
 
             // If we failed to retreive an IPersistFile interface or to initialize
@@ -161,7 +180,6 @@ namespace IFilterTextReader
                 Object ppunk;
                 classFactory.CreateInstance(null, ref filterGuid, out ppunk);
                 return (ppunk as NativeMethods.IFilter);
-
             }
             catch (Exception exception)
             {
@@ -184,6 +202,7 @@ namespace IFilterTextReader
         {
             // Try to get the filter from the cache
             if (GetFilterDllAndClassFromCache(extension, out dllName, out filterPersistClass)) return;
+            
             var persistentHandlerClass = GetPersistentHandlerClass(extension, true);
 
             if (persistentHandlerClass != null)
@@ -212,12 +231,12 @@ namespace IFilterTextReader
             filterPersistClass = ReadFromHKLM(@"Software\Classes\CLSID\" + persistentHandlerClass +
                                                  @"\PersistentAddinsRegistered\{89BCB740-6119-101A-BCB7-00DD010655AF}");
 
-            if (String.IsNullOrEmpty(filterPersistClass))
+            if (string.IsNullOrEmpty(filterPersistClass))
                 return false;
 
             // Read the dll name 
             dllName = ReadFromHKLM(@"Software\Classes\CLSID\" + filterPersistClass + @"\InprocServer32");
-            return (!String.IsNullOrEmpty(dllName));
+            return (!string.IsNullOrEmpty(dllName));
         }
         #endregion
 

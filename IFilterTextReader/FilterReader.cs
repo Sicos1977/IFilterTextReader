@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Net.Mime;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using IFilterTextReader.Exceptions;
 
 /*
@@ -34,6 +31,7 @@ namespace IFilterTextReader
     /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
     /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
     /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+    /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
     /// (e.g. files with a wrong extension)</exception>
     public class FilterReader : TextReader
     {
@@ -116,7 +114,7 @@ namespace IFilterTextReader
             if (string.IsNullOrWhiteSpace(extension))
                 extension = Path.GetExtension(fileName);
 
-            _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension);
+            _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, fileName);
 
             if (_filter == null)
             {
