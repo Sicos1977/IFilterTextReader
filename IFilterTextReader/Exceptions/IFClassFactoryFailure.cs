@@ -25,12 +25,12 @@ namespace IFilterTextReader.Exceptions
     [Serializable]
     public class IFClassFactoryFailure : Exception
     {
-        protected IFClassFactoryFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFClassFactoryFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public IFClassFactoryFailure() { }
+        internal IFClassFactoryFailure() { }
 
-        public IFClassFactoryFailure(string message) : base(message) { }
+        internal IFClassFactoryFailure(string message) : base(message) { }
 
-        public IFClassFactoryFailure(string message, Exception innerException) : base(message, innerException) { }
+        internal IFClassFactoryFailure(string message, Exception innerException) : base(message, innerException) { }
     }
 }

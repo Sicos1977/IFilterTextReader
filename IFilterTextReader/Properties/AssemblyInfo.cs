@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("IFilterTextReader")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("C# implementation of an IFilter to get text from any kind of file")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("IFilterTextReader")]

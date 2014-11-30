@@ -25,12 +25,12 @@ namespace IFilterTextReader.Exceptions
     [Serializable]
     public class IFAccesFailure : Exception
     {
-        protected IFAccesFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFAccesFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public IFAccesFailure() { }
+        internal IFAccesFailure() { }
 
-        public IFAccesFailure(string message) : base(message) { }
+        internal IFAccesFailure(string message) : base(message) { }
 
-        public IFAccesFailure(string message, Exception innerException) : base(message, innerException) { }
+        internal IFAccesFailure(string message, Exception innerException) : base(message, innerException) { }
     }
 }

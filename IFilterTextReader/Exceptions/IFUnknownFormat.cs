@@ -25,12 +25,12 @@ namespace IFilterTextReader.Exceptions
     [Serializable]
     public class IFUnknownFormat : Exception
     {
-        protected IFUnknownFormat(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFUnknownFormat(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public IFUnknownFormat() { }
+        internal IFUnknownFormat() { }
 
-        public IFUnknownFormat(string message) : base(message) { }
+        internal IFUnknownFormat(string message) : base(message) { }
 
-        public IFUnknownFormat(string message, Exception innerException) : base(message, innerException) { }
+        internal IFUnknownFormat(string message, Exception innerException) : base(message, innerException) { }
     }
 }

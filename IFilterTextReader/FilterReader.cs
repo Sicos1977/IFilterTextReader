@@ -89,11 +89,6 @@ namespace IFilterTextReader
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
         private bool _carriageReturnFound;
-
-        /// <summary>
-        /// Contains a list with <see cref="MetadataProperty"/>
-        /// </summary>
-        private static List<MetadataProperty> _metadataProperties; 
         #endregion
 
         #region Constructor en Destructor

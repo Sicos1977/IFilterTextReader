@@ -25,12 +25,12 @@ namespace IFilterTextReader.Exceptions
     [Serializable]
     public class IFFileIsPasswordProtected : Exception
     {
-        protected IFFileIsPasswordProtected(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFileIsPasswordProtected(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public IFFileIsPasswordProtected() { }
+        internal IFFileIsPasswordProtected() { }
 
-        public IFFileIsPasswordProtected(string message) : base(message) { }
+        internal IFFileIsPasswordProtected(string message) : base(message) { }
 
-        public IFFileIsPasswordProtected(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFileIsPasswordProtected(string message, Exception innerException) : base(message, innerException) { }
     }
 }

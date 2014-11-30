@@ -25,12 +25,12 @@ namespace IFilterTextReader.Exceptions
     [Serializable]
     public class IFFilterNotFound : Exception
     {
-        protected IFFilterNotFound(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFilterNotFound(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public IFFilterNotFound() { }
+        internal IFFilterNotFound() { }
 
-        public IFFilterNotFound(string message) : base(message) { }
+        internal IFFilterNotFound(string message) : base(message) { }
 
-        public IFFilterNotFound(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFilterNotFound(string message, Exception innerException) : base(message, innerException) { }
     }
 }

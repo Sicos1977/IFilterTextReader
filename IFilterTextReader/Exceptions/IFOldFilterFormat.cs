@@ -9,12 +9,12 @@ namespace IFilterTextReader.Exceptions
     [Serializable]
     public class IFOldFilterFormat : Exception
     {
-        protected IFOldFilterFormat(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFOldFilterFormat(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        public IFOldFilterFormat() { }
+        internal IFOldFilterFormat() { }
 
-        public IFOldFilterFormat(string message) : base(message) { }
+        internal IFOldFilterFormat(string message) : base(message) { }
 
-        public IFOldFilterFormat(string message, Exception innerException) : base(message, innerException) { }
+        internal IFOldFilterFormat(string message, Exception innerException) : base(message, innerException) { }
     }
 }
