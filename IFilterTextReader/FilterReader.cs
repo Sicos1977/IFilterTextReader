@@ -475,6 +475,7 @@ namespace IFilterTextReader
                 if (string.IsNullOrWhiteSpace(propertyVariant.Value.ToString()))
                     return null;
 
+                // Read the string property
                 if (_chunk.attribute.psProperty.ulKind == NativeMethods.PROPSPECKIND.PRSPEC_LPWSTR)
                 {
                     var propertyNameString = Marshal.PtrToStringUni(_chunk.attribute.psProperty.data);
@@ -482,10 +483,19 @@ namespace IFilterTextReader
                 }
                 else
                 {
+                    //var id = Marshal.PtrToStringUni(_chunk.attribute.psProperty.data);
+
+                    var property = PropertyMapper.GetProperty(_chunk.attribute.guidPropSet,
+                        (long) _chunk.attribute.psProperty.data);
+
+                    if (!string.IsNullOrEmpty(property))
+                        return property + " : " + propertyVariant.Value + "\n";
+
+                    // Reader the property guid and id
                     var propertyKey = new NativeMethods.PROPERTYKEY
                     {
                         fmtid = new Guid(_chunk.attribute.guidPropSet.ToString()),
-                        pid = (long) _chunk.attribute.psProperty.data
+                        pid = (long)_chunk.attribute.psProperty.data
                     };
 
                     string propertyName;
