@@ -176,5 +176,37 @@ namespace IFilterTextReader
             return result.Key == null ? null : result.Value;
         }
         #endregion
+
+        /*
+        Document title : Title
+Document subject : Subject
+Document author : Authors; Kees van Spelde
+Document keywords : Tags
+Document comments : Comments
+Document last author : Kees van Spelde
+f29f85e0-4ff9-1068-ab91-08002b27b3d9/9 : Revision number
+f29f85e0-4ff9-1068-ab91-08002b27b3d9/12 : 16-10-2014 18:18:14
+f29f85e0-4ff9-1068-ab91-08002b27b3d9/13 : 23-11-2014 00:32:17
+f29f85e0-4ff9-1068-ab91-08002b27b3d9/18 : Microsoft Excel
+f29f85e0-4ff9-1068-ab91-08002b27b3d9/19 : 0
+Document category : Categories
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/27 : Content status
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/28 : Language
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/29 : Version number
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/11 : False
+Document manager : Manager
+Document company : Company
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/16 : False
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/19 : False
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/20 : Dit is de hyperlinkbasis
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/22 : False
+d5cdd502-2e9c-101b-9397-08002b2cf9ae/23 : 983340
+Bla bla bla : Dit is een bla bla bla property
+Tekst property : Dit is tekst
+Datum property : 14-2-1977 00:00:00
+Getal property : 12
+Ja of nee property : True
+         */
+
     }
 }
