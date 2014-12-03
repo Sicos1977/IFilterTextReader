@@ -160,6 +160,7 @@
             this.Controls.Add(this.FilterTextBox);
             this.Name = "MainForm";
             this.Text = "IFilter Text Viewer";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -15,6 +15,9 @@ namespace IFilterTextReader
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Creates a new job (sandbox) object
+        /// </summary>
         public Job()
         {
             _jobHandle = NativeMethods.CreateJobObject(IntPtr.Zero, null);
@@ -69,7 +72,7 @@ namespace IFilterTextReader
 
         #region AddProcess
         /// <summary>
-        /// Add a process to the job by it's <see cref="processHandle"/>
+        /// Add a process to the job by it's <paramref name="processHandle"/>
         /// </summary>
         /// <param name="processHandle"></param>
         /// <returns></returns>
@@ -79,7 +82,7 @@ namespace IFilterTextReader
         }
 
         /// <summary>
-        /// Add a process to the job by it's <see cref="processId"/>
+        /// Add a process to the job by it's <paramref name="processId"/>
         /// </summary>
         /// <param name="processId"></param>
         /// <returns></returns>

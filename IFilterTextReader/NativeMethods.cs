@@ -337,6 +337,7 @@ namespace IFilterTextReader
         #endregion
 
         #region Struct STAT_CHUNK
+#pragma warning disable 0649
         internal struct STAT_CHUNK
         {
             /// <summary>
@@ -397,8 +398,9 @@ namespace IFilterTextReader
             /// </summary>
             public int cwcLenSource;
         }
+#pragma warning restore 0649
         #endregion
-       
+
         #region Struct FILTERREGION
         [StructLayout(LayoutKind.Sequential)]
         internal struct FILTERREGION

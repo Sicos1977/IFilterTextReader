@@ -100,7 +100,7 @@ namespace IFilterTextReader
 
         #region Constructor en Destructor
         /// <summary>
-        /// Creates an TextReader object for the given <see cref="fileName"/>
+        /// Creates an TextReader object for the given <paramref name="fileName"/>
         /// </summary>
         /// <param name="fileName">The file to read</param>
         /// <param name="extension">Overrides the file extension</param>
@@ -133,10 +133,10 @@ namespace IFilterTextReader
         /// Creates an TextReader object for the given <see cref="Stream"/>
         /// </summary>
         /// <param name="stream">The file stream to read</param>
-        /// <param name="extension">The extension for the <see cref="stream"/></param>
+        /// <param name="extension">The extension for the <paramref name="stream"/></param>
         /// <param name="includeProperties">Set to true to also read any available 
         /// properties (e.g summary properties in a Word document)</param>
-        /// <exception cref="ArgumentException">Raised when the <see cref="extension"/> argument is null or empty</exception>
+        /// <exception cref="ArgumentException">Raised when the <paramref name="stream"/> argument is null or empty</exception>
         public FilterReader(Stream stream,
                             string extension,
                             bool includeProperties = false)
@@ -152,6 +152,9 @@ namespace IFilterTextReader
             _includeProperties = includeProperties;
         }
 
+        /// <summary>
+        /// Disposes this object
+        /// </summary>
         ~FilterReader()
         {
             Dispose(false);
@@ -963,6 +966,9 @@ namespace IFilterTextReader
         #endregion
         
         #region Close
+        /// <summary>
+        /// Closes this textreader
+        /// </summary>
         public override void Close()
         {
             Dispose(true);

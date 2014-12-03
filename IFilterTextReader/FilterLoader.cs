@@ -95,7 +95,7 @@ namespace IFilterTextReader
 
         #region LoadAndInitIFilter
         /// <summary>
-        /// Returns an IFilter for the given <see cref="stream"/>
+        /// Returns an IFilter for the given <paramref name="stream"/>
         /// when there is no filter available
         /// </summary>
         /// <param name="stream">An <see cref="Stream"/></param>
@@ -196,8 +196,8 @@ namespace IFilterTextReader
         /// <param name="extension">The file extension</param>
         /// <param name="dllName"></param>
         /// <param name="filterPersistClass"></param>
-        /// <returns>True when an <see cref="NativeMethods.IFilter"/> dll has been loaded for the given <see cref="extension"/></returns>
-        /// <exception cref="IFFilterNotFound">Raised when no IFilter dll could be found for the given <see cref="extension"/></exception>
+        /// <returns>True when an <see cref="NativeMethods.IFilter"/> dll has been loaded for the given <paramref name="extension"/></returns>
+        /// <exception cref="IFFilterNotFound">Raised when no IFilter dll could be found for the given <paramref name="extension"/></exception>
         private static void GetFilterDllAndClass(string extension, out string dllName, out string filterPersistClass)
         {
             // Try to get the filter from the cache
