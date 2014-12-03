@@ -35,13 +35,20 @@ namespace IFilterTextReader
     /// (e.g. files with a wrong extension)</exception>
     public class FilterReader : TextReader
     {
-        #region Delegate
+        #region Delegates
         /// <summary>
         /// Raised when an unmapped property has been retrieved with the <see cref="NativeMethods.IFilter.GetValue"/> method
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"><see cref="UnmappedPropertyEventArgs"/></param>
         public delegate void UnmappedPropertyEventHandler(Object sender, UnmappedPropertyEventArgs e);
+        #endregion
+
+        #region Events
+        /// <summary>
+        /// Raised when an unmapped property has been retrieved with the <see cref="NativeMethods.IFilter.GetValue"/> method
+        /// </summary>
+        public event UnmappedPropertyEventHandler UnmappedPropertyEvent;
         #endregion
 
         #region Fields
@@ -483,8 +490,6 @@ namespace IFilterTextReader
                 }
                 else
                 {
-                    //var id = Marshal.PtrToStringUni(_chunk.attribute.psProperty.data);
-
                     var property = PropertyMapper.GetProperty(_chunk.attribute.guidPropSet,
                         (long) _chunk.attribute.psProperty.data);
 
@@ -501,10 +506,25 @@ namespace IFilterTextReader
                     string propertyName;
                     var result = NativeMethods.PSGetNameFromPropertyKey(ref propertyKey, out propertyName);
                     if (result == 0)
+                    {
+                        if (UnmappedPropertyEvent != null)
+                            UnmappedPropertyEvent(this,
+                                new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
+                                    _chunk.attribute.psProperty.data.ToString(), propertyName,
+                                    propertyVariant.Value.ToString()));
+
                         return propertyName + " : " + propertyVariant.Value + "\n";
+                    }
                     else
+                    {
+                        if (UnmappedPropertyEvent != null)
+                            UnmappedPropertyEvent(this,
+                                new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
+                                    _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString())); 
+                        
                         return _chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data + " : " +
                                propertyVariant.Value + "\n";
+                    }
                 }
             }
             finally
