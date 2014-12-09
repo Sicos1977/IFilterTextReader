@@ -27,12 +27,6 @@ namespace IFilterTextReader
     /// This class is a <see cref="TextReader"/> wrapper around an IFilter. This way a file can be processed 
     /// like if it is a dead normal text file
     /// </summary>
-    /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
-    /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
-    /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
-    /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
-    /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
-    /// (e.g. files with a wrong extension)</exception>
     public class FilterReader : TextReader
     {
         #region Delegates
@@ -175,6 +169,12 @@ namespace IFilterTextReader
         /// Reads a line of characters from the text reader and returns the data as a string.
         /// </summary>
         /// <returns>The next line from the reader, or null if all characters have been read.</returns>
+        /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
+        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
+        /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+        /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
+        /// (e.g. files with a wrong extension)</exception>
         public override string ReadLine()
         {
             var buffer = new char[2048];
@@ -251,6 +251,12 @@ namespace IFilterTextReader
         /// Reads the next character from the text reader and advances the character position by one character.
         /// </summary>
         /// <returns>The next character from the text reader, or -1 if no more characters are available.</returns>
+        /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
+        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
+        /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+        /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
+        /// (e.g. files with a wrong extension)</exception>
         public override int Read()
         {
             var chr = new char[0];
@@ -273,6 +279,12 @@ namespace IFilterTextReader
         /// <returns>The number of characters that have been read. The number will be less than or equal to count, 
         /// depending on whether the data is available within the reader.  This method returns 0 (zero) if it is called
         /// when no more characters are left to read</returns>
+        /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
+        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
+        /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+        /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
+        /// (e.g. files with a wrong extension)</exception>
         public override int Read(char[] buffer, int index, int count)
         {
             if (buffer == null)
@@ -443,6 +455,31 @@ namespace IFilterTextReader
             }
 
             return charsRead;
+        }
+        #endregion
+
+        #region ReadBlock
+        /// <summary>
+        /// Reads a specified maximum number of characters from the current reader and writes the data to a buffer, 
+        /// beginning at the specified index
+        /// </summary>
+        /// <param name="buffer">When this method returns, contains the specified character array with the values 
+        /// between index and (index + count - 1) replaced by the characters read from the current source. </param>
+        /// <param name="index">The position in buffer at which to begin writing. </param>
+        /// <param name="count">The maximum number of characters to read. If the end of the reader is reached before 
+        /// the specified number of characters is read into the buffer, the method returns. </param>
+        /// <returns>The number of characters that have been read. The number will be less than or equal to count, 
+        /// depending on whether the data is available within the reader.  This method returns 0 (zero) if it is called
+        /// when no more characters are left to read</returns>
+        /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
+        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
+        /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+        /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
+        /// (e.g. files with a wrong extension)</exception>
+        public override int ReadBlock(char[] buffer, int index, int count)
+        {
+            return Read(buffer, index, count);
         }
         #endregion
 
@@ -981,6 +1018,17 @@ namespace IFilterTextReader
         public override void Close()
         {
             Dispose(true);
+        }
+        #endregion
+
+        #region Not implemented methods
+        /// <summary>
+        /// This method is not supported and will aways throw an <see cref="NotImplementedException"/>
+        /// </summary>
+        /// <returns></returns>
+        public override int Peek()
+        {
+            throw new NotImplementedException();
         }
         #endregion
 
