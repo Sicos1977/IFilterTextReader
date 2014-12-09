@@ -24,7 +24,7 @@ using IFilterTextReader.Exceptions;
 namespace IFilterTextReader
 {
     /// <summary>
-    /// This class is a <see cref="TextReader"/> wrapper around an IFilter. This way a file can be processed 
+    /// This class is a <see cref="TextReader"/> wrapper around an <see cref="NativeMethods.IFilter"/>. This way a file can be processed 
     /// like if it is a dead normal text file
     /// </summary>
     public class FilterReader : TextReader
@@ -90,6 +90,11 @@ namespace IFilterTextReader
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
         private bool _carriageReturnFound;
+
+        /// <summary>
+        /// Used to hold property mappings
+        /// </summary>
+        private static List<Property> _properties = new List<Property>();
         #endregion
 
         #region Constructor en Destructor
