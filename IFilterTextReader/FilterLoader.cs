@@ -100,10 +100,12 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="stream">An <see cref="Stream"/></param>
         /// <param name="extension">The file extension</param>
+        /// <param name="disableEmbeddedContent">When set to <c>true</c> embedded content is NOT read</param>
         /// <param name="fileName">The name of the file</param>
         /// <returns><see cref="NativeMethods.IFilter"/> or null when no IFilter DLL is</returns>
         public static NativeMethods.IFilter LoadAndInitIFilter(Stream stream, 
                                                                string extension,
+                                                               bool disableEmbeddedContent,
                                                                string fileName = "")
         {
             string dllName, filterPersistClass;
@@ -116,15 +118,18 @@ namespace IFilterTextReader
             if (iFilter == null)
                 return null;
 
-            const NativeMethods.IFILTER_INIT iflags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
-                                                      NativeMethods.IFILTER_INIT.CANON_PARAGRAPHS |
-                                                      NativeMethods.IFILTER_INIT.CANON_SPACES |
-                                                      NativeMethods.IFILTER_INIT.APPLY_INDEX_ATTRIBUTES |
-                                                      NativeMethods.IFILTER_INIT.APPLY_CRAWL_ATTRIBUTES |
-                                                      NativeMethods.IFILTER_INIT.APPLY_OTHER_ATTRIBUTES |
-                                                      NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
-                                                      NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK |
-                                                      NativeMethods.IFILTER_INIT.EMIT_FORMATTING;
+            var iflags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
+                         NativeMethods.IFILTER_INIT.CANON_PARAGRAPHS |
+                         NativeMethods.IFILTER_INIT.CANON_SPACES |
+                         NativeMethods.IFILTER_INIT.APPLY_INDEX_ATTRIBUTES |
+                         NativeMethods.IFILTER_INIT.APPLY_CRAWL_ATTRIBUTES |
+                         NativeMethods.IFILTER_INIT.APPLY_OTHER_ATTRIBUTES |
+                         NativeMethods.IFILTER_INIT.HARD_LINE_BREAKS |
+                         NativeMethods.IFILTER_INIT.FILTER_OWNED_VALUE_OK |
+                         NativeMethods.IFILTER_INIT.EMIT_FORMATTING;
+
+            if (disableEmbeddedContent)
+                iflags = iflags | NativeMethods.IFILTER_INIT.DISABLE_EMBEDDED;
 
             // ReSharper disable once SuspiciousTypeConversion.Global
             var iPersistStream = iFilter as NativeMethods.IPersistStream;

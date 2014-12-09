@@ -103,11 +103,17 @@ namespace IFilterTextReader
         /// Creates an TextReader object for the given <paramref name="fileName"/>
         /// </summary>
         /// <param name="fileName">The file to read</param>
-        /// <param name="extension">Overrides the file extension</param>
-        /// <param name="includeProperties">Set to true to also read any available 
-        /// properties (e.g summary properties in a Word document)</param>
+        /// <param name="extension">Overrides the file extension of the <paramref name="fileName"/>, 
+        /// the extension is used to determine the <see cref="NativeMethods.IFilter"/> that needs to
+        /// be used to read the <see cref="fileName"/></param>
+        /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
+        /// doesn't read embedded, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
+        /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
+        /// a document are also returned, e.g. the summary properties of a Word document. This parameter
+        /// is default set to <c>false</c></param>
         public FilterReader(string fileName, 
-                            string extension = "", 
+                            string extension = "",
+                            bool disableEmbeddedContent = false,
                             bool includeProperties = false)
         {
             _fileName = fileName;
@@ -116,7 +122,7 @@ namespace IFilterTextReader
             if (string.IsNullOrWhiteSpace(extension))
                 extension = Path.GetExtension(fileName);
 
-            _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, fileName);
+            _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName);
 
             if (_filter == null)
             {
@@ -134,17 +140,20 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="stream">The file stream to read</param>
         /// <param name="extension">The extension for the <paramref name="stream"/></param>
-        /// <param name="includeProperties">Set to true to also read any available 
-        /// properties (e.g summary properties in a Word document)</param>
-        /// <exception cref="ArgumentException">Raised when the <paramref name="stream"/> argument is null or empty</exception>
+        /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
+        /// doesn't read embedded, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
+        /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
+        /// a document are also returned, e.g. the summary properties of a Word document. This parameter
+        /// is default set to <c>false</c></param>
         public FilterReader(Stream stream,
                             string extension,
+                            bool disableEmbeddedContent = false,
                             bool includeProperties = false)
         {
             if (string.IsNullOrWhiteSpace(extension))
                 throw new ArgumentException("The extension cannot be empty", "extension");
 
-            _filter = FilterLoader.LoadAndInitIFilter(stream, extension);
+            _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent);
 
             if (_filter == null)
                 throw new IFFilterNotFound("There is no IFilter installed for the stream with the extension '" + extension + "'");
