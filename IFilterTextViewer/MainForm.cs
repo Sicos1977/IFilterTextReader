@@ -19,6 +19,7 @@ using System.Windows.Forms;
 */
 
 using IFilterTextReader;
+using IFilterTextViewer.Properties;
 
 namespace IFilterTextViewer
 {
@@ -80,7 +81,9 @@ namespace IFilterTextViewer
                 try
                 {
                     using (
-                        var reader = new FilterReader(openFileDialog1.FileName, string.Empty,
+                        var reader = new FilterReader(openFileDialog1.FileName, 
+                            string.Empty, 
+                            DisableEmbeddedContentCheckBox.Checked,
                             IncludePropertiesCheckBox.Checked))
                     {
                         string line;
@@ -110,6 +113,11 @@ namespace IFilterTextViewer
             var matches = new Reader().GetRegexMatchesFromFile(FileLabel.Text, TextToFindWithRegexTextBox.Text);
             if (matches != null)
                 FilterTextBox.Lines = matches;
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Settings.Default.Save();
         }
     }
 }

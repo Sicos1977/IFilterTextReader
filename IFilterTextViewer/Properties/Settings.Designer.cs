@@ -58,5 +58,17 @@ namespace IFilterTextViewer.Properties {
                 this["TextToFindWithRegex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableEmbeddedContent {
+            get {
+                return ((bool)(this["DisableEmbeddedContent"]));
+            }
+            set {
+                this["DisableEmbeddedContent"] = value;
+            }
+        }
     }
 }

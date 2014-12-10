@@ -106,7 +106,7 @@ namespace IFilterTextReader
         /// the extension is used to determine the <see cref="NativeMethods.IFilter"/> that needs to
         /// be used to read the <see cref="fileName"/></param>
         /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
-        /// doesn't read embedded, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
+        /// doesn't read embedded content, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
         /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
         /// a document are also returned, e.g. the summary properties of a Word document. This parameter
         /// is default set to <c>false</c></param>
@@ -140,7 +140,7 @@ namespace IFilterTextReader
         /// <param name="stream">The file stream to read</param>
         /// <param name="extension">The extension for the <paramref name="stream"/></param>
         /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
-        /// doesn't read embedded, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
+        /// doesn't read embedded content, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
         /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
         /// a document are also returned, e.g. the summary properties of a Word document. This parameter
         /// is default set to <c>false</c></param>
