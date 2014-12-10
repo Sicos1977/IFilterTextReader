@@ -90,11 +90,6 @@ namespace IFilterTextReader
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
         private bool _carriageReturnFound;
-
-        /// <summary>
-        /// Used to hold property mappings
-        /// </summary>
-        private static List<Property> _properties = new List<Property>();
         #endregion
 
         #region Constructor en Destructor

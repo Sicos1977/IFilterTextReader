@@ -12,7 +12,21 @@ namespace IFilterTextReader
     internal static class PropertyMapper
     {
         #region Fields
-        private static readonly Dictionary<string, string> Properties = new Dictionary<string, string>(); 
+        private static readonly Dictionary<string, string> Properties = new Dictionary<string, string>();
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// 
+        /// </summary>
+        private static List<Property> PropertiesCache
+        {
+            set
+            {
+                if (value == null) throw new ArgumentNullException("value");
+                PropertiesCache = value;
+            }
+        }
         #endregion
 
         #region Constructor
