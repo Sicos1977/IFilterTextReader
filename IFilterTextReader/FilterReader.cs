@@ -110,23 +110,31 @@ namespace IFilterTextReader
                             bool disableEmbeddedContent = false,
                             bool includeProperties = false)
         {
-            _fileName = fileName;
-            _fileStream = File.OpenRead(fileName);
-
-            if (string.IsNullOrWhiteSpace(extension))
-                extension = Path.GetExtension(fileName);
-
-            _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName);
-
-            if (_filter == null)
+            try
             {
+                _fileName = fileName;
+                _fileStream = File.OpenRead(fileName);
+
                 if (string.IsNullOrWhiteSpace(extension))
-                    throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+                    extension = Path.GetExtension(fileName); 
+                
+                _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName);
 
-                throw new IFFilterNotFound("There is no IFilter installed for the extension '" + extension + "'");
+                if (_filter == null)
+                {
+                    if (string.IsNullOrWhiteSpace(extension))
+                        throw new IFFilterNotFound("There is no IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+
+                    throw new IFFilterNotFound("There is no IFilter installed for the extension '" + extension + "'");
+                }
+            
+                _includeProperties = includeProperties;
             }
-
-            _includeProperties = includeProperties;
+            catch (Exception)
+            {
+                Dispose();
+                throw;
+            }
         }
 
         /// <summary>
