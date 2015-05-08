@@ -99,7 +99,7 @@ namespace IFilterTextReader
         /// <param name="fileName">The file to read</param>
         /// <param name="extension">Overrides the file extension of the <paramref name="fileName"/>, 
         /// the extension is used to determine the <see cref="NativeMethods.IFilter"/> that needs to
-        /// be used to read the <see cref="fileName"/></param>
+        /// be used to read the <paramref name="fileName"/></param>
         /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
         /// doesn't read embedded content, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
         /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
