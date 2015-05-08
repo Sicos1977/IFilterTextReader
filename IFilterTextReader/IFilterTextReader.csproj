@@ -61,10 +61,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Localization\LanguageConsts.nl.resx" />
     <EmbeddedResource Include="Localization\LanguageConsts.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LanguageConsts1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
