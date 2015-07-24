@@ -428,7 +428,7 @@ namespace IFilterTextReader
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
                                         if (textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
                                         {
-                                            textBuffer[textLength] = ' ';
+                                            textBuffer[textLength] = '\n';
                                             textLength += 1;
                                         }
                                         break;

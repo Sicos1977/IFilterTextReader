@@ -58,6 +58,29 @@ namespace IFilterTextViewer
             _job.AddProcess(Process.GetCurrentProcess().Handle);
         }
 
+        private void DisableInput()
+        {
+            SelectButton.Enabled = false;
+            FindTextButton.Enabled = false;
+            FindWithRegexButton.Enabled = false;
+            TextToFindTextBox.Enabled = false;
+            TextToFindWithRegexTextBox.Enabled = false;
+            DisableEmbeddedContentCheckBox.Enabled = false;
+            IncludePropertiesCheckBox.Enabled = false;
+            FilterTextBox.Clear();
+        }
+
+        private void EnableInput()
+        {
+            SelectButton.Enabled = true;
+            FindTextButton.Enabled = true;
+            FindWithRegexButton.Enabled = true;
+            TextToFindTextBox.Enabled = true;
+            TextToFindWithRegexTextBox.Enabled = true;
+            DisableEmbeddedContentCheckBox.Enabled = true;
+            IncludePropertiesCheckBox.Enabled = false;            
+        }
+
         private void SelectButton_Click(object sender, EventArgs e)
         {
             // Create an instance of the open file dialog box.
@@ -80,6 +103,11 @@ namespace IFilterTextViewer
 
                 try
                 {
+                    DisableInput();
+
+                    FilterTextBox.AppendText("*** Processing file '" + openFileDialog1.FileName + "' ***" + Environment.NewLine + Environment.NewLine);
+                    Application.DoEvents();
+
                     using (
                         var reader = new FilterReader(openFileDialog1.FileName, 
                             string.Empty, 
@@ -89,30 +117,64 @@ namespace IFilterTextViewer
                         string line;
                         var text = string.Empty;
                         while ((line = reader.ReadLine()) != null)
+                        {
                             text += line + Environment.NewLine;
-                        FilterTextBox.Text = text;
+                            FilterTextBox.AppendText(text);
+                            Application.DoEvents();
+                        }
+
+                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE ***" + Environment.NewLine);
+                        Application.DoEvents();
                     }
                 }
                 catch (Exception exception)
                 {
+                    DisableInput();
                     FilterTextBox.Text = exception.StackTrace + Environment.NewLine + GetInnerException(exception);
+                }
+                finally
+                {
+                    EnableInput();
                 }
             }
         }
 
         private void FindTextButton_Click(object sender, EventArgs e)
         {
-            if (new Reader().FileContainsText(FileLabel.Text, TextToFindTextBox.Text))
-                MessageBox.Show("Text '" + TextToFindTextBox.Text + "' found inside the file");
-            else
-                MessageBox.Show("Text '" + TextToFindTextBox.Text + "' not found inside the file");
+            try
+            {
+                DisableInput();
+                if (new Reader().FileContainsText(FileLabel.Text, TextToFindTextBox.Text))
+                    MessageBox.Show("Text '" + TextToFindTextBox.Text + "' found inside the file");
+                else
+                    MessageBox.Show("Text '" + TextToFindTextBox.Text + "' not found inside the file");
+            }
+            catch (Exception exception)
+            {
+                FilterTextBox.Text = exception.StackTrace + Environment.NewLine + GetInnerException(exception);
+            }
+            finally
+            {
+                EnableInput();
+            }
         }
 
         private void FindWithRegexButton_Click(object sender, EventArgs e)
         {
-            var matches = new Reader().GetRegexMatchesFromFile(FileLabel.Text, TextToFindWithRegexTextBox.Text);
-            if (matches != null)
-                FilterTextBox.Lines = matches;
+            try
+            {
+                var matches = new Reader().GetRegexMatchesFromFile(FileLabel.Text, TextToFindWithRegexTextBox.Text);
+                if (matches != null)
+                    FilterTextBox.Lines = matches;
+            }
+            catch (Exception exception)
+            {
+                FilterTextBox.Text = exception.StackTrace + Environment.NewLine + GetInnerException(exception);
+            }
+            finally
+            {
+                EnableInput();
+            }
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
