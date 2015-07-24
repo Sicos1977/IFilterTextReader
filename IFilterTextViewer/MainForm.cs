@@ -78,7 +78,7 @@ namespace IFilterTextViewer
             TextToFindTextBox.Enabled = true;
             TextToFindWithRegexTextBox.Enabled = true;
             DisableEmbeddedContentCheckBox.Enabled = true;
-            IncludePropertiesCheckBox.Enabled = false;            
+            IncludePropertiesCheckBox.Enabled = true;            
         }
 
         private void SelectButton_Click(object sender, EventArgs e)
