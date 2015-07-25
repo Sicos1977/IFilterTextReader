@@ -115,11 +115,9 @@ namespace IFilterTextViewer
                             IncludePropertiesCheckBox.Checked))
                     {
                         string line;
-                        var text = string.Empty;
                         while ((line = reader.ReadLine()) != null)
                         {
-                            text += line + Environment.NewLine;
-                            FilterTextBox.AppendText(text);
+                            FilterTextBox.AppendText(line + Environment.NewLine);
                             Application.DoEvents();
                         }
 
