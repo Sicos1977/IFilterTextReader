@@ -148,6 +148,7 @@ namespace IFilterTextReader
                     throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
 
                 // If we get here we probably are using an old IFilter so try to load it the old way
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 var persistFile = iFilter as IPersistFile;
                 if (persistFile != null)
                 {

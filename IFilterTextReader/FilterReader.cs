@@ -338,8 +338,16 @@ namespace IFilterTextReader
                 {
                     var result = _filter.GetChunk(out _chunk);
                     _chunkValid = result == NativeMethods.IFilterReturnCode.S_OK;
-                    if (result == NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS)
-                        _done = true;
+
+                    switch (result)
+                    {
+                        case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
+                            throw new IFAccesFailure("Could not acces IFilter object, invalid file");
+
+                        case NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS:
+                            _done = true;
+                            break;
+                    }
 
                     // If the read chunk isn't valid then continue
                     if (!_chunkValid) continue;
