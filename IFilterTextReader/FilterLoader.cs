@@ -147,7 +147,7 @@ namespace IFilterTextReader
                 }
                 catch (Exception exception)
                 {
-                    Marshal.ReleaseComObject(iFilter);
+                    Marshal.ReleaseComObject(iPersistStream);
                     iPersistStreamException = exception;
                 }
             }
