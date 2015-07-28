@@ -133,19 +133,29 @@ namespace IFilterTextReader
 
             // ReSharper disable once SuspiciousTypeConversion.Global
             var iPersistStream = iFilter as NativeMethods.IPersistStream;
+            Exception iPersistStreamException = null;
 
             // IPersistStream is asumed on 64 bits systems
             if (iPersistStream != null)
             {
-                iPersistStream.Load(new IStreamWrapper(stream));
-                NativeMethods.IFILTER_FLAGS flags;
-                if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
-                    return iFilter;
+                try
+                {
+                    iPersistStream.Load(new IStreamWrapper(stream));
+                    NativeMethods.IFILTER_FLAGS flags;
+                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                        return iFilter;
+                }
+                catch (Exception exception)
+                {
+                    Marshal.ReleaseComObject(iFilter);
+                    iPersistStreamException = exception;
+                }
             }
-            else
+
+            if (iPersistStreamException != null)
             {
                 if (string.IsNullOrWhiteSpace(fileName))
-                    throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
+                    throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter", iPersistStreamException);
 
                 // If we get here we probably are using an old IFilter so try to load it the old way
                 // ReSharper disable once SuspiciousTypeConversion.Global
@@ -162,6 +172,10 @@ namespace IFilterTextReader
             // If we failed to retreive an IPersistFile interface or to initialize
             // the filter, we release it and return null.
             Marshal.ReleaseComObject(iFilter);
+
+            if (iPersistStreamException != null)
+                throw iPersistStreamException;
+
             return null;
         }
         #endregion
