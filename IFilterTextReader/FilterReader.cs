@@ -123,11 +123,11 @@ namespace IFilterTextReader
                 if (_filter == null)
                 {
                     if (string.IsNullOrWhiteSpace(extension))
-                        throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64 bits" : "32 bits") +
-                                                   "IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+                        throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
+                                                   " bits IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
 
-                    throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64 bits" : "32 bits") +
-                                               "IFilter installed for the extension '" + extension + "'");
+                    throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
+                                               " bits IFilter installed for the extension '" + extension + "'");
                 }
             
                 _includeProperties = includeProperties;
@@ -160,8 +160,8 @@ namespace IFilterTextReader
             _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent);
 
             if (_filter == null)
-                throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64 bits" : "32 bits") +
-                                           "IFilter installed for the stream with the extension '" + extension + "'");
+                throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
+                                           " bits IFilter installed for the stream with the extension '" + extension + "'");
 
             _includeProperties = includeProperties;
         }

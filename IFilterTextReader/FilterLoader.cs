@@ -217,8 +217,8 @@ namespace IFilterTextReader
                     !GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName,
                         out filterPersistClass))
                     throw new IFFilterNotFound("Could not find a " +
-                                               (Environment.Is64BitProcess ? "64 bits" : "32 bits") +
-                                               " IFilter dll for a file with an '" + extension +
+                                               (Environment.Is64BitProcess ? "64" : "32") +
+                                               " bits IFilter dll for a file with an '" + extension +
                                                "' extension");
 
             FilterCache.Add(extension.ToUpperInvariant(), new CacheEntry(dllName, filterPersistClass));
