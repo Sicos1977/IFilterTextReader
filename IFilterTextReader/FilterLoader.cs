@@ -142,24 +142,22 @@ namespace IFilterTextReader
                 if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
                     return iFilter;
             }
-            else
+            
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
+
+            // If we get here we probably are using an old IFilter so try to load it the old way
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            var persistFile = iFilter as IPersistFile;
+            if (persistFile != null)
             {
-                if (string.IsNullOrWhiteSpace(fileName))
-                    throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
-
-                // If we get here we probably are using an old IFilter so try to load it the old way
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                var persistFile = iFilter as IPersistFile;
-                if (persistFile != null)
-                {
-                    persistFile.Load(fileName, 0);
-                    NativeMethods.IFILTER_FLAGS flags;
-                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
-                        return iFilter;
-                }
+                persistFile.Load(fileName, 0);
+                NativeMethods.IFILTER_FLAGS flags;
+                if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                    return iFilter;
             }
-
-            // If we failed to retreive an IPersistFile interface or to initialize
+            
+            // If we failed to retreive an IPersistStream or IPersistFile interface or to initialize
             // the filter, we release it and return null.
             Marshal.ReleaseComObject(iFilter);
             return null;
