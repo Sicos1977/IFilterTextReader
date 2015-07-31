@@ -20,6 +20,7 @@ using System.Windows.Forms;
 
 using IFilterTextReader;
 using IFilterTextViewer.Properties;
+// ReSharper disable LocalizableElement
 
 namespace IFilterTextViewer
 {
@@ -50,6 +51,7 @@ namespace IFilterTextViewer
         }
         #endregion
 
+        #region Constructor
         public MainForm()
         {
             InitializeComponent();
@@ -57,7 +59,9 @@ namespace IFilterTextViewer
             // Add the current process to the sandbox
             _job.AddProcess(Process.GetCurrentProcess().Handle);
         }
+        #endregion
 
+        #region Disable/Enable interface
         private void DisableInput()
         {
             SelectButton.Enabled = false;
@@ -67,6 +71,7 @@ namespace IFilterTextViewer
             TextToFindWithRegexTextBox.Enabled = false;
             DisableEmbeddedContentCheckBox.Enabled = false;
             IncludePropertiesCheckBox.Enabled = false;
+            ReadIntoMemoryCheckBox.Enabled = false;
             FilterTextBox.Clear();
         }
 
@@ -78,9 +83,12 @@ namespace IFilterTextViewer
             TextToFindTextBox.Enabled = true;
             TextToFindWithRegexTextBox.Enabled = true;
             DisableEmbeddedContentCheckBox.Enabled = true;
-            IncludePropertiesCheckBox.Enabled = true;            
+            IncludePropertiesCheckBox.Enabled = true;
+            ReadIntoMemoryCheckBox.Enabled = true;
         }
+        #endregion
 
+        #region SelectButton_Click
         private void SelectButton_Click(object sender, EventArgs e)
         {
             // Create an instance of the open file dialog box.
@@ -137,7 +145,9 @@ namespace IFilterTextViewer
                 }
             }
         }
+        #endregion
 
+        #region FindTextButton_Click
         private void FindTextButton_Click(object sender, EventArgs e)
         {
             try
@@ -157,7 +167,9 @@ namespace IFilterTextViewer
                 EnableInput();
             }
         }
+        #endregion
 
+        #region FindWithRegexButton_Click
         private void FindWithRegexButton_Click(object sender, EventArgs e)
         {
             try
@@ -180,5 +192,6 @@ namespace IFilterTextViewer
         {
             Settings.Default.Save();
         }
+        #endregion
     }
 }
