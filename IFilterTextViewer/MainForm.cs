@@ -115,6 +115,7 @@ namespace IFilterTextViewer
 
                     FilterTextBox.AppendText("*** Processing file '" + openFileDialog1.FileName + "' ***" + Environment.NewLine + Environment.NewLine);
                     Application.DoEvents();
+                    var stopWatch = new Stopwatch();
 
                     using (
                         var reader = new FilterReader(openFileDialog1.FileName, 
@@ -123,14 +124,15 @@ namespace IFilterTextViewer
                             IncludePropertiesCheckBox.Checked,
                             ReadIntoMemoryCheckBox.Checked))
                     {
+                        stopWatch.Start();
                         string line;
                         while ((line = reader.ReadLine()) != null)
                         {
                             FilterTextBox.AppendText(line + Environment.NewLine);
                             Application.DoEvents();
                         }
-
-                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE ***" + Environment.NewLine);
+                        stopWatch.Stop();
+                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);
                         Application.DoEvents();
                     }
                 }
