@@ -102,11 +102,16 @@ namespace IFilterTextReader
         /// <param name="extension">The file extension</param>
         /// <param name="disableEmbeddedContent">When set to <c>true</c> embedded content is NOT read</param>
         /// <param name="fileName">The name of the file</param>
+        /// <param name="readIntoMemory">When set to <c>true</c> the <paramref name="stream"/> is completely read 
+        /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
+        /// directly from the <paramref name="stream"/> and advances reading when the chunks are returned. 
+        /// Default set to <c>false</c></param>
         /// <returns><see cref="NativeMethods.IFilter"/> or null when no IFilter DLL is</returns>
         public static NativeMethods.IFilter LoadAndInitIFilter(Stream stream, 
                                                                string extension,
                                                                bool disableEmbeddedContent,
-                                                               string fileName = "")
+                                                               string fileName = "",
+                                                               bool readIntoMemory = false)
         {
             string dllName, filterPersistClass;
 
@@ -137,7 +142,22 @@ namespace IFilterTextReader
             // IPersistStream is asumed on 64 bits systems
             if (iPersistStream != null)
             {
-                iPersistStream.Load(new IStreamWrapper(stream));
+                // Create a COM stream
+                IStream comStream;
+
+                if (readIntoMemory)
+                {
+                    // Copy the content to global memory
+                    var buffer = new byte[stream.Length];
+                    stream.Read(buffer, 0, buffer.Length);
+                    var nativePtr = Marshal.AllocHGlobal(buffer.Length);
+                    Marshal.Copy(buffer, 0, nativePtr, buffer.Length);
+                    NativeMethods.CreateStreamOnHGlobal(nativePtr, true, out comStream);
+                }
+                else
+                    comStream = new IStreamWrapper(stream);
+
+                iPersistStream.Load(comStream);
                 NativeMethods.IFILTER_FLAGS flags;
                 if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
                     return iFilter;

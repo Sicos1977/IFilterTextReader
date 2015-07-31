@@ -112,7 +112,8 @@ namespace IFilterTextViewer
                         var reader = new FilterReader(openFileDialog1.FileName, 
                             string.Empty, 
                             DisableEmbeddedContentCheckBox.Checked,
-                            IncludePropertiesCheckBox.Checked))
+                            IncludePropertiesCheckBox.Checked,
+                            ReadIntoMemoryCheckBox.Checked))
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)

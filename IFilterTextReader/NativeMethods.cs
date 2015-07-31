@@ -859,6 +859,9 @@ namespace IFilterTextReader
         #endregion
 
         #region DllImports
+        [DllImport("ole32.dll")]
+        internal static extern int CreateStreamOnHGlobal(IntPtr hGlobal, bool fDeleteOnRelease, out IStream ppstm);
+
         [
             System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"),
             DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)

@@ -70,5 +70,17 @@ namespace IFilterTextViewer.Properties {
                 this["DisableEmbeddedContent"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ReadIntoMemory {
+            get {
+                return ((bool)(this["ReadIntoMemory"]));
+            }
+            set {
+                this["ReadIntoMemory"] = value;
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using IFilterTextReader.Exceptions;
+// ReSharper disable LocalizableElement
 
 /*
    Copyright 2013-2015 Kees van Spelde
@@ -105,10 +106,15 @@ namespace IFilterTextReader
         /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
         /// a document are also returned, e.g. the summary properties of a Word document. This parameter
         /// is default set to <c>false</c></param>
+        /// <param name="readIntoMemory">When set to <c>true</c> the <paramref name="fileName"/> is completely read 
+        /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
+        /// directly from the <paramref name="fileName"/> and advances reading when the chunks are returned. 
+        /// Default set to <c>false</c></param> 
         public FilterReader(string fileName, 
                             string extension = "",
                             bool disableEmbeddedContent = false,
-                            bool includeProperties = false)
+                            bool includeProperties = false,
+                            bool readIntoMemory = false)
         {
             try
             {
@@ -118,7 +124,7 @@ namespace IFilterTextReader
                 if (string.IsNullOrWhiteSpace(extension))
                     extension = Path.GetExtension(fileName); 
                 
-                _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName);
+                _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName, readIntoMemory);
 
                 if (_filter == null)
                 {
@@ -149,15 +155,20 @@ namespace IFilterTextReader
         /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
         /// a document are also returned, e.g. the summary properties of a Word document. This parameter
         /// is default set to <c>false</c></param>
+        /// <param name="readIntoMemory">When set to <c>true</c> the <paramref name="stream"/> is completely read 
+        /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
+        /// directly from the <paramref name="stream"/> and advances reading when the chunks are returned. 
+        /// Default set to <c>false</c></param>
         public FilterReader(Stream stream,
                             string extension,
                             bool disableEmbeddedContent = false,
-                            bool includeProperties = false)
+                            bool includeProperties = false,
+                            bool readIntoMemory = false)
         {
             if (string.IsNullOrWhiteSpace(extension))
                 throw new ArgumentException("The extension cannot be empty", "extension");
 
-            _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent);
+            _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent, string.Empty, readIntoMemory);
 
             if (_filter == null)
                 throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
