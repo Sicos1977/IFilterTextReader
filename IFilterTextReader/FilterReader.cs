@@ -481,7 +481,7 @@ namespace IFilterTextReader
                     {
                         buffer[index + charsRead] = ' ';
                     }
-                    Array.Copy(textBuffer, 0, buffer, index + charsRead + (PrependBreak ? 1 : 0), read);
+                    Array.Copy(textBuffer, 0, buffer, index + charsRead + (PrependBreak ? 1 : 0), read - (PrependBreak ? 1 : 0));
                     charsRead += read;
                 }
             }
