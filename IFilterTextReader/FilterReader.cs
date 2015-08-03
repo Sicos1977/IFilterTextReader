@@ -373,6 +373,7 @@ namespace IFilterTextReader
 
                 var textBuffer = new char[textLength + 1];
                 var textRead = false;
+                bool PrependBreak = false;
 
                 switch (_chunk.flags)
                 {
@@ -433,6 +434,7 @@ namespace IFilterTextReader
                             case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
 
                                 textRead = true;
+                                PrependBreak = false;
                                 // Remove junk from the buffer
                                 CleanUpCharacters(textLength, textBuffer);
 
@@ -448,11 +450,8 @@ namespace IFilterTextReader
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                        if (textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
-                                        {
-                                            textBuffer[textLength] = '\n';
-                                            textLength += 1;
-                                        }
+                                        PrependBreak = true;
+                                        textLength++;
                                         break;
                                 }
 
@@ -477,9 +476,12 @@ namespace IFilterTextReader
                         read -= charsLeft;
                     }
                     else
-                        _charsLeftFromLastRead = null;
-
-                    Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
+                      _charsLeftFromLastRead = null;
+                    if (PrependBreak)
+                    {
+                        buffer[index + charsRead] = ' ';
+                    }
+                    Array.Copy(textBuffer, 0, buffer, index + charsRead + (PrependBreak ? 1 : 0), read);
                     charsRead += read;
                 }
             }
