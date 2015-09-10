@@ -158,13 +158,13 @@
             // 
             // TimeoutTextBox
             // 
-            this.TimeoutTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::IFilterTextViewer.Properties.Settings.Default, "TimeoutTextBox", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.TimeoutTextBox.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::IFilterTextViewer.Properties.Settings.Default, "TimeoutTextBoxValue", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.TimeoutTextBox.Location = new System.Drawing.Point(643, 118);
             this.TimeoutTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.TimeoutTextBox.Name = "TimeoutTextBox";
             this.TimeoutTextBox.Size = new System.Drawing.Size(281, 31);
             this.TimeoutTextBox.TabIndex = 6;
-            this.TimeoutTextBox.Text = global::IFilterTextViewer.Properties.Settings.Default.TimeoutTextBox;
+            this.TimeoutTextBox.Text = global::IFilterTextViewer.Properties.Settings.Default.TimeoutTextBoxValue;
             // 
             // ReadIntoMemoryCheckBox
             // 

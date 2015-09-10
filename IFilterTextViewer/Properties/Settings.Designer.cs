@@ -94,5 +94,17 @@ namespace IFilterTextViewer.Properties {
                 this["TimeoutTextBox"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public string TimeoutTextBoxValue {
+            get {
+                return ((string)(this["TimeoutTextBoxValue"]));
+            }
+            set {
+                this["TimeoutTextBoxValue"] = value;
+            }
+        }
     }
 }
