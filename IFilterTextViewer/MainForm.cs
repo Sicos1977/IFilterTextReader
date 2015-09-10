@@ -58,6 +58,7 @@ namespace IFilterTextViewer
 
             // Add the current process to the sandbox
             _job.AddProcess(Process.GetCurrentProcess().Handle);
+            TimeoutOptionsComboBox.SelectedIndex = 0;
         }
         #endregion
 
@@ -117,12 +118,31 @@ namespace IFilterTextViewer
                     Application.DoEvents();
                     var stopWatch = new Stopwatch();
 
+                    var timeoutOption = FilterReaderTimeout.NoTimeout;
+
+                    switch (TimeoutOptionsComboBox.SelectedIndex)
+                    {
+                        case 0:
+                            timeoutOption = FilterReaderTimeout.NoTimeout;
+                            break;
+
+                        case 1:
+                            timeoutOption = FilterReaderTimeout.TimeoutOnly;
+                            break;
+
+                        case 2:
+                            timeoutOption = FilterReaderTimeout.TimeoutWithException;
+                            break;
+                    }
+
                     using (
                         var reader = new FilterReader(openFileDialog1.FileName, 
                             string.Empty, 
                             DisableEmbeddedContentCheckBox.Checked,
                             IncludePropertiesCheckBox.Checked,
-                            ReadIntoMemoryCheckBox.Checked))
+                            ReadIntoMemoryCheckBox.Checked,
+                            timeoutOption,
+                            int.Parse(TimeoutTextBox.Text)))
                     {
                         stopWatch.Start();
                         string line;

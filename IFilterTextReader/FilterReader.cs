@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using IFilterTextReader.Exceptions;
 // ReSharper disable LocalizableElement
+// ReSharper disable FunctionComplexityOverflow
 
 /*
    Copyright 2013-2015 Kees van Spelde
@@ -24,6 +26,29 @@ using IFilterTextReader.Exceptions;
 
 namespace IFilterTextReader
 {
+    #region FilterReaderTimeout
+    /// <summary>
+    /// A method to control the parsing of very large files
+    /// </summary>
+    public enum FilterReaderTimeout
+    {
+        /// <summary>
+        /// The reader does not timeout and reads to the end of the file
+        /// </summary>
+        NoTimeout,
+
+        /// <summary>
+        /// The reader times out and returns like it has succesfully parsed the complete file
+        /// </summary>
+        TimeoutOnly,
+
+        /// <summary>
+        /// The reader times out and throws the exception <see cref="IFFilterTimeout"/>
+        /// </summary>
+        TimeoutWithException
+    }
+    #endregion
+
     /// <summary>
     /// This class is a <see cref="TextReader"/> wrapper around an <see cref="NativeMethods.IFilter"/>. This way a file can be processed 
     /// like if it is a dead normal text file
@@ -86,6 +111,21 @@ namespace IFilterTextReader
         /// When set to true all available properties will also be read with the <see cref="NativeMethods.IFilter.GetValue"/> method
         /// </summary>
         private readonly bool _includeProperties;
+
+        /// <summary>
+        /// Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/>
+        /// </summary>
+        private readonly FilterReaderTimeout _filterReaderTimeout;
+
+        /// <summary>
+        /// The timeout in millisecond when the <see cref="_filterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/>
+        /// </summary>
+        private readonly int _timeout;
+
+        /// <summary>
+        /// Used in conjuction with <see cref="_filterReaderTimeout"/> and <see cref="_timeout"/>
+        /// </summary>
+        private Stopwatch _stopwatch;
         
         /// <summary>
         /// Indicates when true that a carriage return was found on the previous line
@@ -109,12 +149,17 @@ namespace IFilterTextReader
         /// <param name="readIntoMemory">When set to <c>true</c> the <paramref name="fileName"/> is completely read 
         /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
         /// directly from the <paramref name="fileName"/> and advances reading when the chunks are returned. 
-        /// Default set to <c>false</c></param> 
+        /// Default set to <c>false</c></param>
+        /// <param name="filterReaderTimeout">Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/></param>
+        /// <param name="timeout">The timeout in millisecond when the <paramref name="filterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/>
+        /// </param>
         public FilterReader(string fileName, 
                             string extension = "",
                             bool disableEmbeddedContent = false,
                             bool includeProperties = false,
-                            bool readIntoMemory = false)
+                            bool readIntoMemory = false,
+                            FilterReaderTimeout filterReaderTimeout = FilterReaderTimeout.NoTimeout,
+                            int timeout = -1)
         {
             try
             {
@@ -137,6 +182,12 @@ namespace IFilterTextReader
                 }
             
                 _includeProperties = includeProperties;
+                _filterReaderTimeout = filterReaderTimeout;
+
+                if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
+                    throw new ArgumentException("Needs to be larger then 0", "timeout");
+
+                _timeout = timeout;
             }
             catch (Exception)
             {
@@ -159,11 +210,15 @@ namespace IFilterTextReader
         /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
         /// directly from the <paramref name="stream"/> and advances reading when the chunks are returned. 
         /// Default set to <c>false</c></param>
+        /// <param name="filterReaderTimeout">Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/></param>
+        /// <param name="timeout">The timeout in millisecond when the <paramref name="filterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/></param>
         public FilterReader(Stream stream,
                             string extension,
                             bool disableEmbeddedContent = false,
                             bool includeProperties = false,
-                            bool readIntoMemory = false)
+                            bool readIntoMemory = false,
+                            FilterReaderTimeout filterReaderTimeout = FilterReaderTimeout.NoTimeout,
+                            int timeout = -1)
         {
             if (string.IsNullOrWhiteSpace(extension))
                 throw new ArgumentException("The extension cannot be empty", "extension");
@@ -175,6 +230,12 @@ namespace IFilterTextReader
                                            " bits IFilter installed for the stream with the extension '" + extension + "'");
 
             _includeProperties = includeProperties;
+            _filterReaderTimeout = filterReaderTimeout;
+
+            if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
+                throw new ArgumentException("Needs to be larger then 0", "timeout");
+
+            _timeout = timeout;
         }
 
         /// <summary>
@@ -182,7 +243,43 @@ namespace IFilterTextReader
         /// </summary>
         ~FilterReader()
         {
+            if (_stopwatch != null)
+                _stopwatch.Stop();
+
             Dispose(false);
+        }
+        #endregion
+
+        #region Timeout
+        /// <summary>
+        /// Validates if the <see cref="_stopwatch"/> has passed the <see cref="_timeout"/> value when
+        /// <see cref="_filterReaderTimeout"/> is set to anything but <see cref="FilterReaderTimeout.NoTimeout"/> and
+        /// takes the correct action
+        /// </summary>
+        private bool Timeout()
+        {
+            if (_filterReaderTimeout == FilterReaderTimeout.NoTimeout) return false;
+
+            if (_stopwatch == null)
+            {
+                _stopwatch = new Stopwatch();
+                _stopwatch.Start();
+                return false;
+            }
+
+            if (_stopwatch.ElapsedMilliseconds >= _timeout)
+            {
+                switch (_filterReaderTimeout)
+                {
+                    case FilterReaderTimeout.TimeoutOnly:
+                        return true;
+
+                    case FilterReaderTimeout.TimeoutWithException:
+                        throw new IFFilterTimeout("The IFilter has timed out");
+                }
+            }
+
+            return false;
         }
         #endregion
 
@@ -207,7 +304,7 @@ namespace IFilterTextReader
             {
                 var charsRead = Read(buffer, 0, 1024);
 
-                if (charsRead == 0)
+                if (charsRead <= 0)
                 {
                     if (stringBuilder.Length != 0)
                         done = true;
@@ -281,6 +378,8 @@ namespace IFilterTextReader
         /// (e.g. files with a wrong extension)</exception>
         public override int Read()
         {
+            if (Timeout()) return -1;
+
             var chr = new char[0];
             var read = Read(chr, 0, 1);
             if (read == 1)
@@ -322,6 +421,9 @@ namespace IFilterTextReader
                 throw new ArgumentOutOfRangeException("count");
 
             var charsRead = 0;
+
+            if (Timeout())
+                return 0;
 
             while (!_done && charsRead < count)
             {
@@ -467,7 +569,6 @@ namespace IFilterTextReader
 
                 if (textRead)
                 {
-
                     var read = (int)textLength;
                     if (read + charsRead > count)
                     {
@@ -482,6 +583,9 @@ namespace IFilterTextReader
                     Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
                     charsRead += read;
                 }
+
+                if (Timeout())
+                    break;
             }
 
             return charsRead;
@@ -1053,12 +1157,12 @@ namespace IFilterTextReader
 
         #region Not implemented methods
         /// <summary>
-        /// This method is not supported and will aways throw an <see cref="NotImplementedException"/>
+        /// This method is not supported and will aways throw an <see cref="NotSupportedException"/>
         /// </summary>
         /// <returns></returns>
         public override int Peek()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
         #endregion
 
@@ -1075,6 +1179,8 @@ namespace IFilterTextReader
 
             if (_fileStream != null)
                 _fileStream.Dispose();
+
+            _stopwatch = null;
 
             base.Dispose(true);
 
