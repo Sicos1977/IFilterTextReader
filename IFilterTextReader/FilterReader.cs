@@ -98,9 +98,15 @@ namespace IFilterTextReader
         private bool _chunkValid;
         
         /// <summary>
-        /// Indicates that we are done with reading <see cref="_chunk">chunks</see>
+        /// Indicates that we are done with processing all the text that has been returned by the 
+        /// <see cref="_chunk"/>
         /// </summary>
         private bool _done;
+
+        /// <summary>
+        /// Indicates that we are done with reading <see cref="_chunk">chunks</see>
+        /// </summary>
+        private bool _endOfChunks;
 
         /// <summary>
         /// Holds the chars that are left from the last chunck read
@@ -446,6 +452,9 @@ namespace IFilterTextReader
                     else
                         _charsLeftFromLastRead = null;
 
+                    if (_charsLeftFromLastRead == null && _endOfChunks)
+                        _done = true;
+
                     continue;
                 }
 
@@ -462,6 +471,7 @@ namespace IFilterTextReader
 
                         case NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS:
                             _done = true;
+                            _endOfChunks = true;
                             break;
                     }
 
