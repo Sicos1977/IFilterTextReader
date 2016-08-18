@@ -58,6 +58,7 @@ namespace IFilterTextViewer
 
             // Add the current process to the sandbox
             _job.AddProcess(Process.GetCurrentProcess().Handle);
+            TimeoutOptionsComboBox.SelectedIndex = 0;
         }
         #endregion
 
@@ -115,22 +116,43 @@ namespace IFilterTextViewer
 
                     FilterTextBox.AppendText("*** Processing file '" + openFileDialog1.FileName + "' ***" + Environment.NewLine + Environment.NewLine);
                     Application.DoEvents();
+                    var stopWatch = new Stopwatch();
+
+                    var timeoutOption = FilterReaderTimeout.NoTimeout;
+
+                    switch (TimeoutOptionsComboBox.SelectedIndex)
+                    {
+                        case 0:
+                            timeoutOption = FilterReaderTimeout.NoTimeout;
+                            break;
+
+                        case 1:
+                            timeoutOption = FilterReaderTimeout.TimeoutOnly;
+                            break;
+
+                        case 2:
+                            timeoutOption = FilterReaderTimeout.TimeoutWithException;
+                            break;
+                    }
 
                     using (
                         var reader = new FilterReader(openFileDialog1.FileName, 
                             string.Empty, 
                             DisableEmbeddedContentCheckBox.Checked,
                             IncludePropertiesCheckBox.Checked,
-                            ReadIntoMemoryCheckBox.Checked))
+                            ReadIntoMemoryCheckBox.Checked,
+                            timeoutOption,
+                            int.Parse(TimeoutTextBox.Text)))
                     {
+                        stopWatch.Start();
                         string line;
                         while ((line = reader.ReadLine()) != null)
                         {
                             FilterTextBox.AppendText(line + Environment.NewLine);
                             Application.DoEvents();
                         }
-
-                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE ***" + Environment.NewLine);
+                        stopWatch.Stop();
+                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);
                         Application.DoEvents();
                     }
                 }

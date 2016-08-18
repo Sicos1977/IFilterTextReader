@@ -6,7 +6,7 @@ A C# TextReader that gets text from different file formats through the IFilter i
 Installing via NuGet
 ====================
 
-The easiest way to install MSGReader is via NuGet.
+The easiest way to install IFilterTextReader is via NuGet.
 
 In Visual Studio's Package Manager Console, simply enter the following command:
 

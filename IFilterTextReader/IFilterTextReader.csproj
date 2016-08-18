@@ -32,7 +32,10 @@
     <DocumentationFile>bin\Release\IFilterTextReader.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>filter.ico</ApplicationIcon>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>IFilterTextReader.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,6 +47,7 @@
     <Compile Include="Exceptions\IFClassFactoryFailure.cs" />
     <Compile Include="Exceptions\IFFilterNotFound.cs" />
     <Compile Include="Exceptions\IFOldFilterFormat.cs" />
+    <Compile Include="Exceptions\IFilterTimeout.cs" />
     <Compile Include="Exceptions\IFUnknownFormat.cs" />
     <Compile Include="FilterLoader.cs" />
     <Compile Include="FilterReader.cs" />
@@ -61,11 +65,10 @@
     <Compile Include="UnmappedPropertyEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="IFilterTextReader.snk" />
     <None Include="Properties.xlsx" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="filter.ico" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Localization\LanguageConsts.resx">
       <Generator>ResXFileCodeGenerator</Generator>
