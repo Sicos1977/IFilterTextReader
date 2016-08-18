@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.FilterTextBox = new System.Windows.Forms.TextBox();
             this.SelectButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -49,7 +50,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.FilterTextBox.Location = new System.Drawing.Point(8, 114);
-            this.FilterTextBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FilterTextBox.Margin = new System.Windows.Forms.Padding(2);
             this.FilterTextBox.Multiline = true;
             this.FilterTextBox.Name = "FilterTextBox";
             this.FilterTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -59,7 +60,7 @@
             // SelectButton
             // 
             this.SelectButton.Location = new System.Drawing.Point(8, 6);
-            this.SelectButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SelectButton.Margin = new System.Windows.Forms.Padding(2);
             this.SelectButton.Name = "SelectButton";
             this.SelectButton.Size = new System.Drawing.Size(74, 22);
             this.SelectButton.TabIndex = 1;
@@ -81,7 +82,7 @@
             // 
             this.FindTextButton.Enabled = false;
             this.FindTextButton.Location = new System.Drawing.Point(464, 60);
-            this.FindTextButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FindTextButton.Margin = new System.Windows.Forms.Padding(2);
             this.FindTextButton.Name = "FindTextButton";
             this.FindTextButton.Size = new System.Drawing.Size(64, 20);
             this.FindTextButton.TabIndex = 6;
@@ -93,7 +94,7 @@
             // 
             this.FindWithRegexButton.Enabled = false;
             this.FindWithRegexButton.Location = new System.Drawing.Point(464, 85);
-            this.FindWithRegexButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FindWithRegexButton.Margin = new System.Windows.Forms.Padding(2);
             this.FindWithRegexButton.Name = "FindWithRegexButton";
             this.FindWithRegexButton.Size = new System.Drawing.Size(64, 20);
             this.FindWithRegexButton.TabIndex = 8;
@@ -198,7 +199,8 @@
             this.Controls.Add(this.TextToFindTextBox);
             this.Controls.Add(this.SelectButton);
             this.Controls.Add(this.FilterTextBox);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MainForm";
             this.Text = "IFilter Text Viewer";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
