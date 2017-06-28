@@ -53,8 +53,14 @@ namespace IFilterTextReader
         /// <param name="cb"></param>
         /// <param name="pcbRead"></param>
         public void Read(byte[] pv, int cb, IntPtr pcbRead)
-        {
-            Marshal.WriteInt32(pcbRead, _stream.Read(pv, 0, cb));
+        {            
+            int bytesRead = _stream.Read(pv, 0, cb);
+
+            if (pcbRead != IntPtr.Zero)
+            {
+                Marshal.WriteInt32(pcbRead, bytesRead);
+            }
+            
         }
         #endregion
 
@@ -67,8 +73,12 @@ namespace IFilterTextReader
         /// <param name="pcbWritten"></param>
         public void Write(byte[] pv, int cb, IntPtr pcbWritten)
         {
-            var written = Marshal.ReadInt32(pcbWritten);
-            _stream.Write(pv, 0, written);
+            _stream.Write(pv, 0, cb);
+
+            if (pcbWritten != IntPtr.Zero)
+            {
+                Marshal.WriteInt32(pcbWritten, cb);
+            }            
         }
         #endregion
 
@@ -81,7 +91,12 @@ namespace IFilterTextReader
         /// <param name="plibNewPosition"></param>
         public void Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition)
         {
-            _stream.Seek(dlibMove, (SeekOrigin)(dwOrigin));
+            long newPosition = _stream.Seek(dlibMove, (SeekOrigin)dwOrigin);
+
+            if (plibNewPosition != IntPtr.Zero)
+            {
+                Marshal.WriteInt64(plibNewPosition, newPosition);
+            }            
         }
         #endregion
 
@@ -97,13 +112,12 @@ namespace IFilterTextReader
         }
 
         /// <summary>
-        /// This function is not implemented and will throw an NotImplementedException
+        /// Commit changes to the stream.
         /// </summary>
-        /// <param name="grfCommitFlags"></param>
-        /// <exception cref="NotImplementedException">This exception will ALWAYS be thrown</exception>
+        /// <param name="grfCommitFlags"></param>        
         public void Commit(int grfCommitFlags)
         {
-            throw new NotImplementedException();
+            _stream.Flush();
         }
 
         /// <summary>
@@ -161,12 +175,11 @@ namespace IFilterTextReader
         }
 
         /// <summary>
-        /// This function is not implemented and will throw an NotImplementedException
-        /// </summary>
-        /// <exception cref="NotImplementedException">This exception will ALWAYS be thrown</exception>
+        /// Set the size of the stream.
+        /// </summary>        
         public void SetSize(long libNewSize)
         {
-            throw new NotImplementedException();
+            _stream.SetLength(libNewSize);
         }
 
         /// <summary>
