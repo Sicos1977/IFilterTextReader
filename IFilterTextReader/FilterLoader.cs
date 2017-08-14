@@ -158,13 +158,17 @@ namespace IFilterTextReader
                     comStream = new IStreamWrapper(stream);
 
                 try
-                {                    
+                {
                     iPersistStream.Load(comStream);
+
                     NativeMethods.IFILTER_FLAGS flags;
                     if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
                         return iFilter;
                 }
-                catch { }
+                catch (Exception exception)
+                {
+                    throw new IFOldFilterFormat("An error occured while trying to load a stream with the IPersistStream interface", exception);
+                }
             }
             
             if (string.IsNullOrWhiteSpace(fileName))
