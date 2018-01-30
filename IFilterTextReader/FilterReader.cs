@@ -173,8 +173,17 @@ namespace IFilterTextReader
                 _fileStream = File.OpenRead(fileName);
 
                 if (string.IsNullOrWhiteSpace(extension))
-                    extension = Path.GetExtension(fileName); 
-                
+                {
+                    extension = Path.GetExtension(fileName);
+                    if (string.IsNullOrWhiteSpace(extension))
+                    {
+                        // Try to detect the extension if the file does not have one
+                        var fileInfo = FileTypeSelector.GetFileTypeFileInfo(fileName);
+                        if (fileInfo != null)
+                            extension = fileInfo.Extension;
+                    }
+                }
+
                 _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName, readIntoMemory);
 
                 if (_filter == null)

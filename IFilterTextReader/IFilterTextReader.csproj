@@ -49,6 +49,7 @@
     <Compile Include="Exceptions\IFOldFilterFormat.cs" />
     <Compile Include="Exceptions\IFilterTimeout.cs" />
     <Compile Include="Exceptions\IFUnknownFormat.cs" />
+    <Compile Include="FileTypeSelector.cs" />
     <Compile Include="FilterLoader.cs" />
     <Compile Include="FilterReader.cs" />
     <Compile Include="Job.cs" />
