@@ -569,7 +569,7 @@ namespace IFilterTextReader
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                        if (textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
+										if(textLength >= 1 && textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
                                         {
                                             textBuffer[textLength] = '\n';
                                             textLength += 1;
