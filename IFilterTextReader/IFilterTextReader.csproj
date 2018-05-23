@@ -46,6 +46,7 @@
     <Compile Include="Exceptions\IFFileIsPasswordProtected.cs" />
     <Compile Include="Exceptions\IFClassFactoryFailure.cs" />
     <Compile Include="Exceptions\IFFilterNotFound.cs" />
+    <Compile Include="Exceptions\IFFilterPartiallyFiltered.cs" />
     <Compile Include="Exceptions\IFOldFilterFormat.cs" />
     <Compile Include="Exceptions\IFilterTimeout.cs" />
     <Compile Include="Exceptions\IFUnknownFormat.cs" />

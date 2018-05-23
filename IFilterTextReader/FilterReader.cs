@@ -475,6 +475,9 @@ namespace IFilterTextReader
 
                     switch (result)
                     {
+                        case NativeMethods.IFilterReturnCode.FILTER_E_PARTIALLY_FILTERED:
+                            throw new IFFilterPartiallyFiltered("The file was to large to filter completely");
+
                         case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
                             throw new IFAccesFailure("Could not acces IFilter object, invalid file");
 

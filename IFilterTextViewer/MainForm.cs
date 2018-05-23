@@ -148,8 +148,9 @@ namespace IFilterTextViewer
                         string line;
                         while ((line = reader.ReadLine()) != null)
                         {
-                            FilterTextBox.AppendText(line + Environment.NewLine);
-                            Application.DoEvents();
+                            //FilterTextBox.AppendText(line + Environment.NewLine);
+                            //Application.DoEvents();
+                            System.IO.File.AppendAllLines("d:\\test.txt", new []{line});
                         }
                         stopWatch.Stop();
                         FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);

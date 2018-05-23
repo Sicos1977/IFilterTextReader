@@ -236,14 +236,20 @@ namespace IFilterTextReader
             FILTER_E_LINK_UNAVAILABLE = 0x80041708,
 
             /// <summary>
-            ///  This is the last text in the current chunk
+            /// This is the last text in the current chunk
             /// </summary>
             FILTER_S_LAST_TEXT = 0x00041709,
 
             /// <summary>
             /// This is the last value in the current chunk
             /// </summary>
-            FILTER_S_LAST_VALUES = 0x0004170A
+            FILTER_S_LAST_VALUES = 0x0004170A,
+            
+            /// <summary>
+            /// The document was too large to filter in its entirety. 
+            /// Portions of the document were not emitted.
+            /// </summary>
+            FILTER_E_PARTIALLY_FILTERED = 0x8004173E
         }
         #endregion
 
