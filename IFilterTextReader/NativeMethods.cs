@@ -249,7 +249,12 @@ namespace IFilterTextReader
             /// The document was too large to filter in its entirety. 
             /// Portions of the document were not emitted.
             /// </summary>
-            FILTER_E_PARTIALLY_FILTERED = 0x8004173E
+            FILTER_E_PARTIALLY_FILTERED = 0x8004173E,
+
+            /// <summary>
+            /// File is too large to filter.
+            /// </summary>
+            FILTER_E_TOO_BIG = 0x80041730
         }
         #endregion
 
