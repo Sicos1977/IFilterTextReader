@@ -200,7 +200,7 @@ namespace IFilterTextReader
                 _filterReaderTimeout = filterReaderTimeout;
 
                 if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
-                    throw new ArgumentException("Needs to be larger then 0", "timeout");
+                    throw new ArgumentException("Needs to be larger then 0", nameof(timeout));
 
                 _timeout = timeout;
             }
@@ -236,7 +236,7 @@ namespace IFilterTextReader
                             int timeout = -1)
         {
             if (string.IsNullOrWhiteSpace(extension))
-                throw new ArgumentException("The extension cannot be empty", "extension");
+                throw new ArgumentException("The extension cannot be empty", nameof(extension));
 
             _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent, string.Empty, readIntoMemory);
 
@@ -248,7 +248,7 @@ namespace IFilterTextReader
             _filterReaderTimeout = filterReaderTimeout;
 
             if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
-                throw new ArgumentException("Needs to be larger then 0", "timeout");
+                throw new ArgumentException("Needs to be larger then 0", nameof(timeout));
 
             _timeout = timeout;
         }
@@ -424,16 +424,16 @@ namespace IFilterTextReader
         public override int Read(char[] buffer, int index, int count)
         {
             if (buffer == null)
-                throw new ArgumentNullException("buffer");
+                throw new ArgumentNullException(nameof(buffer));
 
             if (buffer.Length - index < count)
                 throw new ArgumentException("The buffer is to small");
 
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             if (count < 0)
-                throw new ArgumentOutOfRangeException("count");
+                throw new ArgumentOutOfRangeException(nameof(count));
 
             var charsRead = 0;
 

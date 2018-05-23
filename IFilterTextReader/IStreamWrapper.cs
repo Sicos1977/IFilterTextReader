@@ -39,7 +39,7 @@ namespace IFilterTextReader
         public IStreamWrapper(Stream stream)
         {
             if (stream == null)
-                throw new ArgumentNullException("stream", "Can't wrap null stream.");
+                throw new ArgumentNullException(nameof(stream), "Can't wrap null stream.");
 
             _stream = stream;
         }
