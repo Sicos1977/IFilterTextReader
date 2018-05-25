@@ -258,8 +258,7 @@ namespace IFilterTextReader
         /// </summary>
         ~FilterReader()
         {
-            if (_stopwatch != null)
-                _stopwatch.Stop();
+            _stopwatch?.Stop();
 
             Dispose(false);
         }
@@ -480,6 +479,9 @@ namespace IFilterTextReader
 
                         case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
                             throw new IFAccesFailure("Could not acces IFilter object, invalid file");
+
+                        case NativeMethods.IFilterReturnCode.FILTER_E_TOO_BIG:
+                            throw new IFFileToLarge("The file is to large to filter");
 
                         case NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS:
                             _done = true;
@@ -712,21 +714,19 @@ namespace IFilterTextReader
                     var result = NativeMethods.PSGetNameFromPropertyKey(ref propertyKey, out propertyName);
                     if (result == 0)
                     {
-                        if (UnmappedPropertyEvent != null)
-                            UnmappedPropertyEvent(this,
-                                new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
-                                    _chunk.attribute.psProperty.data.ToString(), propertyName,
-                                    propertyVariant.Value.ToString()));
+                        UnmappedPropertyEvent?.Invoke(this,
+                            new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
+                                _chunk.attribute.psProperty.data.ToString(), propertyName,
+                                propertyVariant.Value.ToString()));
 
                         return propertyName + " : " + propertyVariant.Value + "\n";
                     }
                     else
                     {
-                        if (UnmappedPropertyEvent != null)
-                            UnmappedPropertyEvent(this,
-                                new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
-                                    _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString())); 
-                        
+                        UnmappedPropertyEvent?.Invoke(this,
+                            new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
+                                _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString()));
+
                         return _chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data + " : " +
                                propertyVariant.Value + "\n";
                     }
@@ -1199,8 +1199,7 @@ namespace IFilterTextReader
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
 
-            if (_fileStream != null)
-                _fileStream.Dispose();
+            _fileStream?.Dispose();
 
             _stopwatch = null;
 
