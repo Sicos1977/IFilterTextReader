@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("IFilterTextReader")]
-[assembly: AssemblyCopyright("Copyright © 2014 - 2017 - Kees van Spelde")]
+[assembly: AssemblyCopyright("Copyright 2013-2018 Kees van Spelde")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
