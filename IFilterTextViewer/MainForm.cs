@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 /*
@@ -136,8 +137,8 @@ namespace IFilterTextViewer
                     }
 
                     using (
-                        var reader = new FilterReader(openFileDialog1.FileName, 
-                            string.Empty, 
+                        var reader = new FilterReader(openFileDialog1.FileName,
+                            string.Empty,
                             DisableEmbeddedContentCheckBox.Checked,
                             IncludePropertiesCheckBox.Checked,
                             ReadIntoMemoryCheckBox.Checked,
@@ -146,11 +147,13 @@ namespace IFilterTextViewer
                     {
                         stopWatch.Start();
                         string line;
+                        string tempFileName = Path.GetTempFileName();
+
                         while ((line = reader.ReadLine()) != null)
                         {
-                            //FilterTextBox.AppendText(line + Environment.NewLine);
-                            //Application.DoEvents();
-                            System.IO.File.AppendAllLines("d:\\test.txt", new []{line});
+                            FilterTextBox.AppendText(line + Environment.NewLine);
+                            Application.DoEvents();
+                            System.IO.File.AppendAllLines(tempFileName, new[] { line });
                         }
                         stopWatch.Stop();
                         FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);
