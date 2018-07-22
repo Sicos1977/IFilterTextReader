@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 /*
-   Copyright 2013-2017 Kees van Spelde
+   Copyright 2013-2018 Kees van Spelde
 
    Licensed under The Code Project Open License (CPOL) 1.02;
    you may not use this file except in compliance with the License.
@@ -136,8 +137,8 @@ namespace IFilterTextViewer
                     }
 
                     using (
-                        var reader = new FilterReader(openFileDialog1.FileName, 
-                            string.Empty, 
+                        var reader = new FilterReader(openFileDialog1.FileName,
+                            string.Empty,
                             DisableEmbeddedContentCheckBox.Checked,
                             IncludePropertiesCheckBox.Checked,
                             ReadIntoMemoryCheckBox.Checked,
@@ -146,10 +147,13 @@ namespace IFilterTextViewer
                     {
                         stopWatch.Start();
                         string line;
+                        string tempFileName = Path.GetTempFileName();
+
                         while ((line = reader.ReadLine()) != null)
                         {
                             FilterTextBox.AppendText(line + Environment.NewLine);
                             Application.DoEvents();
+                            System.IO.File.AppendAllLines(tempFileName, new[] { line });
                         }
                         stopWatch.Stop();
                         FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);

@@ -20,17 +20,17 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when a file or IFilter cannot be accessed 
+    /// Raised when the file is to large to filter
     /// </summary>
     [Serializable]
-    public class IFAccesFailure : Exception
+    public class IFFileToLarge : Exception
     {
-        internal IFAccesFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFileToLarge(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-        internal IFAccesFailure() { }
+        internal IFFileToLarge() { }
 
-        internal IFAccesFailure(string message) : base(message) { }
+        internal IFFileToLarge(string message) : base(message) { }
 
-        internal IFAccesFailure(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFileToLarge(string message, Exception innerException) : base(message, innerException) { }
     }
 }

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
 /*
-   Copyright 2013-2017 Kees van Spelde
+   Copyright 2013-2018 Kees van Spelde
 
    Licensed under The Code Project Open License (CPOL) 1.02;
    you may not use this file except in compliance with the License.
@@ -236,14 +236,25 @@ namespace IFilterTextReader
             FILTER_E_LINK_UNAVAILABLE = 0x80041708,
 
             /// <summary>
-            ///  This is the last text in the current chunk
+            /// This is the last text in the current chunk
             /// </summary>
             FILTER_S_LAST_TEXT = 0x00041709,
 
             /// <summary>
             /// This is the last value in the current chunk
             /// </summary>
-            FILTER_S_LAST_VALUES = 0x0004170A
+            FILTER_S_LAST_VALUES = 0x0004170A,
+            
+            /// <summary>
+            /// The document was too large to filter in its entirety. 
+            /// Portions of the document were not emitted.
+            /// </summary>
+            FILTER_E_PARTIALLY_FILTERED = 0x8004173E,
+
+            /// <summary>
+            /// File is too large to filter.
+            /// </summary>
+            FILTER_E_TOO_BIG = 0x80041730
         }
         #endregion
 

@@ -9,7 +9,7 @@ using IFilterTextReader.Exceptions;
 // ReSharper disable FunctionComplexityOverflow
 
 /*
-   Copyright 2013-2017 Kees van Spelde
+   Copyright 2013-2018 Kees van Spelde
 
    Licensed under The Code Project Open License (CPOL) 1.02;
    you may not use this file except in compliance with the License.
@@ -173,8 +173,17 @@ namespace IFilterTextReader
                 _fileStream = File.OpenRead(fileName);
 
                 if (string.IsNullOrWhiteSpace(extension))
-                    extension = Path.GetExtension(fileName); 
-                
+                {
+                    extension = Path.GetExtension(fileName);
+                    if (string.IsNullOrWhiteSpace(extension))
+                    {
+                        // Try to detect the extension if the file does not have one
+                        var fileInfo = FileTypeSelector.GetFileTypeFileInfo(fileName);
+                        if (fileInfo != null)
+                            extension = fileInfo.Extension;
+                    }
+                }
+
                 _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName, readIntoMemory);
 
                 if (_filter == null)
@@ -191,7 +200,7 @@ namespace IFilterTextReader
                 _filterReaderTimeout = filterReaderTimeout;
 
                 if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
-                    throw new ArgumentException("Needs to be larger then 0", "timeout");
+                    throw new ArgumentException("Needs to be larger then 0", nameof(timeout));
 
                 _timeout = timeout;
             }
@@ -227,7 +236,7 @@ namespace IFilterTextReader
                             int timeout = -1)
         {
             if (string.IsNullOrWhiteSpace(extension))
-                throw new ArgumentException("The extension cannot be empty", "extension");
+                throw new ArgumentException("The extension cannot be empty", nameof(extension));
 
             _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent, string.Empty, readIntoMemory);
 
@@ -239,7 +248,7 @@ namespace IFilterTextReader
             _filterReaderTimeout = filterReaderTimeout;
 
             if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
-                throw new ArgumentException("Needs to be larger then 0", "timeout");
+                throw new ArgumentException("Needs to be larger then 0", nameof(timeout));
 
             _timeout = timeout;
         }
@@ -249,8 +258,7 @@ namespace IFilterTextReader
         /// </summary>
         ~FilterReader()
         {
-            if (_stopwatch != null)
-                _stopwatch.Stop();
+            _stopwatch?.Stop();
 
             Dispose(false);
         }
@@ -415,16 +423,16 @@ namespace IFilterTextReader
         public override int Read(char[] buffer, int index, int count)
         {
             if (buffer == null)
-                throw new ArgumentNullException("buffer");
+                throw new ArgumentNullException(nameof(buffer));
 
             if (buffer.Length - index < count)
                 throw new ArgumentException("The buffer is to small");
 
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index));
 
             if (count < 0)
-                throw new ArgumentOutOfRangeException("count");
+                throw new ArgumentOutOfRangeException(nameof(count));
 
             var charsRead = 0;
 
@@ -466,8 +474,14 @@ namespace IFilterTextReader
 
                     switch (result)
                     {
+                        case NativeMethods.IFilterReturnCode.FILTER_E_PARTIALLY_FILTERED:
+                            throw new IFFilterPartiallyFiltered("The file was to large to filter completely");
+
                         case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
                             throw new IFAccesFailure("Could not acces IFilter object, invalid file");
+
+                        case NativeMethods.IFilterReturnCode.FILTER_E_TOO_BIG:
+                            throw new IFFileToLarge("The file is to large to filter");
 
                         case NativeMethods.IFilterReturnCode.FILTER_E_END_OF_CHUNKS:
                             _done = true;
@@ -560,7 +574,7 @@ namespace IFilterTextReader
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-                                        if (textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
+										if(textLength >= 1 && textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
                                         {
                                             textBuffer[textLength] = '\n';
                                             textLength += 1;
@@ -700,21 +714,19 @@ namespace IFilterTextReader
                     var result = NativeMethods.PSGetNameFromPropertyKey(ref propertyKey, out propertyName);
                     if (result == 0)
                     {
-                        if (UnmappedPropertyEvent != null)
-                            UnmappedPropertyEvent(this,
-                                new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
-                                    _chunk.attribute.psProperty.data.ToString(), propertyName,
-                                    propertyVariant.Value.ToString()));
+                        UnmappedPropertyEvent?.Invoke(this,
+                            new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
+                                _chunk.attribute.psProperty.data.ToString(), propertyName,
+                                propertyVariant.Value.ToString()));
 
                         return propertyName + " : " + propertyVariant.Value + "\n";
                     }
                     else
                     {
-                        if (UnmappedPropertyEvent != null)
-                            UnmappedPropertyEvent(this,
-                                new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
-                                    _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString())); 
-                        
+                        UnmappedPropertyEvent?.Invoke(this,
+                            new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
+                                _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString()));
+
                         return _chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data + " : " +
                                propertyVariant.Value + "\n";
                     }
@@ -1187,8 +1199,7 @@ namespace IFilterTextReader
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
 
-            if (_fileStream != null)
-                _fileStream.Dispose();
+            _fileStream?.Dispose();
 
             _stopwatch = null;
 
