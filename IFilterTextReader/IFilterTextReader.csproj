@@ -51,6 +51,7 @@
     <Compile Include="Exceptions\IFUnknownFormat.cs" />
     <Compile Include="FilterLoader.cs" />
     <Compile Include="FilterReader.cs" />
+    <Compile Include="FilterReaderOptions.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="Localization\LanguageConsts1.Designer.cs">
       <AutoGen>True</AutoGen>
