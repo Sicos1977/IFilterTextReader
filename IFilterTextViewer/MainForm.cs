@@ -136,14 +136,16 @@ namespace IFilterTextViewer
                             break;
                     }
 
-                    using (
-                        var reader = new FilterReader(openFileDialog1.FileName,
-                            string.Empty,
-                            DisableEmbeddedContentCheckBox.Checked,
-                            IncludePropertiesCheckBox.Checked,
-                            ReadIntoMemoryCheckBox.Checked,
-                            timeoutOption,
-                            int.Parse(TimeoutTextBox.Text)))
+                    var options = new FilterReaderOptions()
+                    {
+                        DisableEmbeddedContent = DisableEmbeddedContentCheckBox.Checked,
+                        IncludeProperties = DisableEmbeddedContentCheckBox.Checked,
+                        ReadIntoMemory = ReadIntoMemoryCheckBox.Checked,
+                        ReaderTimeout = timeoutOption,
+                        Timeout = int.Parse(TimeoutTextBox.Text)
+                    };
+
+                    using (var reader = new FilterReader(openFileDialog1.FileName, string.Empty, options))
                     {
                         stopWatch.Start();
                         string line;

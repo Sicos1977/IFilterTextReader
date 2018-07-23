@@ -114,22 +114,12 @@ namespace IFilterTextReader
         private char[] _charsLeftFromLastRead;
 
         /// <summary>
-        /// When set to true all available properties will also be read with the <see cref="NativeMethods.IFilter.GetValue"/> method
+        /// <see cref="FilterReaderOptions"/>
         /// </summary>
-        private readonly bool _includeProperties;
+        private readonly FilterReaderOptions _options = new FilterReaderOptions();
 
         /// <summary>
-        /// Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/>
-        /// </summary>
-        private readonly FilterReaderTimeout _filterReaderTimeout;
-
-        /// <summary>
-        /// The timeout in millisecond when the <see cref="_filterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/>
-        /// </summary>
-        private readonly int _timeout;
-
-        /// <summary>
-        /// Used in conjuction with <see cref="_filterReaderTimeout"/> and <see cref="_timeout"/>
+        /// Used in conjuction with <see cref="_options"/>
         /// </summary>
         private Stopwatch _stopwatch;
         
@@ -147,28 +137,16 @@ namespace IFilterTextReader
         /// <param name="extension">Overrides the file extension of the <paramref name="fileName"/>, 
         /// the extension is used to determine the <see cref="NativeMethods.IFilter"/> that needs to
         /// be used to read the <paramref name="fileName"/></param>
-        /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
-        /// doesn't read embedded content, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
-        /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
-        /// a document are also returned, e.g. the summary properties of a Word document. This parameter
-        /// is default set to <c>false</c></param>
-        /// <param name="readIntoMemory">When set to <c>true</c> the <paramref name="fileName"/> is completely read 
-        /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
-        /// directly from the <paramref name="fileName"/> and advances reading when the chunks are returned. 
-        /// Default set to <c>false</c></param>
-        /// <param name="filterReaderTimeout">Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/></param>
-        /// <param name="timeout">The timeout in millisecond when the <paramref name="filterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/>
-        /// </param>
+        /// <param name="filterReaderOptions"><see cref="FilterReaderOptions"/></param>
         public FilterReader(string fileName, 
                             string extension = "",
-                            bool disableEmbeddedContent = false,
-                            bool includeProperties = false,
-                            bool readIntoMemory = false,
-                            FilterReaderTimeout filterReaderTimeout = FilterReaderTimeout.NoTimeout,
-                            int timeout = -1)
+                            FilterReaderOptions filterReaderOptions = null)
         {
             try
             {
+                if (filterReaderOptions != null)
+                    _options = filterReaderOptions;
+
                 _fileName = fileName;
                 _fileStream = File.OpenRead(fileName);
 
@@ -184,7 +162,12 @@ namespace IFilterTextReader
                     }
                 }
 
-                _filter = FilterLoader.LoadAndInitIFilter(_fileStream, extension, disableEmbeddedContent, fileName, readIntoMemory);
+                _filter = FilterLoader.LoadAndInitIFilter(
+                    _fileStream, 
+                    extension, 
+                    _options.DisableEmbeddedContent, 
+                    fileName, 
+                    _options.ReadIntoMemory);
 
                 if (_filter == null)
                 {
@@ -196,13 +179,8 @@ namespace IFilterTextReader
                                                " bits IFilter installed for the extension '" + extension + "'");
                 }
             
-                _includeProperties = includeProperties;
-                _filterReaderTimeout = filterReaderTimeout;
-
-                if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
-                    throw new ArgumentException("Needs to be larger then 0", nameof(timeout));
-
-                _timeout = timeout;
+                if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
+                    throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
             }
             catch (Exception)
             {
@@ -216,41 +194,29 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="stream">The file stream to read</param>
         /// <param name="extension">The extension for the <paramref name="stream"/></param>
-        /// <param name="disableEmbeddedContent">When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
-        /// doesn't read embedded content, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c></param>
-        /// <param name="includeProperties">When set to <c>true</c> the metadata properties of
-        /// a document are also returned, e.g. the summary properties of a Word document. This parameter
-        /// is default set to <c>false</c></param>
-        /// <param name="readIntoMemory">When set to <c>true</c> the <paramref name="stream"/> is completely read 
-        /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
-        /// directly from the <paramref name="stream"/> and advances reading when the chunks are returned. 
-        /// Default set to <c>false</c></param>
-        /// <param name="filterReaderTimeout">Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/></param>
-        /// <param name="timeout">The timeout in millisecond when the <paramref name="filterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/></param>
+        /// <param name="filterReaderOptions"><see cref="FilterReaderOptions"/></param>
         public FilterReader(Stream stream,
                             string extension,
-                            bool disableEmbeddedContent = false,
-                            bool includeProperties = false,
-                            bool readIntoMemory = false,
-                            FilterReaderTimeout filterReaderTimeout = FilterReaderTimeout.NoTimeout,
-                            int timeout = -1)
+                            FilterReaderOptions filterReaderOptions)
         {
             if (string.IsNullOrWhiteSpace(extension))
                 throw new ArgumentException("The extension cannot be empty", nameof(extension));
 
-            _filter = FilterLoader.LoadAndInitIFilter(stream, extension, disableEmbeddedContent, string.Empty, readIntoMemory);
+            if (filterReaderOptions != null)
+                _options = filterReaderOptions;
+
+            _filter = FilterLoader.LoadAndInitIFilter(
+                stream, 
+                extension, 
+                _options.DisableEmbeddedContent, string.Empty, 
+                _options.ReadIntoMemory);
 
             if (_filter == null)
                 throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
                                            " bits IFilter installed for the stream with the extension '" + extension + "'");
 
-            _includeProperties = includeProperties;
-            _filterReaderTimeout = filterReaderTimeout;
-
-            if (filterReaderTimeout != FilterReaderTimeout.NoTimeout && timeout < 0)
-                throw new ArgumentException("Needs to be larger then 0", nameof(timeout));
-
-            _timeout = timeout;
+            if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
+                throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
         }
 
         /// <summary>
@@ -266,13 +232,13 @@ namespace IFilterTextReader
 
         #region Timeout
         /// <summary>
-        /// Validates if the <see cref="_stopwatch"/> has passed the <see cref="_timeout"/> value when
-        /// <see cref="_filterReaderTimeout"/> is set to anything but <see cref="FilterReaderTimeout.NoTimeout"/> and
+        /// Validates if the <see cref="_stopwatch"/> has passed the <see cref="FilterReaderOptions.Timeout"/> value when
+        /// <see cref="FilterReaderOptions.ReaderTimeout"/> is set to anything but <see cref="FilterReaderTimeout.NoTimeout"/> and
         /// takes the correct action
         /// </summary>
         private bool Timeout()
         {
-            if (_filterReaderTimeout == FilterReaderTimeout.NoTimeout) return false;
+            if (_options.ReaderTimeout == FilterReaderTimeout.NoTimeout) return false;
 
             if (_stopwatch == null)
             {
@@ -281,9 +247,9 @@ namespace IFilterTextReader
                 return false;
             }
 
-            if (_stopwatch.ElapsedMilliseconds >= _timeout)
+            if (_stopwatch.ElapsedMilliseconds >= _options.Timeout)
             {
-                switch (_filterReaderTimeout)
+                switch (_options.ReaderTimeout)
                 {
                     case FilterReaderTimeout.TimeoutOnly:
                         return true;
@@ -509,7 +475,7 @@ namespace IFilterTextReader
 
                     case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
 
-                        if (!_includeProperties)
+                        if (!_options.IncludeProperties)
                         {
                             _chunkValid = false;
                             continue;

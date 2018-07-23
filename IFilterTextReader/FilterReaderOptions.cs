@@ -1,40 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace IFilterTextReader
+﻿namespace IFilterTextReader
 {
     /// <summary>
     /// A class with options that control the way the <see cref="FilterReader"/> processes files
     /// </summary>
     public class FilterReaderOptions
     {
+        #region Properties
         /// <summary>
-        /// When set to <c>true</c> then embedded content (e.g. an attachment in an E-mail) is not processed
+        /// When set to <c>true</c> the <see cref="NativeMethods.IFilter"/>
+        /// doesn't read embedded content, e.g. an attachment inside an E-mail msg file. This parameter is default set to <c>false</c>
         /// </summary>
         public bool DisableEmbeddedContent { get; set; }
 
         /// <summary>
-        /// When set to <c>true</c> then file properties are also processed (e.g. properties in Word documents)
+        /// When set to <c>true</c> the metadata properties of
+        /// a document are also returned, e.g. the summary properties of a Word document. This parameter
+        /// is default set to <c>false</c>
         /// </summary>
         public bool IncludeProperties { get; set; }
 
         /// <summary>
-        /// When set to <c>true</c> then the file is read into memory before processing
+        /// When set to <c>true</c> the file to process is completely read 
+        /// into memory first before the iFilters starts to read chunks, when set to <c>false</c> the iFilter reads
+        /// directly from the file and advances reading when the chunks are returned. 
+        /// Default set to <c>false</c>
         /// </summary>
         public bool ReadIntoMemory { get; set; }
 
         /// <summary>
-        /// Controls the way the reader timeouts when processing files (default is no timeout)
+        /// Can be used to timeout when parsing very large files, default set to <see cref="FilterReaderTimeout.NoTimeout"/>
         /// </summary>
-        public FilterReaderTimeout FilterReaderTimeout { get; set; } 
+        public FilterReaderTimeout ReaderTimeout { get; set; }
 
         /// <summary>
-        /// The amount of milliseconds before processing a file times out. This value is only
+        /// The timeout in millisecond when the <see cref="FilterReaderTimeout"/> is set to a value other then <see cref="FilterReaderTimeout.NoTimeout"/>
+        /// </summary>
+        /// <remarks>This value is only
         /// used when <see cref="FilterReaderTimeout"/> is set to <see cref="FilterReaderTimeout.TimeoutOnly"/>
         /// or <see cref="FilterReaderTimeout.TimeoutWithException"/>
-        /// </summary>
+        /// </remarks>
         public int Timeout { get; set; }
+        #endregion
+
+        #region Constructor
+        /// <summary>
+        /// Creates this object and sets it's defaults properties
+        /// </summary>
+        public FilterReaderOptions()
+        {
+            DisableEmbeddedContent = false;
+            IncludeProperties = false;
+            ReadIntoMemory = false;
+            ReaderTimeout = FilterReaderTimeout.NoTimeout;
+            Timeout = -1;
+        }
+        #endregion
     }
 }
