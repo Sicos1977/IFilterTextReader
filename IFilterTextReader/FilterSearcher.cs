@@ -94,7 +94,7 @@ namespace IFilterTextReader
             return false;
         }
         #endregion
-        
+
         #region GetRegexMatchesFromFile
         /// <summary>
         /// Returns an array with all the matches that are found with the give <see cref="regularExpression"/> regular expression
