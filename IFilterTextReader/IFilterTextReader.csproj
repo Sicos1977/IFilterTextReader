@@ -1,34 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{86693E2D-C3CB-4E16-9684-94445934A9D3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IFilterTextReader</RootNamespace>
     <AssemblyName>IFilterTextReader</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\IFilterTextReader.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\IFilterTextReader.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
@@ -36,56 +20,18 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>IFilterTextReader.snk</AssemblyOriginatorKeyFile>
+    <AssemblyVersion>1.7.0.0</AssemblyVersion>
+    <FileVersion>1.7.0.0</FileVersion>
+    <Copyright>Copyright 2013-2018 Kees van Spelde</Copyright>
+    <Authors>Kees van Spelde</Authors>
+    <Version>1.7.0</Version>
+    <Description>C# implementation of an IFilter to get text from any kind of file</Description>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ComHelpers.cs" />
-    <Compile Include="Exceptions\IFAccessFailure.cs" />
-    <Compile Include="Exceptions\IFFileIsPasswordProtected.cs" />
-    <Compile Include="Exceptions\IFClassFactoryFailure.cs" />
-    <Compile Include="Exceptions\IFFilterNotFound.cs" />
-    <Compile Include="Exceptions\IFFileToLarge.cs" />
-    <Compile Include="Exceptions\IFFilterPartiallyFiltered.cs" />
-    <Compile Include="Exceptions\IFOldFilterFormat.cs" />
-    <Compile Include="Exceptions\IFilterTimeout.cs" />
-    <Compile Include="Exceptions\IFUnknownFormat.cs" />
-    <Compile Include="FileTypeSelector.cs" />
-    <Compile Include="FilterLoader.cs" />
-    <Compile Include="FilterReader.cs" />
-    <Compile Include="FilterReaderOptions.cs" />
-    <Compile Include="Job.cs" />
-    <Compile Include="Localization\LanguageConsts1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>LanguageConsts.resx</DependentUpon>
-    </Compile>
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IStreamWrapper.cs" />
-    <Compile Include="Property.cs" />
-    <Compile Include="PropertyMapper.cs" />
-    <Compile Include="UnmappedPropertyEventArgs.cs" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="IFilterTextReader.snk" />
     <None Include="Properties.xlsx" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="Localization\LanguageConsts.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>LanguageConsts1.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
