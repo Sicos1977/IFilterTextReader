@@ -127,6 +127,11 @@ namespace IFilterTextReader
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
         private bool _carriageReturnFound;
+
+        /// <summary>
+        /// Collection of metadata properties extracted from file
+        /// </summary>
+        public readonly Dictionary<string, object> MetaDataProperties = new Dictionary<string, object>();
         #endregion
 
         #region Constructor en Destructor
@@ -475,12 +480,6 @@ namespace IFilterTextReader
 
                     case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
 
-                        if (!_options.IncludeProperties)
-                        {
-                            _chunkValid = false;
-                            continue;
-                        }
-
                         var valuePtr = IntPtr.Zero;
                         var valueResult = _filter.GetValue(ref valuePtr);
                         CheckResult(valueResult);
@@ -659,7 +658,7 @@ namespace IFilterTextReader
                 if (_chunk.attribute.psProperty.ulKind == NativeMethods.PROPSPECKIND.PRSPEC_LPWSTR)
                 {
                     var propertyNameString = Marshal.PtrToStringUni(_chunk.attribute.psProperty.data);
-                    return propertyNameString + " : " + propertyVariant.Value + "\n";
+                    return GetMetaDataProperty(propertyNameString, propertyVariant.Value);
                 }
                 else
                 {
@@ -667,7 +666,7 @@ namespace IFilterTextReader
                         (long) _chunk.attribute.psProperty.data);
 
                     if (!string.IsNullOrEmpty(property))
-                        return property + " : " + propertyVariant.Value + "\n";
+                        return GetMetaDataProperty(property, propertyVariant.Value);
 
                     // Reader the property guid and id
                     var propertyKey = new NativeMethods.PROPERTYKEY
@@ -685,7 +684,7 @@ namespace IFilterTextReader
                                 _chunk.attribute.psProperty.data.ToString(), propertyName,
                                 propertyVariant.Value.ToString()));
 
-                        return propertyName + " : " + propertyVariant.Value + "\n";
+                        return GetMetaDataProperty(propertyName, propertyVariant.Value);
                     }
                     else
                     {
@@ -693,8 +692,8 @@ namespace IFilterTextReader
                             new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
                                 _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString()));
 
-                        return _chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data + " : " +
-                               propertyVariant.Value + "\n";
+                        return GetMetaDataProperty(_chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data, 
+                            propertyVariant.Value);
                     }
                 }
             }
@@ -704,7 +703,22 @@ namespace IFilterTextReader
             }
         }
         #endregion
-        
+
+        #region GetMetaDataProperty
+        /// <summary>
+        /// Adds metadata to dictionary and outputs name/value string
+        /// </summary>
+        /// <param name="name">Metadata name</param>
+        /// <param name="value">Metadata value</param>
+        /// <returns>Name and value of the property or null if IncludeProperties option is false</returns>
+        private string GetMetaDataProperty(string name, object value)
+        {
+            MetaDataProperties.Add(name, value);
+
+            return _options.IncludeProperties ? name + " : " + value + "\n" : null;
+        }
+        #endregion
+
         #region CleanUpCharacters
         /// <summary>
         /// Remove junk from the <paramref name="buffer"/>

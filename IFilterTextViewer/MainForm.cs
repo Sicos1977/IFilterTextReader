@@ -139,7 +139,7 @@ namespace IFilterTextViewer
                     var options = new FilterReaderOptions()
                     {
                         DisableEmbeddedContent = DisableEmbeddedContentCheckBox.Checked,
-                        IncludeProperties = DisableEmbeddedContentCheckBox.Checked,
+                        IncludeProperties = IncludePropertiesCheckBox.Checked,
                         ReadIntoMemory = ReadIntoMemoryCheckBox.Checked,
                         ReaderTimeout = timeoutOption,
                         Timeout = int.Parse(TimeoutTextBox.Text)
