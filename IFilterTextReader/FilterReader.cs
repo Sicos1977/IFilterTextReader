@@ -1,3 +1,29 @@
+//
+// FilterReader.cs
+//
+// Author: Kees van Spelde <sicos2002@hotmail.com>
+//
+// Copyright (c) 2013-2019 Magic-Sessions. (www.magic-sessions.com)
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,22 +33,6 @@ using System.Text;
 using IFilterTextReader.Exceptions;
 // ReSharper disable LocalizableElement
 // ReSharper disable FunctionComplexityOverflow
-
-/*
-   Copyright 2013-2018 Kees van Spelde
-
-   Licensed under The Code Project Open License (CPOL) 1.02;
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-     http://www.codeproject.com/info/cpol10.aspx
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
 
 namespace IFilterTextReader
 {
@@ -274,7 +284,7 @@ namespace IFilterTextReader
         /// </summary>
         /// <returns>The next line from the reader, or null if all characters have been read.</returns>
         /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
-        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="IFAccessFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
         /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
         /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
         /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
@@ -356,7 +366,7 @@ namespace IFilterTextReader
         /// </summary>
         /// <returns>The next character from the text reader, or -1 if no more characters are available.</returns>
         /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
-        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="IFAccessFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
         /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
         /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
         /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
@@ -386,7 +396,7 @@ namespace IFilterTextReader
         /// depending on whether the data is available within the reader.  This method returns 0 (zero) if it is called
         /// when no more characters are left to read</returns>
         /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
-        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="IFAccessFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
         /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
         /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
         /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
@@ -449,7 +459,7 @@ namespace IFilterTextReader
                             throw new IFFilterPartiallyFiltered("The file was to large to filter completely");
 
                         case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
-                            throw new IFAccesFailure("Could not acces IFilter object, invalid file");
+                            throw new IFAccessFailure("Could not acces IFilter object, invalid file");
 
                         case NativeMethods.IFilterReturnCode.FILTER_E_TOO_BIG:
                             throw new IFFileToLarge("The file is to large to filter");
@@ -595,7 +605,7 @@ namespace IFilterTextReader
         /// depending on whether the data is available within the reader.  This method returns 0 (zero) if it is called
         /// when no more characters are left to read</returns>
         /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
-        /// <exception cref="IFAccesFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="IFAccessFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
         /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
         /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
         /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
@@ -622,7 +632,7 @@ namespace IFilterTextReader
 
                 case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
                 case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
-                    throw new IFAccesFailure("Unable to acces the IFilter or file");
+                    throw new IFAccessFailure("Unable to acces the IFilter or file");
 
                 case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
                     throw new OutOfMemoryException("Not enough memory to proceed reading the file '" +
