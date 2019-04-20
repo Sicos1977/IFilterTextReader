@@ -14,7 +14,7 @@ In Visual Studio's Package Manager Console, simply enter the following command:
 
 ## License Information
 
-MsgReader is Copyright (C) 2013-2018 Magic-Sessions and is licensed under the MIT license:
+MsgReader is Copyright (C) 2013-2019 Magic-Sessions and is licensed under the MIT license:
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
