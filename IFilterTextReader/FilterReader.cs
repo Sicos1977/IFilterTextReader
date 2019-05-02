@@ -141,7 +141,7 @@ namespace IFilterTextReader
         /// <summary>
         /// Collection of metadata properties extracted from file
         /// </summary>
-        public readonly Dictionary<string, object> MetaDataProperties = new Dictionary<string, object>();
+        public readonly Dictionary<string, List<object>> MetaDataProperties = new Dictionary<string, List<object>>();
         #endregion
 
         #region Constructor en Destructor
@@ -723,7 +723,10 @@ namespace IFilterTextReader
         /// <returns>Name and value of the property or null if IncludeProperties option is false</returns>
         private string GetMetaDataProperty(string name, object value)
         {
-            MetaDataProperties.Add(name, value);
+            if(MetaDataProperties.ContainsKey(name))
+                MetaDataProperties[name].Add(value); 
+            else            
+                MetaDataProperties.Add(name, new List<object>() { value });
 
             return _options.IncludeProperties ? name + " : " + value + "\n" : null;
         }
