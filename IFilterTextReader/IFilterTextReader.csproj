@@ -2,16 +2,30 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>1.6.0.0</AssemblyVersion>
-    <FileVersion>1.6.0.0</FileVersion>
-    <Version>1.6.0</Version>
+    <AssemblyVersion>1.6.1.0</AssemblyVersion>
+    <FileVersion>1.6.1.0</FileVersion>
+    <Version>1.6.1</Version>
     <Description>C# implementation of an IFilter to get text from any kind of file</Description>
     <Product>IFilterTextReader</Product>
     <Company />
     <Authors>Kees van Spelde</Authors>
-    <Copyright>Copyright 2013-2018 Kees van Spelde</Copyright>
+    <Copyright>Copyright 2013-2019 Kees van Spelde</Copyright>
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Sicos1977/IFilterTextReader.git</RepositoryUrl>
+    <PackageReleaseNotes>- Use a class to pass options to the filterreader instead of method parameters
+- Handle file to large return code
+- Added code to handle IFilter return code FILTER_E_TOO_BIG
+- Added code to handle IFilter return code FILTER_E_PARTIALLY_FILTERED
+- Changed license to MIT</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>http://icons.iconarchive.com/icons/fatcow/farm-fresh/32/filter-add-icon.png</PackageIconUrl>
+    <PackageTags>IFilter, Outlook, Word, Excel Powerpoint</PackageTags>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>IFilterTextReader.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Progsoft\_GitHub_\IFilterTextReader\IFilterTextReader\IFilterTextReader.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
