@@ -48,10 +48,7 @@ namespace IFilterTextReader
         /// <param name="stream"></param>
         public IStreamWrapper(Stream stream)
         {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream), "Can't wrap null stream.");
-
-            _stream = stream;
+            _stream = stream ?? throw new ArgumentNullException(nameof(stream), "Can't wrap null stream.");
         }
         #endregion
 
@@ -211,10 +208,10 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="pstatstg"></param>
         /// <param name="grfStatFlag"></param>
-        public void Stat(out STATSTG pstatstg, int grfStatFlag)
+        public void Stat(out System.Runtime.InteropServices.ComTypes.STATSTG pstatstg, int grfStatFlag)
         {
             //IStreamWrapper wants the length
-            var tempStatstg = new STATSTG {cbSize = _stream.Length};
+            var tempStatstg = new System.Runtime.InteropServices.ComTypes.STATSTG {cbSize = _stream.Length};
             pstatstg = tempStatstg;
         }
         #endregion

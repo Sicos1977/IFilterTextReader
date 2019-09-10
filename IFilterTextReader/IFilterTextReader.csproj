@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>1.6.1.0</AssemblyVersion>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <AssemblyVersion>1.6.2.0</AssemblyVersion>
     <FileVersion>1.6.2.0</FileVersion>
     <Version>1.6.2</Version>
     <Description>C# implementation of an IFilter to get text from any kind of file</Description>
@@ -13,13 +13,15 @@
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Sicos1977/IFilterTextReader.git</RepositoryUrl>
     <PackageReleaseNotes>- Fix exception when multiple meta-data properties values exist</PackageReleaseNotes>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>IFilterTextReader.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Exceptions\IFAccesFailure.cs" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0" />
   </ItemGroup>
 
