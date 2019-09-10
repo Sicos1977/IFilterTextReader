@@ -726,7 +726,7 @@ namespace IFilterTextReader
             if(MetaDataProperties.ContainsKey(name))
                 MetaDataProperties[name].Add(value); 
             else            
-                MetaDataProperties.Add(name, new List<object>() { value });
+                MetaDataProperties.Add(name, new List<object> { value });
 
             return _options.IncludeProperties ? name + " : " + value + "\n" : null;
         }

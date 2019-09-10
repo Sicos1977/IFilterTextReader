@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>1.6.0.0</AssemblyVersion>
-    <FileVersion>1.6.0.0</FileVersion>
-    <Version>1.6.0</Version>
+    <AssemblyVersion>1.6.1.0</AssemblyVersion>
+    <FileVersion>1.6.2.0</FileVersion>
+    <Version>1.6.2</Version>
     <Description>C# implementation of an IFilter to get text from any kind of file</Description>
     <Product>IFilterTextReader</Product>
     <Company />
@@ -12,6 +12,7 @@
     <Copyright>Copyright 2013-2018 Kees van Spelde</Copyright>
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Sicos1977/IFilterTextReader.git</RepositoryUrl>
+    <PackageReleaseNotes>- Fix exception when multiple meta-data properties values exist</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
