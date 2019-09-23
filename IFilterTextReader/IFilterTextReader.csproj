@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>1.6.3.0</AssemblyVersion>
-    <FileVersion>1.6.3.0</FileVersion>
-    <Version>1.6.2</Version>
+    <AssemblyVersion>1.6.4.0</AssemblyVersion>
+    <FileVersion>1.6.4.0</FileVersion>
+    <Version>1.6.4</Version>
     <Description>C# implementation of an IFilter to get text from any kind of file</Description>
     <Product>IFilterTextReader</Product>
     <Company />
