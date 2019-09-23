@@ -46,8 +46,8 @@ namespace IFilterTextReader
         /// </summary>
         private class CacheEntry
         {
-            public string DllName { get; private set; }
-            public string ClassName { get; private set; }
+            public string DllName { get; }
+            public string ClassName { get; }
 
             /// <summary>
             /// 
@@ -66,12 +66,12 @@ namespace IFilterTextReader
         /// <summary>
         /// Contains cached IFilter lookups
         /// </summary>
-        private readonly static Dictionary<string, CacheEntry> FilterCache = new Dictionary<string, CacheEntry>(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, CacheEntry> FilterCache = new Dictionary<string, CacheEntry>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// The <see cref="ComHelpers"/> object
         /// </summary>
-        private readonly static ComHelpers ComHelpers = new ComHelpers();
+        private static readonly ComHelpers ComHelpers = new ComHelpers();
         #endregion
 
         #region ReadFromHKLM
@@ -123,10 +123,8 @@ namespace IFilterTextReader
                                                                string fileName = "",
                                                                bool readIntoMemory = false)
         {
-            string dllName, filterPersistClass;
-
             // Find the dll and ClassID
-            GetFilterDllAndClass(extension, out dllName, out filterPersistClass);
+            GetFilterDllAndClass(extension, out var dllName, out var filterPersistClass);
             
             var iFilter = LoadFilterFromDll(dllName, filterPersistClass);
 
@@ -171,13 +169,13 @@ namespace IFilterTextReader
                 {
                     iPersistStream.Load(comStream);
 
-                    NativeMethods.IFILTER_FLAGS flags;
-                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
                         return iFilter;
                 }
                 catch (Exception exception)
                 {
-                    throw new IFOldFilterFormat("An error occured while trying to load a stream with the IPersistStream interface", exception);
+                    if (string.IsNullOrWhiteSpace(fileName))
+                        throw new IFOldFilterFormat("An error occured while trying to load a stream with the IPersistStream interface", exception);
                 }
             }
             
@@ -186,12 +184,10 @@ namespace IFilterTextReader
 
             // If we get here we probably are using an old IFilter so try to load it the old way
             // ReSharper disable once SuspiciousTypeConversion.Global
-            var persistFile = iFilter as IPersistFile;
-            if (persistFile != null)
+            if (iFilter is IPersistFile persistFile)
             {
                 persistFile.Load(fileName, 0);
-                NativeMethods.IFILTER_FLAGS flags;
-                if (iFilter.Init(iflags, 0, IntPtr.Zero, out flags) == NativeMethods.IFilterReturnCode.S_OK)
+                if (iFilter.Init(iflags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
                     return iFilter;
             }
             
