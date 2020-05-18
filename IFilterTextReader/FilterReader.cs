@@ -403,6 +403,8 @@ namespace IFilterTextReader
         /// (e.g. files with a wrong extension)</exception>
         public override int Read(char[] buffer, int index, int count)
         {
+            var breakChar = string.Empty;
+
             if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
 
@@ -541,19 +543,17 @@ namespace IFilterTextReader
                                 switch (_chunk.breakType)
                                 {
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_NO_BREAK:
+                                        breakChar = string.Empty;
                                         break;
 
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
+                                        breakChar = "-";
                                         break;
 
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOP:
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOS:
-										if(textLength >= 1 && textBuffer[textLength - 1] != ' ' && textBuffer[textLength - 1] != '\n')
-                                        {
-                                            textBuffer[textLength] = '\n';
-                                            textLength += 1;
-                                        }
+                                        breakChar = "\n";
                                         break;
                                 }
 
@@ -571,7 +571,7 @@ namespace IFilterTextReader
                     var read = (int)textLength;
                     if (read + charsRead > count)
                     {
-                        var charsLeft = (read + charsRead - count);
+                        var charsLeft = read + charsRead - count;
                         _charsLeftFromLastRead = new char[charsLeft];
                         Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
                         read -= charsLeft;
@@ -579,7 +579,15 @@ namespace IFilterTextReader
                     else
                         _charsLeftFromLastRead = null;
 
-                    Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
+                    if (breakChar != string.Empty)
+                    {
+                        Array.Copy(breakChar.ToCharArray(), 0, buffer, index + charsRead, 1);
+                        Array.Copy(textBuffer, 0, buffer, index + charsRead + 1, read);
+                        read += 1;
+                    }
+                    else
+                        Array.Copy(textBuffer, 0, buffer, index + charsRead, read);
+
                     charsRead += read;
                 }
 
