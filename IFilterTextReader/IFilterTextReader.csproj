@@ -2,19 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>1.6.4.0</AssemblyVersion>
-    <FileVersion>1.6.4.0</FileVersion>
-    <Version>1.6.4</Version>
+    <AssemblyVersion>1.6.5.0</AssemblyVersion>
+    <FileVersion>1.6.5.0</FileVersion>
+    <Version>1.6.5</Version>
     <Description>C# implementation of an IFilter to get text from any kind of file</Description>
     <Product>IFilterTextReader</Product>
     <Company />
     <Authors>Kees van Spelde</Authors>
-    <Copyright>Copyright 2013-2019 Kees van Spelde</Copyright>
+    <Copyright>Copyright 2013-2020 Kees van Spelde</Copyright>
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Sicos1977/IFilterTextReader.git</RepositoryUrl>
-    <PackageReleaseNotes>- Target both .NET 4.5 and .NETSTANDARD 2.0
-- Fix exception when multiple values exists for a meta-data property
-- Signed the assembly</PackageReleaseNotes>
+    <PackageReleaseNotes>- Place break char before the read chunk and not after</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>IFilterTextReader.snk</AssemblyOriginatorKeyFile>
