@@ -493,30 +493,40 @@ namespace IFilterTextReader
                     case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
 
                         var valuePtr = IntPtr.Zero;
-                        var valueResult = _filter.GetValue(ref valuePtr);
-                        CheckResult(valueResult);
 
-                        switch (valueResult)
+                        try
                         {
-                            case NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_VALUES:
-                            case NativeMethods.IFilterReturnCode.FILTER_E_NO_VALUES:
-                                _chunkValid = false;
-                                break;
+                            var valueResult = _filter.GetValue(ref valuePtr);
+                        
+                            CheckResult(valueResult);
 
-                            case NativeMethods.IFilterReturnCode.S_OK:
-                            case NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES:
-                                var temp = GetPropertyNameAndValue(valuePtr);
-                                if (!string.IsNullOrEmpty(temp))
-                                {
-                                    textBuffer = temp.ToCharArray();
-                                    textLength = (uint) textBuffer.Length;
-                                    textRead = true;
-                                }
+                            switch (valueResult)
+                            {
+                                case NativeMethods.IFilterReturnCode.FILTER_E_NO_MORE_VALUES:
+                                case NativeMethods.IFilterReturnCode.FILTER_E_NO_VALUES:
+                                    _chunkValid = false;
+                                    break;
+
+                                case NativeMethods.IFilterReturnCode.S_OK:
+                                case NativeMethods.IFilterReturnCode.FILTER_S_LAST_VALUES:
+                                    var temp = GetPropertyNameAndValue(valuePtr);
+                                    if (!string.IsNullOrEmpty(temp))
+                                    {
+                                        textBuffer = temp.ToCharArray();
+                                        textLength = (uint) textBuffer.Length;
+                                        textRead = true;
+                                    }
     
-                                _chunkValid = false;
-                                break;
+                                    _chunkValid = false;
+                                    break;
+                            }
                         }
-
+                        finally
+                        {
+                            if (valuePtr != IntPtr.Zero)
+                                Marshal.Release(valuePtr);
+                        }
+                        
                         break;
 
                     case NativeMethods.CHUNKSTATE.CHUNK_TEXT:
@@ -693,8 +703,7 @@ namespace IFilterTextReader
                         pid = (long)_chunk.attribute.psProperty.data
                     };
 
-                    string propertyName;
-                    var result = NativeMethods.PSGetNameFromPropertyKey(ref propertyKey, out propertyName);
+                    var result = NativeMethods.PSGetNameFromPropertyKey(ref propertyKey, out var propertyName);
                     if (result == 0)
                     {
                         UnmappedPropertyEvent?.Invoke(this,

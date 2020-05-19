@@ -588,7 +588,7 @@ namespace IFilterTextReader
             /// Called to properly clean up the memory referenced by a PropVariant instance.
             /// </summary>
             [DllImport("ole32.dll")]
-            private static extern int PropVariantClear(ref PROPVARIANT pvar);
+            public static extern int PropVariantClear(ref PROPVARIANT pvar);
 
             /// <summary>
             /// Called to clear the PropVariant's referenced and local memory.
@@ -614,10 +614,7 @@ namespace IFilterTextReader
             /// <summary>
             /// Gets the variant type.
             /// </summary>
-            public VarEnum Type
-            {
-                get { return (VarEnum) vt; }
-            }
+            public VarEnum Type => (VarEnum) vt;
 
             /// <summary>
             /// Gets the variant value.
@@ -833,13 +830,13 @@ namespace IFilterTextReader
             /// The IFilter::GetValue method retrieves a value (public value-type property) from a chunk, 
             /// which must have a CHUNKSTATE enumeration value of CHUNK_VALUE.
             /// </summary>
+            /// <remarks>
+            /// Allocate the PROPVARIANT structure with CoTaskMemAlloc. Some PROPVARIANT structures contain pointers, 
+            /// which can be freed by calling the PropVariantClear function. It is up to the caller of the GetValue method 
+            /// to call the PropVariantClear method.            
+            /// </remarks>
             [PreserveSig]
-            IFilterReturnCode GetValue(
-                // Allocate the PROPVARIANT structure with CoTaskMemAlloc. Some PROPVARIANT structures contain pointers, 
-                // which can be freed by calling the PropVariantClear function. It is up to the caller of the GetValue method 
-                // to call the PropVariantClear method.            
-                ref IntPtr pval);
-                //[Out, MarshalAs(UnmanagedType.Struct)] out PROPVARIANT pval);
+            IFilterReturnCode GetValue(ref IntPtr pval);
 
             /// <summary>
             /// The IFilter::BindRegion method retrieves an interface representing the specified portion of the object. 
