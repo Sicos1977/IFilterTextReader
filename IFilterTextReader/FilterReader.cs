@@ -103,10 +103,15 @@ namespace IFilterTextReader
         private NativeMethods.STAT_CHUNK _chunk;
 
         /// <summary>
+        /// Contains pointer to non-movable memory block that holds the STAT_CHUNK structure
+        /// </summary>
+        private IntPtr _chunkBuffer;
+
+        /// <summary>
         /// Indicates if the <see cref="_chunk"/> is valid
         /// </summary>
         private bool _chunkValid;
-        
+
         /// <summary>
         /// Indicates that we are done with processing all the text that has been returned by the 
         /// <see cref="_chunk"/>
@@ -132,7 +137,7 @@ namespace IFilterTextReader
         /// Used in conjuction with <see cref="_options"/>
         /// </summary>
         private Stopwatch _stopwatch;
-        
+
         /// <summary>
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
@@ -153,7 +158,7 @@ namespace IFilterTextReader
         /// the extension is used to determine the <see cref="NativeMethods.IFilter"/> that needs to
         /// be used to read the <paramref name="fileName"/></param>
         /// <param name="filterReaderOptions"><see cref="FilterReaderOptions"/></param>
-        public FilterReader(string fileName, 
+        public FilterReader(string fileName,
                             string extension = "",
                             FilterReaderOptions filterReaderOptions = null)
         {
@@ -178,10 +183,10 @@ namespace IFilterTextReader
                 }
 
                 _filter = FilterLoader.LoadAndInitIFilter(
-                    _fileStream, 
-                    extension, 
-                    _options.DisableEmbeddedContent, 
-                    fileName, 
+                    _fileStream,
+                    extension,
+                    _options.DisableEmbeddedContent,
+                    fileName,
                     _options.ReadIntoMemory);
 
                 if (_filter == null)
@@ -193,7 +198,7 @@ namespace IFilterTextReader
                     throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
                                                " bits IFilter installed for the extension '" + extension + "'");
                 }
-            
+
                 if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
                     throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
             }
@@ -221,9 +226,9 @@ namespace IFilterTextReader
                 _options = filterReaderOptions;
 
             _filter = FilterLoader.LoadAndInitIFilter(
-                stream, 
-                extension, 
-                _options.DisableEmbeddedContent, string.Empty, 
+                stream,
+                extension,
+                _options.DisableEmbeddedContent, string.Empty,
                 _options.ReadIntoMemory);
 
             if (_filter == null)
@@ -321,7 +326,7 @@ namespace IFilterTextReader
                         case '\n':
                             if (!_carriageReturnFound)
                                 done = true;
-                                
+
                             break;
 
                         default:
@@ -452,8 +457,27 @@ namespace IFilterTextReader
                 // If we don't have a valid chunck anymore then read a new chunck
                 if (!_chunkValid)
                 {
-                    var result = _filter.GetChunk(out _chunk);
+                    if (_chunkBuffer == IntPtr.Zero)
+                    {
+                        // Keep the buffer allocated in a non-movable memory block. Some filters
+                        // (offfilt.dll) expect the buffer passed to GetChunk(buffer) call to
+                        // be valid even during the later call to GetText/GetValue methods.
+                        //
+                        // This means that we either have to pin a managed memory or allocate
+                        // an unmanaged one. Since the buffer lifetime is not bound to single
+                        // method call pinning is potentially expensive operation (until pinned
+                        // heap becomes available in .NET 5). Use the unmanaged allocator instead.
+                        _chunkBuffer = Marshal.AllocCoTaskMem(Marshal.SizeOf<NativeMethods.STAT_CHUNK>());
+                    }
+
+                    var result = _filter.GetChunk(_chunkBuffer);
                     _chunkValid = result == NativeMethods.IFilterReturnCode.S_OK;
+
+
+                    if (_chunkValid)
+                    {
+                        _chunk = Marshal.PtrToStructure<NativeMethods.STAT_CHUNK>(_chunkBuffer);
+                    }
 
                     switch (result)
                     {
@@ -497,7 +521,7 @@ namespace IFilterTextReader
                         try
                         {
                             var valueResult = _filter.GetValue(ref valuePtr);
-                        
+
                             CheckResult(valueResult);
 
                             switch (valueResult)
@@ -513,10 +537,10 @@ namespace IFilterTextReader
                                     if (!string.IsNullOrEmpty(temp))
                                     {
                                         textBuffer = temp.ToCharArray();
-                                        textLength = (uint) textBuffer.Length;
+                                        textLength = (uint)textBuffer.Length;
                                         textRead = true;
                                     }
-    
+
                                     _chunkValid = false;
                                     break;
                             }
@@ -526,7 +550,7 @@ namespace IFilterTextReader
                             if (valuePtr != IntPtr.Zero)
                                 Marshal.Release(valuePtr);
                         }
-                        
+
                         break;
 
                     case NativeMethods.CHUNKSTATE.CHUNK_TEXT:
@@ -691,7 +715,7 @@ namespace IFilterTextReader
                 else
                 {
                     var property = PropertyMapper.GetProperty(_chunk.attribute.guidPropSet,
-                        (long) _chunk.attribute.psProperty.data);
+                        (long)_chunk.attribute.psProperty.data);
 
                     if (!string.IsNullOrEmpty(property))
                         return GetMetaDataProperty(property, propertyVariant.Value);
@@ -719,7 +743,7 @@ namespace IFilterTextReader
                             new UnmappedPropertyEventArgs(_chunk.attribute.guidPropSet,
                                 _chunk.attribute.psProperty.data.ToString(), null, propertyVariant.Value.ToString()));
 
-                        return GetMetaDataProperty(_chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data, 
+                        return GetMetaDataProperty(_chunk.attribute.guidPropSet + "/" + _chunk.attribute.psProperty.data,
                             propertyVariant.Value);
                     }
                 }
@@ -740,9 +764,9 @@ namespace IFilterTextReader
         /// <returns>Name and value of the property or null if IncludeProperties option is false</returns>
         private string GetMetaDataProperty(string name, object value)
         {
-            if(MetaDataProperties.ContainsKey(name))
-                MetaDataProperties[name].Add(value); 
-            else            
+            if (MetaDataProperties.ContainsKey(name))
+                MetaDataProperties[name].Add(value);
+            else
                 MetaDataProperties.Add(name, new List<object> { value });
 
             return _options.IncludeProperties ? name + " : " + value + "\n" : null;
@@ -1079,7 +1103,7 @@ namespace IFilterTextReader
                         buffer[i] = Convert.ToChar(chi);
                         break;
 
-                        // ONE is at ZERO location... careful
+                    // ONE is at ZERO location... careful
                     case 0x3220: // parenthesized ideograph one
                     case 0x3221: // parenthesized ideograph two
                     case 0x3222: // parenthesized ideograph three
@@ -1176,7 +1200,7 @@ namespace IFilterTextReader
             }
         }
         #endregion
-        
+
         #region Close
         /// <summary>
         /// Closes this textreader
@@ -1208,6 +1232,12 @@ namespace IFilterTextReader
         {
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
+
+            if (_chunkBuffer != IntPtr.Zero)
+            {
+                Marshal.FreeCoTaskMem(_chunkBuffer);
+                _chunkBuffer = IntPtr.Zero;
+            }
 
             _fileStream?.Dispose();
 

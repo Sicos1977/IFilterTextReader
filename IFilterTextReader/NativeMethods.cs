@@ -811,7 +811,7 @@ namespace IFilterTextReader
             /// is the first call to the GetChunk method, and returns a description of the current chunk. 
             /// </summary>
             [PreserveSig]
-            IFilterReturnCode GetChunk(out STAT_CHUNK pStat);
+            IFilterReturnCode GetChunk(IntPtr pStat);
 
             /// <summary>
             /// The IFilter::GetText method retrieves text (text-type properties) from the current chunk, 
