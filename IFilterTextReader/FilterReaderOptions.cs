@@ -24,6 +24,9 @@
 // THE SOFTWARE.
 //
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace IFilterTextReader
 {
     /// <summary>
@@ -66,6 +69,16 @@ namespace IFilterTextReader
         /// or <see cref="FilterReaderTimeout.TimeoutWithException"/>
         /// </remarks>
         public int Timeout { get; set; }
+
+        /// <summary>
+        /// Indicates when <c>true</c> (default) that certain characters should be translated to likely ASCII characters.
+        /// </summary>
+        public bool DoCleanUpCharacters { get; set; }
+
+        /// <summary>
+        /// The separator that is used between word breaks
+        /// </summary>
+        public string WordBreakSeparator { get; set; }
         #endregion
 
         #region Constructor
@@ -79,6 +92,8 @@ namespace IFilterTextReader
             ReadIntoMemory = false;
             ReaderTimeout = FilterReaderTimeout.NoTimeout;
             Timeout = -1;
+            DoCleanUpCharacters = true;
+            WordBreakSeparator = "-";
         }
         #endregion
     }

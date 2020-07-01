@@ -33,6 +33,9 @@ using System.Text;
 using IFilterTextReader.Exceptions;
 // ReSharper disable LocalizableElement
 // ReSharper disable FunctionComplexityOverflow
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable EventNeverSubscribedTo.Global
 
 namespace IFilterTextReader
 {
@@ -142,13 +145,6 @@ namespace IFilterTextReader
         /// Indicates when true that a carriage return was found on the previous line
         /// </summary>
         private bool _carriageReturnFound;
-
-        /// <summary>
-        /// Indicates when true (default) that certain characters should be translated to likely ASCII characters.
-        /// </summary>
-        public bool DoCleanUpCharacters { get; set; } = true;
-
-        public string WordBreakSeparator { get; set; } = "-";
 
         /// <summary>
         /// Collection of metadata properties extracted from file
@@ -579,10 +575,8 @@ namespace IFilterTextReader
                                 textRead = true;
 
                                 // Remove junk from the buffer
-                                if (DoCleanUpCharacters)
-                                {
+                                if (_options.DoCleanUpCharacters)
                                     CleanUpCharacters(textLength, textBuffer);
-                                }
 
                                 // Check the break type
                                 switch (_chunk.breakType)
@@ -592,7 +586,7 @@ namespace IFilterTextReader
                                         break;
 
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
-                                        breakChar = WordBreakSeparator;
+                                        breakChar = _options.WordBreakSeparator;
                                         break;
 
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
