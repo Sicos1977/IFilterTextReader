@@ -144,6 +144,13 @@ namespace IFilterTextReader
         private bool _carriageReturnFound;
 
         /// <summary>
+        /// Indicates when true (default) that certain characters should be translated to likely ASCII characters.
+        /// </summary>
+        public bool DoCleanUpCharacters { get; set; } = true;
+
+        public string WordBreakSeparator { get; set; } = "-";
+
+        /// <summary>
         /// Collection of metadata properties extracted from file
         /// </summary>
         public readonly Dictionary<string, List<object>> MetaDataProperties = new Dictionary<string, List<object>>();
@@ -570,8 +577,12 @@ namespace IFilterTextReader
                             case NativeMethods.IFilterReturnCode.FILTER_S_LAST_TEXT:
 
                                 textRead = true;
+
                                 // Remove junk from the buffer
-                                CleanUpCharacters(textLength, textBuffer);
+                                if (DoCleanUpCharacters)
+                                {
+                                    CleanUpCharacters(textLength, textBuffer);
+                                }
 
                                 // Check the break type
                                 switch (_chunk.breakType)
@@ -581,7 +592,7 @@ namespace IFilterTextReader
                                         break;
 
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOW:
-                                        breakChar = "-";
+                                        breakChar = WordBreakSeparator;
                                         break;
 
                                     case NativeMethods.CHUNK_BREAKTYPE.CHUNK_EOC:
