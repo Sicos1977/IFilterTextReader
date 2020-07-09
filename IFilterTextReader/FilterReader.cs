@@ -663,6 +663,34 @@ namespace IFilterTextReader
         }
         #endregion
 
+        #region ReadToEnd
+        /// <summary>
+        /// Reads all characters from the current position to the end of the text reader and returns them as one string.
+        /// </summary>
+        /// <returns>A string that contains all characters from the current position to the end of the text reader.</returns>
+        /// <exception cref="IFFileIsPasswordProtected">Raised when a file is password protected</exception>
+        /// <exception cref="IFAccessFailure">Raised when the <see cref="_fileName"/> or IFilter file can not be accessed</exception>
+        /// <exception cref="OutOfMemoryException">Raised when there is not enough memory to process the file</exception>
+        /// <exception cref="IFUnknownFormat">Raised when the <see cref="_fileName"/> is not in the format the IFilter expect it to be 
+        /// <exception cref="IFOldFilterFormat">Raised when an old <see cref="NativeMethods.IFilter"/> format is used and no filename is supplied</exception>
+        /// (e.g. files with a wrong extension)</exception>
+        public override string ReadToEnd()
+        {
+            var stringBuilder = new StringBuilder();
+            var line = ReadLine();
+
+            while (line != null)
+            {
+                stringBuilder.AppendLine(line);
+                if (Timeout()) 
+                    return stringBuilder.ToString();
+                line = ReadLine();
+            }
+
+            return stringBuilder.ToString();
+        }
+        #endregion
+
         #region CheckResult
         /// <summary>
         /// Validates the <paramref name="result"/> return by the <see cref="NativeMethods.IFilter.GetText"/>
