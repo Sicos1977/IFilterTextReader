@@ -498,6 +498,26 @@
   <data name="_A94688B6_7D9F_4570_A648_E3DFC0AB2B3F_100" xml:space="preserve">
     <value>Offline availability </value>
   </data>
+  <data name="_AA568EEC_E0E5_11CF_8FDA_00AA00A14F93_12" xml:space="preserve">
+    <value>Date</value>
+    <comment>E-mail sent date</comment>
+  </data>
+  <data name="_AA568EEC_E0E5_11CF_8FDA_00AA00A14F93_5" xml:space="preserve">
+    <value>Subject</value>
+    <comment>E-mail subject</comment>
+  </data>
+  <data name="_AA568EEC_E0E5_11CF_8FDA_00AA00A14F93_53" xml:space="preserve">
+    <value>Date</value>
+    <comment>E-mail sent date</comment>
+  </data>
+  <data name="_AA568EEC_E0E5_11CF_8FDA_00AA00A14F93_6" xml:space="preserve">
+    <value>From</value>
+    <comment>E-mail from</comment>
+  </data>
+  <data name="_AA568EEC_E0E5_11CF_8FDA_00AA00A14F93_7" xml:space="preserve">
+    <value>Message-ID</value>
+    <comment>E-mail message id</comment>
+  </data>
   <data name="_AEAC19E4_89AE_4508_B9B7_BB867ABEE2ED_2" xml:space="preserve">
     <value>Protected </value>
   </data>
