@@ -550,8 +550,15 @@ namespace IFilterTextReader
                         }
                         finally
                         {
-                            if (valuePtr != IntPtr.Zero)
-                                Marshal.Release(valuePtr);
+                            try
+                            {
+                                if (valuePtr != IntPtr.Zero)
+                                    Marshal.Release(valuePtr);
+                            }
+                            catch 
+                            {
+                                // Ignore
+                            }
                         }
 
                         break;
@@ -1260,16 +1267,22 @@ namespace IFilterTextReader
         /// Disposes this object
         /// </summary>
         /// <param name="disposing"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
         protected override void Dispose(bool disposing)
         {
             if (_filter != null)
                 Marshal.ReleaseComObject(_filter);
 
-            if (_chunkBuffer != IntPtr.Zero)
+            try
             {
-                Marshal.FreeCoTaskMem(_chunkBuffer);
-                _chunkBuffer = IntPtr.Zero;
+                if (_chunkBuffer != IntPtr.Zero)
+                {
+                    Marshal.FreeCoTaskMem(_chunkBuffer);
+                    _chunkBuffer = IntPtr.Zero;
+                }
+            }
+            catch 
+            {
+                // Ignore
             }
 
             _fileStream?.Dispose();
