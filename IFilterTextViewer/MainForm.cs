@@ -136,7 +136,7 @@ namespace IFilterTextViewer
                             break;
                     }
 
-                    var options = new FilterReaderOptions()
+                    var options = new FilterReaderOptions
                     {
                         DisableEmbeddedContent = DisableEmbeddedContentCheckBox.Checked,
                         IncludeProperties = IncludePropertiesCheckBox.Checked,
