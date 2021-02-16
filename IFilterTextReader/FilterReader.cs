@@ -550,15 +550,8 @@ namespace IFilterTextReader
                         }
                         finally
                         {
-                            try
-                            {
-                                if (valuePtr != IntPtr.Zero)
-                                    Marshal.Release(valuePtr);
-                            }
-                            catch 
-                            {
-                                // Ignore
-                            }
+                            if (valuePtr != IntPtr.Zero)
+                                Marshal.Release(valuePtr);
                         }
 
                         break;

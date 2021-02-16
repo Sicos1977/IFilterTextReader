@@ -149,13 +149,13 @@ namespace IFilterTextViewer
                     {
                         stopWatch.Start();
                         string line;
-                        string tempFileName = Path.GetTempFileName();
+                        var tempFileName = Path.GetTempFileName();
 
                         while ((line = reader.ReadLine()) != null)
                         {
                             FilterTextBox.AppendText(line + Environment.NewLine);
                             Application.DoEvents();
-                            System.IO.File.AppendAllLines(tempFileName, new[] { line });
+                            File.AppendAllLines(tempFileName, new[] { line });
                         }
                         stopWatch.Stop();
                         FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);
