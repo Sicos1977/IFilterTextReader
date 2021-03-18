@@ -519,7 +519,11 @@ namespace IFilterTextReader
 
                     case NativeMethods.CHUNKSTATE.CHUNK_VALUE:
 
-                        var valuePtr = IntPtr.Zero;
+                        var pvValue = new NativeMethods.PROPVARIANT();
+
+                        // To convert from our C# PropVariant to the interop IntPtr:
+                        IntPtr valuePtr = Marshal.AllocHGlobal(Marshal.SizeOf(pvValue));
+                        Marshal.StructureToPtr(pvValue, valuePtr, false);
 
                         try
                         {
@@ -551,7 +555,7 @@ namespace IFilterTextReader
                         finally
                         {
                             if (valuePtr != IntPtr.Zero)
-                                Marshal.Release(valuePtr);
+                                Marshal.FreeHGlobal(valuePtr);
                         }
 
                         break;
