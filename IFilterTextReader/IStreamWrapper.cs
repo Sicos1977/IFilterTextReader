@@ -48,6 +48,7 @@ namespace IFilterTextReader
         /// <param name="stream"></param>
         public IStreamWrapper(Stream stream)
         {
+            // ReSharper disable once LocalizableElement
             _stream = stream ?? throw new ArgumentNullException(nameof(stream), "Can't wrap null stream.");
         }
         #endregion
@@ -61,12 +62,10 @@ namespace IFilterTextReader
         /// <param name="pcbRead"></param>
         public void Read(byte[] pv, int cb, IntPtr pcbRead)
         {            
-            int bytesRead = _stream.Read(pv, 0, cb);
+            var bytesRead = _stream.Read(pv, 0, cb);
 
             if (pcbRead != IntPtr.Zero)
-            {
                 Marshal.WriteInt32(pcbRead, bytesRead);
-            }
             
         }
         #endregion
@@ -83,9 +82,7 @@ namespace IFilterTextReader
             _stream.Write(pv, 0, cb);
 
             if (pcbWritten != IntPtr.Zero)
-            {
                 Marshal.WriteInt32(pcbWritten, cb);
-            }            
         }
         #endregion
 
@@ -98,12 +95,10 @@ namespace IFilterTextReader
         /// <param name="plibNewPosition"></param>
         public void Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition)
         {
-            long newPosition = _stream.Seek(dlibMove, (SeekOrigin)dwOrigin);
+            var newPosition = _stream.Seek(dlibMove, (SeekOrigin)dwOrigin);
 
             if (plibNewPosition != IntPtr.Zero)
-            {
                 Marshal.WriteInt64(plibNewPosition, newPosition);
-            }            
         }
         #endregion
 
@@ -208,10 +203,10 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="pstatstg"></param>
         /// <param name="grfStatFlag"></param>
-        public void Stat(out System.Runtime.InteropServices.ComTypes.STATSTG pstatstg, int grfStatFlag)
+        public void Stat(out STATSTG pstatstg, int grfStatFlag)
         {
-            //IStreamWrapper wants the length
-            var tempStatstg = new System.Runtime.InteropServices.ComTypes.STATSTG {cbSize = _stream.Length};
+            // IStreamWrapper wants the length
+            var tempStatstg = new STATSTG {cbSize = _stream.Length};
             pstatstg = tempStatstg;
         }
         #endregion

@@ -880,10 +880,7 @@ namespace IFilterTextReader
         [DllImport("ole32.dll")]
         internal static extern int CreateStreamOnHGlobal(IntPtr hGlobal, bool fDeleteOnRelease, out IStream ppstm);
 
-        [
-            System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1"),
-            DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)
-        ]
+        [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true)]
         internal static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -894,9 +891,7 @@ namespace IFilterTextReader
         internal static extern IntPtr LoadLibrary(string lpFileName);
 
         [DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern uint PSGetNameFromPropertyKey(
-            ref PROPERTYKEY propkey,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] out string ppszCanonicalName);
+        internal static extern uint PSGetNameFromPropertyKey(ref PROPERTYKEY propkey, [Out, MarshalAs(UnmanagedType.LPWStr)] out string ppszCanonicalName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         internal static extern IntPtr CreateJobObject(IntPtr a, string lpName);

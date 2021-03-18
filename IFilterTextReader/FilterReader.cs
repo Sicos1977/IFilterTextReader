@@ -434,7 +434,7 @@ namespace IFilterTextReader
             {
                 if (_charsLeftFromLastRead != null)
                 {
-                    var charsToCopy = (_charsLeftFromLastRead.Length < count - charsRead)
+                    var charsToCopy = _charsLeftFromLastRead.Length < count - charsRead
                         ? _charsLeftFromLastRead.Length
                         : count - charsRead;
 
@@ -476,11 +476,8 @@ namespace IFilterTextReader
                     var result = _filter.GetChunk(_chunkBuffer);
                     _chunkValid = result == NativeMethods.IFilterReturnCode.S_OK;
 
-
                     if (_chunkValid)
-                    {
                         _chunk = Marshal.PtrToStructure<NativeMethods.STAT_CHUNK>(_chunkBuffer);
-                    }
 
                     switch (result)
                     {
@@ -522,7 +519,7 @@ namespace IFilterTextReader
                         var pvValue = new NativeMethods.PROPVARIANT();
 
                         // To convert from our C# PropVariant to the interop IntPtr:
-                        IntPtr valuePtr = Marshal.AllocHGlobal(Marshal.SizeOf(pvValue));
+                        var valuePtr = Marshal.AllocHGlobal(Marshal.SizeOf(pvValue));
                         Marshal.StructureToPtr(pvValue, valuePtr, false);
 
                         try
@@ -706,21 +703,17 @@ namespace IFilterTextReader
             switch (result)
             {
                 case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
-                    throw new IFFileIsPasswordProtected("The file '" + _fileName +
-                                                        "' or a file inside this file (e.g. in the case of a ZIP) is password protected");
+                    throw new IFFileIsPasswordProtected($"The file '{_fileName}' or a file inside this file (e.g. in the case of a ZIP) is password protected");
 
                 case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
                 case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
                     throw new IFAccessFailure("Unable to acces the IFilter or file");
 
                 case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
-                    throw new OutOfMemoryException("Not enough memory to proceed reading the file '" +
-                                                   _fileName +
-                                                   "'");
+                    throw new OutOfMemoryException($"Not enough memory to proceed reading the file '{_fileName}'");
 
                 case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
-                    throw new IFUnknownFormat("The file '" + _fileName +
-                                              "' is not in the format the IFilter would expect it to be");
+                    throw new IFUnknownFormat($"The file '{_fileName}' is not in the format the IFilter would expect it to be");
             }
         }
         #endregion

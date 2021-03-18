@@ -48,22 +48,15 @@ namespace IFilterTextReader
         {
             _jobHandle = NativeMethods.CreateJobObject(IntPtr.Zero, null);
 
-            var info = new NativeMethods.JOBOBJECT_BASIC_LIMIT_INFORMATION
-            {
-                LimitFlags = 0x2000
-            };
-
-            var extendedInfo = new NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION
-            {
-                BasicLimitInformation = info
-            };
+            var info = new NativeMethods.JOBOBJECT_BASIC_LIMIT_INFORMATION {LimitFlags = 0x2000};
+            var extendedInfo = new NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION {BasicLimitInformation = info};
 
             var length = Marshal.SizeOf(typeof(NativeMethods.JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
             var extendedInfoPtr = Marshal.AllocHGlobal(length);
             Marshal.StructureToPtr(extendedInfo, extendedInfoPtr, false);
 
             if (!NativeMethods.SetInformationJobObject(_jobHandle, NativeMethods.JobObjectInfoType.ExtendedLimitInformation, extendedInfoPtr, (uint)length))
-                throw new Exception(string.Format("Unable to set information.  Error: {0}", Marshal.GetLastWin32Error()));
+                throw new Exception($"Unable to set information.  Error: {Marshal.GetLastWin32Error()}");
         }
         #endregion
 
@@ -81,14 +74,11 @@ namespace IFilterTextReader
         /// Disposes this object
         /// </summary>
         /// <param name="disposing"></param>
+        // ReSharper disable once UnusedParameter.Local
         private void Dispose(bool disposing)
         {
             if (_disposed)
                 return;
-
-            if (disposing)
-            {
-            }
 
             NativeMethods.CloseHandle(_jobHandle);
             _jobHandle = IntPtr.Zero;
