@@ -241,7 +241,10 @@ namespace IFilterTextReader
         /// <param name="filterPersistClass"></param>
         /// <returns>True when an <see cref="NativeMethods.IFilter"/> dll has been loaded for the given <paramref name="extension"/></returns>
         /// <exception cref="IFFilterNotFound">Raised when no IFilter dll could be found for the given <paramref name="extension"/></exception>
-        private static void GetFilterDllAndClass(string extension, out string dllName, out string filterPersistClass)
+        private static void GetFilterDllAndClass(
+            string extension, 
+            out string dllName, 
+            out string filterPersistClass)
         {
             // Try to get the filter from the cache
             lock (FilterCache)
@@ -251,11 +254,8 @@ namespace IFilterTextReader
                 var persistentHandlerClass = GetPersistentHandlerClass(extension, true);
 
                 if (persistentHandlerClass != null)
-                    if (
-                        !GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName,
-                            out filterPersistClass))
-                        throw new IFFilterNotFound(
-                            $"Could not find a {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter dll for a file with an '{extension}' extension");
+                    if (!GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName, out filterPersistClass))
+                        throw new IFFilterNotFound($"Could not find a {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter dll for a file with an '{extension}' extension");
 
                 FilterCache.Add(extension, new CacheEntry(dllName, filterPersistClass));
             }
@@ -268,7 +268,9 @@ namespace IFilterTextReader
         /// <param name="dllName">The filter dll</param>
         /// <param name="filterPersistClass">The filter persist class</param>
         /// <returns></returns>
-        private static bool GetFilterDllAndClassFromPersistentHandler(string persistentHandlerClass, out string dllName,
+        private static bool GetFilterDllAndClassFromPersistentHandler(
+            string persistentHandlerClass, 
+            out string dllName,
             out string filterPersistClass)
         {
             dllName = null;
@@ -282,6 +284,7 @@ namespace IFilterTextReader
 
             // Read the dll name 
             dllName = ReadFromHKLM($@"Software\Classes\CLSID\{filterPersistClass}\InprocServer32");
+
             return 
                 !string.IsNullOrEmpty(dllName);
         }
@@ -323,7 +326,7 @@ namespace IFilterTextReader
             if (string.IsNullOrEmpty(contentType))
                 return null;
 
-            var contentTypeExtension = ReadFromHKLM(@"Software\Classes\MIME\Database\Content Type\" + contentType, "Extension");
+            var contentTypeExtension = ReadFromHKLM($@"Software\Classes\MIME\Database\Content Type\{contentType}", "Extension");
 
             return extension.Equals(contentTypeExtension, StringComparison.CurrentCultureIgnoreCase)
                 ? null
