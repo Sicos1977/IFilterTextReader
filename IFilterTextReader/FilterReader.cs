@@ -195,15 +195,15 @@ namespace IFilterTextReader
                 if (_filter == null)
                 {
                     if (string.IsNullOrWhiteSpace(extension))
-                        throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
-                                                   " bits IFilter installed for the file '" + Path.GetFileName(fileName) + "'");
+                        throw new IFFilterNotFound(
+                            $"There is no {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter installed for the file '{Path.GetFileName(fileName)}'");
 
-                    throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
-                                               " bits IFilter installed for the extension '" + extension + "'");
+                    throw new IFFilterNotFound(
+                        $"There is no {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter installed for the extension '{extension}'");
                 }
 
                 if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
-                    throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
+                    throw new ArgumentException($"Needs to be larger then 0", nameof(_options.Timeout));
             }
             catch (Exception)
             {
@@ -235,11 +235,11 @@ namespace IFilterTextReader
                 _options.ReadIntoMemory);
 
             if (_filter == null)
-                throw new IFFilterNotFound("There is no " + (Environment.Is64BitProcess ? "64" : "32") +
-                                           " bits IFilter installed for the stream with the extension '" + extension + "'");
+                throw new IFFilterNotFound(
+                    $"There is no {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter installed for the stream with the extension '{extension}'");
 
             if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
-                throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
+                throw new ArgumentException($"Needs to be larger then 0", nameof(_options.Timeout));
         }
 
         /// <summary>
@@ -703,17 +703,17 @@ namespace IFilterTextReader
             switch (result)
             {
                 case NativeMethods.IFilterReturnCode.FILTER_E_PASSWORD:
-                    throw new IFFileIsPasswordProtected($"The file '{_fileName}' or a file inside this file (e.g. in the case of a ZIP) is password protected");
+                    throw new IFFileIsPasswordProtected($@"The file '{_fileName}' or a file inside this file (e.g. in the case of a ZIP) is password protected");
 
                 case NativeMethods.IFilterReturnCode.E_ACCESSDENIED:
                 case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
                     throw new IFAccessFailure("Unable to acces the IFilter or file");
 
                 case NativeMethods.IFilterReturnCode.E_OUTOFMEMORY:
-                    throw new OutOfMemoryException($"Not enough memory to proceed reading the file '{_fileName}'");
+                    throw new OutOfMemoryException($@"Not enough memory to proceed reading the file '{_fileName}'");
 
                 case NativeMethods.IFilterReturnCode.FILTER_E_UNKNOWNFORMAT:
-                    throw new IFUnknownFormat($"The file '{_fileName}' is not in the format the IFilter would expect it to be");
+                    throw new IFUnknownFormat($@"The file '{_fileName}' is not in the format the IFilter would expect it to be");
             }
         }
         #endregion
@@ -799,7 +799,7 @@ namespace IFilterTextReader
             else
                 MetaDataProperties.Add(name, new List<object> { value });
 
-            return _options.IncludeProperties ? name + " : " + value + "\n" : null;
+            return _options.IncludeProperties ? $"{name} : {value}\n" : null;
         }
         #endregion
 

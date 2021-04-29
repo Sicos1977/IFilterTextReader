@@ -26,6 +26,10 @@
 
 using System;
 
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace IFilterTextReader
 {
     #region Enum PropertyType
@@ -60,27 +64,27 @@ namespace IFilterTextReader
         /// <summary>
         /// The <see cref="Guid"/> to which property set the unmapped property belongs
         /// </summary>
-        public Guid PropertySetGuid { get; private set; }
+        public Guid PropertySetGuid { get; }
 
         /// <summary>
         /// The name/id of the property
         /// </summary>
-        public string PropertyName { get; private set; }
+        public string PropertyName { get; }
 
         /// <summary>
         /// The friendly name of the property, e.g. From, To, CC, etc...
         /// </summary>
-        public string FriendlyName { get; private set; }
+        public string FriendlyName { get; }
 
         /// <summary>
         /// The <see cref="PropertyType">type</see> of the property
         /// </summary>
-        public PropertyType Type { get; private set; }
+        public PropertyType Type { get; }
 
         /// <summary>
         /// The mask to use for the property, e.g. YYYY-mm-dd HH:MM:SS
         /// </summary>
-        public string Mask { get; private set; }
+        public string Mask { get; }
         #endregion
 
         #region Constructor

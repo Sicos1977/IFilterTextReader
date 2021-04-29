@@ -66,7 +66,6 @@ namespace IFilterTextReader
 
             if (pcbRead != IntPtr.Zero)
                 Marshal.WriteInt32(pcbRead, bytesRead);
-            
         }
         #endregion
 

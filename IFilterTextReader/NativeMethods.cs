@@ -27,6 +27,11 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable FieldCanBeMadeReadOnly.Global
+// ReSharper disable UnusedType.Global
 
 namespace IFilterTextReader
 {
@@ -35,13 +40,6 @@ namespace IFilterTextReader
     /// </summary>
     internal static class NativeMethods
     {
-        // ReSharper disable InconsistentNaming
-        // ReSharper disable UnusedField.Compiler
-        // ReSharper disable UnassignedField.Compiler
-        // ReSharper disable MemberCanBePrivate.Global
-        // ReSharper disable FieldCanBeMadeReadOnly.Global
-        // ReSharper disable UnusedMember.Global
-
         /// <summary>
         /// DllGetClassObject fuction pointer signature
         /// </summary>
@@ -758,9 +756,9 @@ namespace IFilterTextReader
         [StructLayout(LayoutKind.Sequential)]
         internal struct SECURITY_ATTRIBUTES
         {
-            public UInt32 nLength;
+            public uint nLength;
             public IntPtr lpSecurityDescriptor;
-            public Int32 bInheritHandle;
+            public int bInheritHandle;
         }
         #endregion
 
@@ -905,12 +903,5 @@ namespace IFilterTextReader
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool CloseHandle(IntPtr hObject);
         #endregion
-
-        // ReSharper restore UnusedMember.Global
-        // ReSharper restore FieldCanBeMadeReadOnly.Global
-        // ReSharper restore MemberCanBePrivate.Global
-        // ReSharper restore UnassignedField.Compiler
-        // ReSharper restore UnusedField.Compiler
-        // ReSharper restore InconsistentNaming
     }
 }

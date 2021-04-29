@@ -25,9 +25,9 @@
 //
 
 using System;
+
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-
 namespace IFilterTextReader
 {
     /// <summary>

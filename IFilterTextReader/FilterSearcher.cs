@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+// ReSharper disable UnusedType.Global
 namespace IFilterTextReader
 {
     /// <summary>

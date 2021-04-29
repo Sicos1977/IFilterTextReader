@@ -46,13 +46,20 @@ namespace IFilterTextReader
         /// </summary>
         private class CacheEntry
         {
+            /// <summary>
+            /// Returns the name from the filter DLL
+            /// </summary>
             public string DllName { get; }
+            
+            /// <summary>
+            /// Returns the class name
+            /// </summary>
             public string ClassName { get; }
 
             /// <summary>
-            /// 
+            /// Makes this object and sets it's needed properties
             /// </summary>
-            /// <param name="dllName">The name of the <see cref="NativeMethods.IFilter"/> DL</param>
+            /// <param name="dllName">The name of the <see cref="NativeMethods.IFilter"/> DLL</param>
             /// <param name="className">The name of the <see cref="NativeMethods.IFilter"/> class</param>
             public CacheEntry(string dllName, string className)
             {
@@ -145,10 +152,9 @@ namespace IFilterTextReader
                 iflags = iflags | NativeMethods.IFILTER_INIT.DISABLE_EMBEDDED;
 
             // ReSharper disable once SuspiciousTypeConversion.Global
-            var iPersistStream = iFilter as NativeMethods.IPersistStream;
 
             // IPersistStream is asumed on 64 bits systems
-            if (iPersistStream != null)
+            if (iFilter is NativeMethods.IPersistStream iPersistStream)
             {
                 // Create a COM stream
                 IStream comStream;
@@ -216,14 +222,12 @@ namespace IFilterTextReader
 
                 // And create an IFilter instance using that class factory
                 var filterGuid = new Guid("89BCB740-6119-101A-BCB7-00DD010655AF");
-                Object ppunk;
-                classFactory.CreateInstance(null, ref filterGuid, out ppunk);
-                return (ppunk as NativeMethods.IFilter);
+                classFactory.CreateInstance(null, ref filterGuid, out var ppunk);
+                return ppunk as NativeMethods.IFilter;
             }
             catch (Exception exception)
             {
-                throw new Exception("DLL name: '" + dllName + "'" + Environment.NewLine +
-                                    "Class: " + filterPersistClass + "'", exception);
+                throw new Exception($"DLL name '{dllName}'{Environment.NewLine}, class {filterPersistClass}'", exception);
             }
         }
         #endregion
@@ -250,10 +254,8 @@ namespace IFilterTextReader
                     if (
                         !GetFilterDllAndClassFromPersistentHandler(persistentHandlerClass, out dllName,
                             out filterPersistClass))
-                        throw new IFFilterNotFound("Could not find a " +
-                                                   (Environment.Is64BitProcess ? "64" : "32") +
-                                                   " bits IFilter dll for a file with an '" + extension +
-                                                   "' extension");
+                        throw new IFFilterNotFound(
+                            $"Could not find a {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter dll for a file with an '{extension}' extension");
 
                 FilterCache.Add(extension, new CacheEntry(dllName, filterPersistClass));
             }
@@ -272,15 +274,16 @@ namespace IFilterTextReader
             dllName = null;
 
             // Read the CLASS ID of the IFilter persistent handler
-            filterPersistClass = ReadFromHKLM(@"Software\Classes\CLSID\" + persistentHandlerClass +
-                                                 @"\PersistentAddinsRegistered\{89BCB740-6119-101A-BCB7-00DD010655AF}");
+            filterPersistClass = ReadFromHKLM(
+                $@"Software\Classes\CLSID\{persistentHandlerClass}\PersistentAddinsRegistered\{{89BCB740-6119-101A-BCB7-00DD010655AF}}");
 
             if (string.IsNullOrEmpty(filterPersistClass))
                 return false;
 
             // Read the dll name 
-            dllName = ReadFromHKLM(@"Software\Classes\CLSID\" + filterPersistClass + @"\InprocServer32");
-            return (!string.IsNullOrEmpty(dllName));
+            dllName = ReadFromHKLM($@"Software\Classes\CLSID\{filterPersistClass}\InprocServer32");
+            return 
+                !string.IsNullOrEmpty(dllName);
         }
         #endregion
 
@@ -316,7 +319,7 @@ namespace IFilterTextReader
         /// <returns></returns>
         private static string GetPersistentHandlerClassFromContentType(string extension)
         {
-            var contentType = ReadFromHKLM(@"Software\Classes\" + extension, "Content Type");
+            var contentType = ReadFromHKLM($@"Software\Classes\{extension}", "Content Type");
             if (string.IsNullOrEmpty(contentType))
                 return null;
 
@@ -337,17 +340,17 @@ namespace IFilterTextReader
         private static string GetPersistentHandlerClassFromDocumentType(string extension)
         {
             // Get the DocumentType of this file extension
-            var documentType = ReadFromHKLM(@"Software\Classes\" + extension);
-            if (String.IsNullOrEmpty(documentType))
+            var documentType = ReadFromHKLM($@"Software\Classes\{extension}");
+            if (string.IsNullOrEmpty(documentType))
                 return null;
 
             // Get the Class ID for this document type
-            var docClass = ReadFromHKLM(@"Software\Classes\" + documentType + @"\CLSID");
+            var docClass = ReadFromHKLM($@"Software\Classes\{documentType}\CLSID");
            
             // Now get the PersistentHandler for that Class ID
             return string.IsNullOrEmpty(documentType)
                 ? null
-                : ReadFromHKLM(@"Software\Classes\CLSID\" + docClass + @"\PersistentHandler");
+                : ReadFromHKLM($@"Software\Classes\CLSID\{docClass}\PersistentHandler");
         }
         #endregion
 
@@ -359,7 +362,7 @@ namespace IFilterTextReader
         /// <returns></returns>
         private static string GetPersistentHandlerClassFromExtension(string extension)
         {
-            return ReadFromHKLM(@"Software\Classes\" + extension + @"\PersistentHandler");
+            return ReadFromHKLM($@"Software\Classes\{extension}\PersistentHandler");
         }
         #endregion
 
@@ -374,10 +377,8 @@ namespace IFilterTextReader
         private static bool GetFilterDllAndClassFromCache(string extension, 
                                                           out string dllName, 
                                                           out string filterPersistClass)
-        {           
-
-            CacheEntry cacheEntry;
-            if (FilterCache.TryGetValue(extension, out cacheEntry))
+        {
+            if (FilterCache.TryGetValue(extension, out var cacheEntry))
             {
                 dllName = cacheEntry.DllName;
                 filterPersistClass = cacheEntry.ClassName;
