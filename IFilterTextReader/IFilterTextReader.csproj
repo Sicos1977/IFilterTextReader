@@ -9,7 +9,7 @@
     <Product>IFilterTextReader</Product>
     <Company />
     <Authors>Kees van Spelde</Authors>
-    <Copyright>Copyright 2013-2020 Kees van Spelde</Copyright>
+    <Copyright>Copyright 2013-2021 Kees van Spelde</Copyright>
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Sicos1977/IFilterTextReader.git</RepositoryUrl>
     <PackageReleaseNotes>- Added exception handling when a file is in the wrong format, e.g. a file with a wrong extension</PackageReleaseNotes>
