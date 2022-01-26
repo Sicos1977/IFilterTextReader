@@ -79,6 +79,12 @@ namespace IFilterTextReader
         /// The separator that is used between word breaks
         /// </summary>
         public string WordBreakSeparator { get; set; }
+
+        /// <summary>
+        /// The separator that is used between different chunk types
+        /// </summary>
+        public string ChunkTypeSeparator { get; set; }
+
         #endregion
 
         #region Constructor
@@ -94,6 +100,7 @@ namespace IFilterTextReader
             Timeout = -1;
             DoCleanUpCharacters = true;
             WordBreakSeparator = "-";
+            ChunkTypeSeparator = " ";
         }
         #endregion
     }

@@ -106,6 +106,11 @@ namespace IFilterTextReader
         private NativeMethods.STAT_CHUNK _chunk;
 
         /// <summary>
+        /// The guidPropSet of the last chunk attributes for which text was extracted
+        /// </summary>
+        private Guid _chunkAttributesGuidPropSetOfLastText;
+
+        /// <summary>
         /// Contains pointer to non-movable memory block that holds the STAT_CHUNK structure
         /// </summary>
         private IntPtr _chunkBuffer;
@@ -608,6 +613,14 @@ namespace IFilterTextReader
 
                 if (textRead)
                 {
+                    if (_chunkAttributesGuidPropSetOfLastText != _chunk.attribute.guidPropSet)
+                    {
+                        _chunkAttributesGuidPropSetOfLastText = _chunk.attribute.guidPropSet;
+
+                        if (breakChar == String.Empty)
+                            breakChar = _options.ChunkTypeSeparator;
+                    }
+
                     var read = (int)textLength;
                     int breakCharLength;
 
