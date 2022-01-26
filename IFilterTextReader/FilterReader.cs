@@ -609,9 +609,16 @@ namespace IFilterTextReader
                 if (textRead)
                 {
                     var read = (int)textLength;
-                    if (read + charsRead > count)
+                    int breakCharLength;
+
+                    if (breakChar != string.Empty)
+                        breakCharLength = 1;
+                    else
+                        breakCharLength = 0;
+
+                    if (read + charsRead + breakCharLength > count)
                     {
-                        var charsLeft = read + charsRead - count;
+                        var charsLeft = read + charsRead + breakCharLength - count;
                         _charsLeftFromLastRead = new char[charsLeft];
                         Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
                         read -= charsLeft;
@@ -683,7 +690,7 @@ namespace IFilterTextReader
             while (line != null)
             {
                 stringBuilder.AppendLine(line);
-                if (Timeout()) 
+                if (Timeout())
                     return stringBuilder.ToString();
                 line = ReadLine();
             }
@@ -1270,7 +1277,7 @@ namespace IFilterTextReader
                     _chunkBuffer = IntPtr.Zero;
                 }
             }
-            catch 
+            catch
             {
                 // Ignore
             }
