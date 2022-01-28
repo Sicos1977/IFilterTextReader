@@ -106,6 +106,11 @@ namespace IFilterTextReader
         private NativeMethods.STAT_CHUNK _chunk;
 
         /// <summary>
+        /// The guidPropSet of the last chunk attributes for which text was extracted
+        /// </summary>
+        private Guid _chunkAttributesGuidPropSetOfLastText;
+
+        /// <summary>
         /// Contains pointer to non-movable memory block that holds the STAT_CHUNK structure
         /// </summary>
         private IntPtr _chunkBuffer;
@@ -608,10 +613,25 @@ namespace IFilterTextReader
 
                 if (textRead)
                 {
-                    var read = (int)textLength;
-                    if (read + charsRead > count)
+                    if (_chunkAttributesGuidPropSetOfLastText != _chunk.attribute.guidPropSet)
                     {
-                        var charsLeft = read + charsRead - count;
+                        _chunkAttributesGuidPropSetOfLastText = _chunk.attribute.guidPropSet;
+
+                        if (breakChar == String.Empty)
+                            breakChar = _options.ChunkTypeSeparator;
+                    }
+
+                    var read = (int)textLength;
+                    int breakCharLength;
+
+                    if (breakChar != string.Empty)
+                        breakCharLength = 1;
+                    else
+                        breakCharLength = 0;
+
+                    if (read + charsRead + breakCharLength > count)
+                    {
+                        var charsLeft = read + charsRead + breakCharLength - count;
                         _charsLeftFromLastRead = new char[charsLeft];
                         Array.Copy(textBuffer, read - charsLeft, _charsLeftFromLastRead, 0, charsLeft);
                         read -= charsLeft;
@@ -683,7 +703,7 @@ namespace IFilterTextReader
             while (line != null)
             {
                 stringBuilder.AppendLine(line);
-                if (Timeout()) 
+                if (Timeout())
                     return stringBuilder.ToString();
                 line = ReadLine();
             }
@@ -1270,7 +1290,7 @@ namespace IFilterTextReader
                     _chunkBuffer = IntPtr.Zero;
                 }
             }
-            catch 
+            catch
             {
                 // Ignore
             }
