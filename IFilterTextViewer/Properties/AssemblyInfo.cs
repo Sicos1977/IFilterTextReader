@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("IFilterTextViewer")]
-[assembly: AssemblyCopyright("Copyright 2013-2019 Kees van Spelde")]
+[assembly: AssemblyCopyright("Copyright 2013-2022 Kees van Spelde")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

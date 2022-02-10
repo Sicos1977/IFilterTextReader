@@ -424,7 +424,7 @@
         </member>
         <member name="F:IFilterTextReader.FilterReader._charsLeftFromLastRead">
             <summary>
-            Holds the chars that are left from the last chunck read
+            Holds the chars that are left from the last chunk read
             </summary>
         </member>
         <member name="F:IFilterTextReader.FilterReader._options">
@@ -2443,7 +2443,7 @@
         </member>
         <member name="T:IFilterTextReader.NativeMethods.CHUNKSTATE">
             <summary>
-            The state of the chunck that has been read bij the <see cref="T:IFilterTextReader.NativeMethods.IFilter"/>
+            The state of the chunk that has been read bij the <see cref="T:IFilterTextReader.NativeMethods.IFilter"/>
             </summary>
         </member>
         <member name="F:IFilterTextReader.NativeMethods.CHUNKSTATE.CHUNK_TEXT">

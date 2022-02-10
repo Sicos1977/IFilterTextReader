@@ -3,7 +3,7 @@
 //
 // Author: Kees van Spelde <sicos2002@hotmail.com>
 //
-// Copyright (c) 2013-2021 Magic-Sessions. (www.magic-sessions.com)
+// Copyright (c) 2013-2022 Magic-Sessions. (www.magic-sessions.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ namespace IFilterTextReader
     internal static class NativeMethods
     {
         /// <summary>
-        /// DllGetClassObject fuction pointer signature
+        /// DllGetClassObject function pointer signature
         /// </summary>
         /// <param name="classId"></param>
         /// <param name="interfaceId"></param>
@@ -302,7 +302,7 @@ namespace IFilterTextReader
 
         #region Enum CHUNKSTATE
         /// <summary>
-        /// The state of the chunck that has been read bij the <see cref="IFilter"/>
+        /// The state of the chunk that has been read bij the <see cref="IFilter"/>
         /// </summary>
         [Flags]
         internal enum CHUNKSTATE

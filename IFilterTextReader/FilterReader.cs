@@ -3,7 +3,7 @@
 //
 // Author: Kees van Spelde <sicos2002@hotmail.com>
 //
-// Copyright (c) 2013-2021 Magic-Sessions. (www.magic-sessions.com)
+// Copyright (c) 2013-2022 Magic-Sessions. (www.magic-sessions.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ namespace IFilterTextReader
         NoTimeout,
 
         /// <summary>
-        /// The reader times out and returns like it has succesfully parsed the complete file
+        /// The reader times out and returns like it has successfully parsed the complete file
         /// </summary>
         TimeoutOnly,
 
@@ -127,7 +127,7 @@ namespace IFilterTextReader
         private bool _endOfChunks;
 
         /// <summary>
-        /// Holds the chars that are left from the last chunck read
+        /// Holds the chars that are left from the last chunk read
         /// </summary>
         private char[] _charsLeftFromLastRead;
 
@@ -137,7 +137,7 @@ namespace IFilterTextReader
         private readonly FilterReaderOptions _options = new FilterReaderOptions();
 
         /// <summary>
-        /// Used in conjuction with <see cref="_options"/>
+        /// Used in conjunction with <see cref="_options"/>
         /// </summary>
         private Stopwatch _stopwatch;
 
@@ -203,7 +203,7 @@ namespace IFilterTextReader
                 }
 
                 if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
-                    throw new ArgumentException($"Needs to be larger then 0", nameof(_options.Timeout));
+                    throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
             }
             catch (Exception)
             {
@@ -239,7 +239,7 @@ namespace IFilterTextReader
                     $"There is no {(Environment.Is64BitProcess ? "64" : "32")} bits IFilter installed for the stream with the extension '{extension}'");
 
             if (_options.ReaderTimeout != FilterReaderTimeout.NoTimeout && _options.Timeout < 0)
-                throw new ArgumentException($"Needs to be larger then 0", nameof(_options.Timeout));
+                throw new ArgumentException("Needs to be larger then 0", nameof(_options.Timeout));
         }
 
         /// <summary>
@@ -383,7 +383,7 @@ namespace IFilterTextReader
         {
             if (Timeout()) return -1;
 
-            var chr = new char[0];
+            var chr = Array.Empty<char>();
             var read = Read(chr, 0, 1);
             if (read == 1)
                 return chr[0];
@@ -457,7 +457,7 @@ namespace IFilterTextReader
                     continue;
                 }
 
-                // If we don't have a valid chunck anymore then read a new chunck
+                // If we don't have a valid chunk anymore then read a new chunk
                 if (!_chunkValid)
                 {
                     if (_chunkBuffer == IntPtr.Zero)
@@ -808,7 +808,7 @@ namespace IFilterTextReader
         /// Remove junk from the <paramref name="buffer"/>
         /// </summary>
         /// <param name="length">The length of the buffer</param>
-        /// <param name="buffer">The bufer</param>
+        /// <param name="buffer">The buffer</param>
         private static void CleanUpCharacters(uint length, IList<char> buffer)
         {
             for (var i = 0; i < length; i++)
@@ -830,7 +830,7 @@ namespace IFilterTextReader
                     case 0x2005: // four-per-em space
                     case 0x2006: // six-per-em space
                     case 0x2007: // figure space
-                    case 0x2008: // puctuation space
+                    case 0x2008: // punctuation space
                     case 0x2009: // thin space
                     case 0x200A: // hair space
                     case 0x200B: // zero-width space
@@ -844,8 +844,8 @@ namespace IFilterTextReader
                     case 0x000C: // page break char
                     case 0x00A0: // non breaking space
                     case 0x00B6: // pilcro
-                    case 0x2028: // line seperator
-                    case 0x2029: // paragraph seperator
+                    case 0x2028: // line separator
+                    case 0x2029: // paragraph separator
                         buffer[i] = '\n';
                         break;
 
@@ -988,7 +988,7 @@ namespace IFilterTextReader
                         buffer[i] = '/';
                         break;
 
-                    case 0x2042: // asterism
+                    case 0x2042: // asterisk
                     case 0xFE61: // small asterisk
                         buffer[i] = '*';
                         break;
@@ -1165,7 +1165,7 @@ namespace IFilterTextReader
                         if (0xFF01 <= ch // fullwidth exclamation mark 
                             && ch <= 0xFF5E) // fullwidth tilde
                         {
-                            // the fullwidths line up with ASCII low subset
+                            // the full widths line up with ASCII low subset
                             buffer[i] = Convert.ToChar(chi & 0xFF00 + '!' - 1);
                             //ch = ch & 0xFF00 + '!' - 1;               
                         }
@@ -1233,7 +1233,7 @@ namespace IFilterTextReader
 
         #region Close
         /// <summary>
-        /// Closes this textreader
+        /// Closes this text reader
         /// </summary>
         public override void Close()
         {
@@ -1243,7 +1243,7 @@ namespace IFilterTextReader
 
         #region Not implemented methods
         /// <summary>
-        /// This method is not supported and will aways throw an <see cref="NotSupportedException"/>
+        /// This method is not supported and will always throw an <see cref="NotSupportedException"/>
         /// </summary>
         /// <returns></returns>
         public override int Peek()
