@@ -87,14 +87,14 @@ namespace IFilterTextReader
 
             /// <summary>
             /// Various word-processing programs have forms of hyphens that are not represented in the host character set, such as optional hyphens
-            /// (appearing only at the end of a line) and nonbreaking hyphens. This flag indicates that optional hyphens are to be converted to nulls, and
+            /// (appearing only at the end of a line) and non breaking hyphens. This flag indicates that optional hyphens are to be converted to nulls, and
             /// non-breaking hyphens are to be converted to normal hyphens (0x2010), or HYPHEN-MINUSES (0x002D). 
             /// </summary>
             CANON_HYPHENS = 4,
 
             /// <summary>
             /// Just as the CANON_HYPHENS flag standardizes hyphens, this one standardizes spaces. All special space characters, such as
-            /// nonbreaking spaces, are converted to the standard space character (0x0020). 
+            /// non breaking spaces, are converted to the standard space character (0x0020). 
             /// </summary>
             CANON_SPACES = 8,
 
@@ -194,7 +194,7 @@ namespace IFilterTextReader
             FILTER_E_PASSWORD = 0x8004170B,
 
             /// <summary>
-            /// The document format is not recognised by the filter
+            /// The document format is not recognized by the filter
             /// </summary>
             FILTER_E_UNKNOWNFORMAT = 0x8004170C,
 
@@ -384,7 +384,7 @@ namespace IFilterTextReader
             public CHUNKSTATE flags;
 
             /// <summary>
-            /// The language and sublanguage associated with a chunk of text. Chunk locale is used by document indexers to perform proper word breaking 
+            /// The language and sub language associated with a chunk of text. Chunk locale is used by document indexers to perform proper word breaking 
             /// of text. If the chunk is neither text-type nor a value-type with data type VT_LPWSTR, VT_LPSTR or VT_BSTR, this field is ignored. 
             /// </summary>
             public int locale;
@@ -490,75 +490,33 @@ namespace IFilterTextReader
             #endregion // struct fields
 
             #region Union members
-            private sbyte cVal // CHAR cVal;
-            {
-                get { return (sbyte) GetDataBytes()[0]; }
-            }
+            private sbyte cVal => (sbyte) GetDataBytes()[0]; // CHAR cVal;
 
-            private byte bVal // UCHAR bVal;
-            {
-                get { return GetDataBytes()[0]; }
-            }
+            private byte bVal => GetDataBytes()[0]; // UCHAR bVal;
 
-            private short iVal // SHORT iVal;
-            {
-                get { return BitConverter.ToInt16(GetDataBytes(), 0); }
-            }
+            private short iVal => BitConverter.ToInt16(GetDataBytes(), 0); // SHORT iVal;
 
-            private ushort uiVal // USHORT uiVal;
-            {
-                get { return BitConverter.ToUInt16(GetDataBytes(), 0); }
-            }
+            private ushort uiVal => BitConverter.ToUInt16(GetDataBytes(), 0); // USHORT uiVal;
 
-            private int lVal // LONG lVal;
-            {
-                get { return BitConverter.ToInt32(GetDataBytes(), 0); }
-            }
+            private int lVal => BitConverter.ToInt32(GetDataBytes(), 0); // LONG lVal;
 
-            private uint ulVal // ULONG ulVal;
-            {
-                get { return BitConverter.ToUInt32(GetDataBytes(), 0); }
-            }
+            private uint ulVal => BitConverter.ToUInt32(GetDataBytes(), 0); // ULONG ulVal;
 
-            private long hVal // LARGE_INTEGER hVal;
-            {
-                get { return BitConverter.ToInt64(GetDataBytes(), 0); }
-            }
+            private long hVal => BitConverter.ToInt64(GetDataBytes(), 0); // LARGE_INTEGER hVal;
 
-            private ulong uhVal // ULARGE_INTEGER uhVal;
-            {
-                get { return BitConverter.ToUInt64(GetDataBytes(), 0); }
-            }
+            private ulong uhVal => BitConverter.ToUInt64(GetDataBytes(), 0); // ULARGE_INTEGER uhVal;
 
-            private float fltVal // FLOAT fltVal;
-            {
-                get { return BitConverter.ToSingle(GetDataBytes(), 0); }
-            }
+            private float fltVal => BitConverter.ToSingle(GetDataBytes(), 0); // FLOAT fltVal;
 
-            private double dblVal // DOUBLE dblVal;
-            {
-                get { return BitConverter.ToDouble(GetDataBytes(), 0); }
-            }
+            private double dblVal => BitConverter.ToDouble(GetDataBytes(), 0); // DOUBLE dblVal;
 
-            private bool boolVal // VARIANT_BOOL boolVal;
-            {
-                get { return (iVal != 0); }
-            }
+            private bool boolVal => (iVal != 0); // VARIANT_BOOL boolVal;
 
-            private int scode // SCODE scode;
-            {
-                get { return lVal; }
-            }
+            private int scode => lVal; // SCODE scode;
 
-            private decimal cyVal // CY cyVal;
-            {
-                get { return decimal.FromOACurrency(hVal); }
-            }
+            private decimal cyVal => decimal.FromOACurrency(hVal); // CY cyVal;
 
-            private DateTime date // DATE date;
-            {
-                get { return DateTime.FromOADate(dblVal); }
-            }
+            private DateTime date => DateTime.FromOADate(dblVal); // DATE date;
             #endregion // union members
 
             #region Helper methods
@@ -895,7 +853,7 @@ namespace IFilterTextReader
         internal static extern IntPtr CreateJobObject(IntPtr a, string lpName);
 
         [DllImport("kernel32.dll")]
-        internal static extern bool SetInformationJobObject(IntPtr hJob, JobObjectInfoType infoType, IntPtr lpJobObjectInfo, UInt32 cbJobObjectInfoLength);
+        internal static extern bool SetInformationJobObject(IntPtr hJob, JobObjectInfoType infoType, IntPtr lpJobObjectInfo, uint cbJobObjectInfoLength);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool AssignProcessToJobObject(IntPtr job, IntPtr process);
