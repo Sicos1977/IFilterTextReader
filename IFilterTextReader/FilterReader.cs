@@ -236,7 +236,8 @@ namespace IFilterTextReader
             _filter = FilterLoader.LoadAndInitIFilter(
                 stream,
                 extension,
-                _options.DisableEmbeddedContent, string.Empty,
+                _options.DisableEmbeddedContent, 
+                string.Empty,
                 _options.ReadIntoMemory);
 
             if (_filter == null)

@@ -138,7 +138,7 @@ namespace IFilterTextReader
             if (iFilter == null)
                 return null;
 
-            var iflags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
+            var iFlags = NativeMethods.IFILTER_INIT.CANON_HYPHENS |
                          NativeMethods.IFILTER_INIT.CANON_PARAGRAPHS |
                          NativeMethods.IFILTER_INIT.CANON_SPACES |
                          NativeMethods.IFILTER_INIT.APPLY_INDEX_ATTRIBUTES |
@@ -149,11 +149,11 @@ namespace IFilterTextReader
                          NativeMethods.IFILTER_INIT.EMIT_FORMATTING;
 
             if (disableEmbeddedContent)
-                iflags = iflags | NativeMethods.IFILTER_INIT.DISABLE_EMBEDDED;
+                iFlags |= NativeMethods.IFILTER_INIT.DISABLE_EMBEDDED;
 
             // ReSharper disable once SuspiciousTypeConversion.Global
 
-            // IPersistStream is asumed on 64 bits systems
+            // IPersistStream is assumed on 64 bits systems
             if (iFilter is NativeMethods.IPersistStream iPersistStream)
             {
                 // Create a COM stream
@@ -163,6 +163,7 @@ namespace IFilterTextReader
                 {
                     // Copy the content to global memory
                     var buffer = new byte[stream.Length];
+                    // ReSharper disable once MustUseReturnValue
                     stream.Read(buffer, 0, buffer.Length);
                     var nativePtr = Marshal.AllocHGlobal(buffer.Length);
                     Marshal.Copy(buffer, 0, nativePtr, buffer.Length);
@@ -175,13 +176,13 @@ namespace IFilterTextReader
                 {
                     iPersistStream.Load(comStream);
 
-                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
+                    if (iFilter.Init(iFlags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
                         return iFilter;
                 }
                 catch (Exception exception)
                 {
                     if (string.IsNullOrWhiteSpace(fileName))
-                        throw new IFOldFilterFormat("An error occured while trying to load a stream with the IPersistStream interface", exception);
+                        throw new IFOldFilterFormat("An error occurred while trying to load a stream with the IPersistStream interface", exception);
                 }
             }
             
@@ -195,7 +196,7 @@ namespace IFilterTextReader
                 if (iFilter is IPersistFile persistFile)
                 {
                     persistFile.Load(fileName, 0);
-                    if (iFilter.Init(iflags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
+                    if (iFilter.Init(iFlags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
                         return iFilter;
                 }
             }
@@ -205,7 +206,7 @@ namespace IFilterTextReader
             }
             finally
             {
-                // If we failed to retreive an IPersistStream or IPersistFile interface or to initialize
+                // If we failed to retrieve an IPersistStream or IPersistFile interface or to initialize
                 // the filter, we release it and return null.
                 Marshal.ReleaseComObject(iFilter);
             }
@@ -286,8 +287,7 @@ namespace IFilterTextReader
             dllName = null;
 
             // Read the CLASS ID of the IFilter persistent handler
-            filterPersistClass = ReadFromHKLM(
-                $@"Software\Classes\CLSID\{persistentHandlerClass}\PersistentAddinsRegistered\{{89BCB740-6119-101A-BCB7-00DD010655AF}}");
+            filterPersistClass = ReadFromHKLM($@"Software\Classes\CLSID\{persistentHandlerClass}\PersistentAddinsRegistered\{{89BCB740-6119-101A-BCB7-00DD010655AF}}");
 
             if (string.IsNullOrEmpty(filterPersistClass))
                 return false;
@@ -302,7 +302,7 @@ namespace IFilterTextReader
 
         #region GetPersistentHandlerClass
         /// <summary>
-        /// Returns an persistant handler class
+        /// Returns an persistent handler class
         /// </summary>
         /// <param name="extension">The file extension</param>
         /// <param name="searchContentType"></param>
@@ -326,7 +326,7 @@ namespace IFilterTextReader
 
         #region GetPersistentHandlerClassFromContentType
         /// <summary>
-        /// Returns an persistant handler class based on the contenttype of the file
+        /// Returns an persistent handler class based on the content type of the file
         /// </summary>
         /// <param name="extension"></param>
         /// <returns></returns>
@@ -346,7 +346,7 @@ namespace IFilterTextReader
 
         #region GetPersistentHandlerClassFromDocumentType
         /// <summary>
-        /// Returns an persistant handler class based on the document type
+        /// Returns an persistent handler class based on the document type
         /// </summary>
         /// <param name="extension">The file extension</param>
         /// <returns></returns>
@@ -369,7 +369,7 @@ namespace IFilterTextReader
 
         #region GetPersistentHandlerClassFromExtension
         /// <summary>
-        /// Returns an persistant handler class based on the extension of the file
+        /// Returns an persistent handler class based on the extension of the file
         /// </summary>
         /// <param name="extension">The file extension</param>
         /// <returns></returns>
