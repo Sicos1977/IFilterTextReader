@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "86693e2d-c3cb-4e16-9684-94445934a9d3": {
+      "ProjectGuid": "86693e2d-c3cb-4e16-9684-94445934a9d3",
+      "DisplayName": "IFilterTextReader",
+      "ColorIndex": 0
+    },
+    "7e0c9f1b-0e41-4653-be50-187566fb82ec": {
+      "ProjectGuid": "7e0c9f1b-0e41-4653-be50-187566fb82ec",
+      "DisplayName": "IFilterTextViewer",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}
