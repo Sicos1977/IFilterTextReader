@@ -189,28 +189,25 @@ namespace IFilterTextReader
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
 
-            try
+            // If we get here we probably are using an old IFilter so try to load it the old way
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (iFilter is IPersistFile persistFile)
             {
-                // If we get here we probably are using an old IFilter so try to load it the old way
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                if (iFilter is IPersistFile persistFile)
+                try
                 {
                     persistFile.Load(fileName, 0);
-                    if (iFilter.Init(iFlags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
-                        return iFilter;
                 }
-            }
-            catch (Exception)
-            {
-                throw new IFUnknownFormat($"The file '{fileName}' has an unknown format");
-            }
-            finally
-            {
-                // If we failed to retrieve an IPersistStream or IPersistFile interface or to initialize
-                // the filter, we release it and return null.
-                Marshal.ReleaseComObject(iFilter);
+                catch (Exception)
+                {
+                    Marshal.ReleaseComObject(iFilter);
+                    throw new IFUnknownFormat($"The file '{fileName}' has an unknown format");
+                }
+
+                if (iFilter.Init(iFlags, 0, IntPtr.Zero, out _) == NativeMethods.IFilterReturnCode.S_OK)
+                    return iFilter;
             }
 
+            Marshal.ReleaseComObject(iFilter);
             return null;
         }
         #endregion
