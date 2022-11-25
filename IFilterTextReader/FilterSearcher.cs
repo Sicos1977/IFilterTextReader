@@ -125,7 +125,7 @@ namespace IFilterTextReader
         
         #region GetRegexMatchesFromFile
         /// <summary>
-        /// Returns an array with all the matches that are found with the give <see cref="regularExpression"/> regular expression
+        /// Returns an array with all the matches that are found with the give <paramref name="regularExpression"/> regular expression
         /// </summary>
         /// <param name="fileName">The file to inspect</param>
         /// <param name="regularExpression">The regular expression to use</param>
