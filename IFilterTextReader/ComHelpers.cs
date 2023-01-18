@@ -65,29 +65,36 @@ namespace IFilterTextReader
         /// <param name="dllName">The name of the DLL</param>
         /// <param name="filterPersistClass">The persistant class we want</param>
         /// <returns></returns>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         private NativeMethods.IClassFactory GetClassFactoryFromDll(string dllName, string filterPersistClass)
         {
-            // Load the dll
-            var dllHandle = NativeMethods.LoadLibrary(dllName);
+            // Load the dll if it is not already loaded
+            var dllHandle = NativeMethods.GetModuleHandle(dllName);
             if (dllHandle == IntPtr.Zero)
-                return null;
+            {
+                dllHandle = NativeMethods.LoadLibrary(dllName);
+                if (dllHandle == IntPtr.Zero)
+                    return null;
 
-            // Keep a reference to the dll until the process\AppDomain dies
-            _dllHandles.Add(dllHandle);
+                // Keep a reference to the dll until the process\AppDomain dies
+                _dllHandles.Add(dllHandle);
+            }
 
             // Get a pointer to the DllGetClassObject function
             var dllGetClassObjectPtr = NativeMethods.GetProcAddress(dllHandle, "DllGetClassObject");
             if (dllGetClassObjectPtr == IntPtr.Zero)
+            {
+                _dllHandles.Remove(dllHandle);
+                NativeMethods.FreeLibrary(dllHandle);
                 throw new IFClassFactoryFailure("Could not get proc address from filter dll");
+            }
 
             // Convert the function pointer to a .net delegate
-            var dllGetClassObject =
-                (NativeMethods.DllGetClassObject)
-                    Marshal.GetDelegateForFunctionPointer(dllGetClassObjectPtr, typeof (NativeMethods.DllGetClassObject));
+            var dllGetClassObject = Marshal.GetDelegateForFunctionPointer<NativeMethods.DllGetClassObject>(dllGetClassObjectPtr);
 
             // Call the DllGetClassObject to retreive a class factory for out Filter class
             var filterPersistGuid = new Guid(filterPersistClass);
-            var classFactoryGuid = new Guid("00000001-0000-0000-C000-000000000046"); //IClassFactory class id
+            var classFactoryGuid = typeof(NativeMethods.IClassFactory).GUID;
             
             Object unk;
             
@@ -102,8 +109,23 @@ namespace IFilterTextReader
         #region Dispose
         public void Dispose()
         {
-            foreach (var dllHandle in _dllHandles)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            for (int i = _dllHandles.Count - 1; i >= 0; i--)
+            {
+                IntPtr dllHandle = _dllHandles[i];
+                _dllHandles.RemoveAt(i);
                 NativeMethods.FreeLibrary(dllHandle);
+            }
+        }
+
+        ~ComHelpers()
+        {
+            Dispose(false);
         }
         #endregion
     }

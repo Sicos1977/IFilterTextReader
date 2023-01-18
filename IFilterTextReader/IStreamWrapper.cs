@@ -202,10 +202,10 @@ namespace IFilterTextReader
         /// </summary>
         /// <param name="pstatstg"></param>
         /// <param name="grfStatFlag"></param>
-        public void Stat(out STATSTG pstatstg, int grfStatFlag)
+        public void Stat(out System.Runtime.InteropServices.ComTypes.STATSTG pstatstg, int grfStatFlag)
         {
             // IStreamWrapper wants the length
-            var tempStatstg = new STATSTG {cbSize = _stream.Length};
+            var tempStatstg = new System.Runtime.InteropServices.ComTypes.STATSTG {cbSize = _stream.Length};
             pstatstg = tempStatstg;
         }
         #endregion
