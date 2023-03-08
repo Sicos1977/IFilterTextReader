@@ -182,12 +182,23 @@ namespace IFilterTextReader
                 catch (Exception exception)
                 {
                     if (string.IsNullOrWhiteSpace(fileName))
+                    {
+                        Marshal.ReleaseComObject(iFilter);
                         throw new IFOldFilterFormat("An error occurred while trying to load a stream with the IPersistStream interface", exception);
+                    }
+                }
+                finally
+                {
+                    if (comStream != null && Marshal.IsComObject(comStream))
+                        Marshal.ReleaseComObject(comStream);
                 }
             }
             
             if (string.IsNullOrWhiteSpace(fileName))
+            {
+                Marshal.ReleaseComObject(iFilter);
                 throw new IFOldFilterFormat("The IFilter does not support the IPersistStream interface, supply a filename to use the IFilter");
+            }
 
             // If we get here we probably are using an old IFilter so try to load it the old way
             // ReSharper disable once SuspiciousTypeConversion.Global
@@ -210,6 +221,19 @@ namespace IFilterTextReader
             Marshal.ReleaseComObject(iFilter);
             return null;
         }
+
+        /// <summary>
+        /// Clears all cached data and frees loaded filter DLLs.
+        /// Can only be called when there are no active FilterReader instances exist, e.g. on shutdown.
+        /// </summary>
+        public static void Clear()
+        {
+            lock (FilterCache)
+            {
+                FilterCache.Clear();
+                ComHelpers.Dispose();
+            }
+        }
         #endregion
 
         #region LoadFilterFromDll
@@ -229,8 +253,9 @@ namespace IFilterTextReader
                     return null;
 
                 // And create an IFilter instance using that class factory
-                var filterGuid = new Guid("89BCB740-6119-101A-BCB7-00DD010655AF");
+                var filterGuid = typeof(NativeMethods.IFilter).GUID;
                 classFactory.CreateInstance(null, ref filterGuid, out var ppunk);
+//              Marshal.ReleaseComObject(classFactory);
                 return ppunk as NativeMethods.IFilter;
             }
             catch (Exception exception)
