@@ -2,17 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net47</TargetFrameworks>
-    <AssemblyVersion>1.7.8.0</AssemblyVersion>
-    <FileVersion>1.7.8.0</FileVersion>
-    <Version>1.7.8</Version>
+    <AssemblyVersion>1.7.9.0</AssemblyVersion>
+    <FileVersion>1.7.9.0</FileVersion>
+    <Version>1.7.9</Version>
     <Description>C# implementation of an IFilter to get text from any kind of file</Description>
     <Product>IFilterTextReader</Product>
     <Company />
     <Authors>Kees van Spelde</Authors>
-    <Copyright>Copyright 2013-2022 Kees van Spelde</Copyright>
+    <Copyright>Copyright 2013-2023 Kees van Spelde</Copyright>
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>    
-    <PackageReleaseNotes>- Fix for issue #49</PackageReleaseNotes>
+    <PackageReleaseNotes>- Fixed memory and resource leaks 
+- Added .NET Framework 4.7 target</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -24,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
