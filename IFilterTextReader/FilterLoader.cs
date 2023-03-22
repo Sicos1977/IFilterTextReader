@@ -3,7 +3,7 @@
 //
 // Author: Kees van Spelde <sicos2002@hotmail.com>
 //
-// Copyright (c) 2013-2022 Magic-Sessions. (www.magic-sessions.com)
+// Copyright (c) 2013-2023 Magic-Sessions. (www.magic-sessions.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -255,7 +255,7 @@ namespace IFilterTextReader
             out string filterPersistClass)
         {
             // Try to get the filter from the cache
-            lock (FilterCache)
+            //lock (FilterCache)
             {
                 if (GetFilterDllAndClassFromCache(extension, out dllName, out filterPersistClass)) return;
 
