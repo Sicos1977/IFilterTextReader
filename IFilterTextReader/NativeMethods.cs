@@ -846,6 +846,9 @@ namespace IFilterTextReader
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern IntPtr LoadLibrary(string lpFileName);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern IntPtr GetModuleHandle(string lpFileName);
+
         [DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern uint PSGetNameFromPropertyKey(ref PROPERTYKEY propkey, [Out, MarshalAs(UnmanagedType.LPWStr)] out string ppszCanonicalName);
 
