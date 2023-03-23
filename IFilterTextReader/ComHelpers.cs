@@ -68,6 +68,10 @@ namespace IFilterTextReader
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.Synchronized)]
         private NativeMethods.IClassFactory GetClassFactoryFromDll(string dllName, string filterPersistClass)
         {
+            // Don't try to load non-existing dll
+            if (dllName == null || filterPersistClass == null)
+                return null;
+
             // Load the dll if it is not already loaded
             var dllHandle = NativeMethods.GetModuleHandle(dllName);
             if (dllHandle == IntPtr.Zero)
