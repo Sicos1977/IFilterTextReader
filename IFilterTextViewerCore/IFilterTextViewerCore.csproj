@@ -17,10 +17,22 @@
     <Content Include="filter.ico" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    <PackageReference Include="System.Security.AccessControl" Version="6.0.0" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.Win32.Registry">
+		  <Version>5.0.0</Version>
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	  </PackageReference>
+    <PackageReference Include="System.Security.AccessControl">
+		  <Version>6.0.0</Version>
+		 <PrivateAssets>all</PrivateAssets>
+		 <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	 </PackageReference>
+    <PackageReference Include="System.Security.Principal.Windows">
+		 <Version>5.0.0</Version>
+		 <PrivateAssets>all</PrivateAssets>
+		 <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	 </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
