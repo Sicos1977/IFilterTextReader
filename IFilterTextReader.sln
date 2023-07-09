@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IFilterTextReader", "IFilterTextReader\IFilterTextReader.csproj", "{86693E2D-C3CB-4E16-9684-94445934A9D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFilterTextViewer", "IFilterTextViewer\IFilterTextViewer.csproj", "{7E0C9F1B-0E41-4653-BE50-187566FB82EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFilterTextViewerCore", "IFilterTextViewerCore\IFilterTextViewerCore.csproj", "{198BA2C2-C036-4FF5-8A26-96553F680850}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{7E0C9F1B-0E41-4653-BE50-187566FB82EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7E0C9F1B-0E41-4653-BE50-187566FB82EC}.Release|x64.ActiveCfg = Release|x64
 		{7E0C9F1B-0E41-4653-BE50-187566FB82EC}.Release|x64.Build.0 = Release|x64
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Debug|x64.Build.0 = Debug|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Release|x64.ActiveCfg = Release|Any CPU
+		{198BA2C2-C036-4FF5-8A26-96553F680850}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
