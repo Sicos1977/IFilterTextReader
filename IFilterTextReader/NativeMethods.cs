@@ -280,7 +280,8 @@ namespace IFilterTextReader
             /// <summary>
             /// A word break is placed between this chunk and the previous chunk that had the same attribute. 
             /// Use of CHUNK_EOW should be minimized because the choice of word breaks is language-dependent, 
-            /// so determining word breaks is best left to the search engine. /// </summary>
+            /// so determining word breaks is best left to the search engine.
+            /// </summary>
             CHUNK_EOW = 1,
 
             /// <summary>
