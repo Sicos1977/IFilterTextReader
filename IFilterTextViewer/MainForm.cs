@@ -2,7 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
-
+using IFilterTextReader;
+using IFilterTextViewer.Properties;
 /*
    Copyright 2013-2018 Kees van Spelde
 
@@ -19,8 +20,6 @@ using System.Windows.Forms;
    limitations under the License.
 */
 
-using IFilterTextReader;
-using IFilterTextViewer.Properties;
 // ReSharper disable LocalizableElement
 
 namespace IFilterTextViewer
@@ -29,27 +28,9 @@ namespace IFilterTextViewer
     {
         #region Fields
         /// <summary>
-        /// Make a job object to sandbox the IFilter code
+        ///     Make a job object to sandbox the IFilter code
         /// </summary>
         private readonly Job _job = new Job();
-        #endregion
-
-        #region GetInnerException
-        /// <summary>
-        /// Geeft de volledige inner exceptie
-        /// </summary>
-        /// <param name="exception">exceptie object</param>
-        /// <returns>inhoud van de inner exceptie</returns>
-        public static string GetInnerException(Exception exception)
-        {
-            var result = string.Empty;
-
-            if (exception == null) return result;
-            result = exception.Message + Environment.NewLine;
-            if (exception.InnerException != null)
-                result += GetInnerException(exception.InnerException);
-            return result;
-        }
         #endregion
 
         #region Constructor
@@ -63,30 +44,21 @@ namespace IFilterTextViewer
         }
         #endregion
 
-        #region Disable/Enable interface
-        private void DisableInput()
+        #region GetInnerException
+        /// <summary>
+        ///     Geeft de volledige inner exceptie
+        /// </summary>
+        /// <param name="exception">exceptie object</param>
+        /// <returns>inhoud van de inner exceptie</returns>
+        public static string GetInnerException(Exception exception)
         {
-            SelectButton.Enabled = false;
-            FindTextButton.Enabled = false;
-            FindWithRegexButton.Enabled = false;
-            TextToFindTextBox.Enabled = false;
-            TextToFindWithRegexTextBox.Enabled = false;
-            DisableEmbeddedContentCheckBox.Enabled = false;
-            IncludePropertiesCheckBox.Enabled = false;
-            ReadIntoMemoryCheckBox.Enabled = false;
-            FilterTextBox.Clear();
-        }
+            var result = string.Empty;
 
-        private void EnableInput()
-        {
-            SelectButton.Enabled = true;
-            FindTextButton.Enabled = true;
-            FindWithRegexButton.Enabled = true;
-            TextToFindTextBox.Enabled = true;
-            TextToFindWithRegexTextBox.Enabled = true;
-            DisableEmbeddedContentCheckBox.Enabled = true;
-            IncludePropertiesCheckBox.Enabled = true;
-            ReadIntoMemoryCheckBox.Enabled = true;
+            if (exception == null) return result;
+            result = exception.Message + Environment.NewLine;
+            if (exception.InnerException != null)
+                result += GetInnerException(exception.InnerException);
+            return result;
         }
         #endregion
 
@@ -115,7 +87,8 @@ namespace IFilterTextViewer
                 {
                     DisableInput();
 
-                    FilterTextBox.AppendText("*** Processing file '" + openFileDialog1.FileName + "' ***" + Environment.NewLine + Environment.NewLine);
+                    FilterTextBox.AppendText("*** Processing file '" + openFileDialog1.FileName + "' ***" +
+                                             Environment.NewLine + Environment.NewLine);
                     Application.DoEvents();
                     var stopWatch = new Stopwatch();
 
@@ -157,8 +130,10 @@ namespace IFilterTextViewer
                             Application.DoEvents();
                             File.AppendAllLines(tempFileName, new[] { line });
                         }
+
                         stopWatch.Stop();
-                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" + Environment.NewLine);
+                        FilterTextBox.AppendText(Environment.NewLine + "*** DONE IN " + stopWatch.Elapsed + " ***" +
+                                                 Environment.NewLine);
                         Application.DoEvents();
                     }
                 }
@@ -194,6 +169,33 @@ namespace IFilterTextViewer
             {
                 EnableInput();
             }
+        }
+        #endregion
+
+        #region Disable/Enable interface
+        private void DisableInput()
+        {
+            SelectButton.Enabled = false;
+            FindTextButton.Enabled = false;
+            FindWithRegexButton.Enabled = false;
+            TextToFindTextBox.Enabled = false;
+            TextToFindWithRegexTextBox.Enabled = false;
+            DisableEmbeddedContentCheckBox.Enabled = false;
+            IncludePropertiesCheckBox.Enabled = false;
+            ReadIntoMemoryCheckBox.Enabled = false;
+            FilterTextBox.Clear();
+        }
+
+        private void EnableInput()
+        {
+            SelectButton.Enabled = true;
+            FindTextButton.Enabled = true;
+            FindWithRegexButton.Enabled = true;
+            TextToFindTextBox.Enabled = true;
+            TextToFindWithRegexTextBox.Enabled = true;
+            DisableEmbeddedContentCheckBox.Enabled = true;
+            IncludePropertiesCheckBox.Enabled = true;
+            ReadIntoMemoryCheckBox.Enabled = true;
         }
         #endregion
 

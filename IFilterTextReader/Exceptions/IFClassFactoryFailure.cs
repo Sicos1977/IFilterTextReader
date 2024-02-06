@@ -30,17 +30,25 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when it is not possible to get the class object from an IFilter
+    ///     Raised when it is not possible to get the class object from an IFilter
     /// </summary>
     [Serializable]
     public class IFClassFactoryFailure : Exception
     {
-        internal IFClassFactoryFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFClassFactoryFailure(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFClassFactoryFailure() { }
+        internal IFClassFactoryFailure()
+        {
+        }
 
-        internal IFClassFactoryFailure(string message) : base(message) { }
+        internal IFClassFactoryFailure(string message) : base(message)
+        {
+        }
 
-        internal IFClassFactoryFailure(string message, Exception innerException) : base(message, innerException) { }
+        internal IFClassFactoryFailure(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

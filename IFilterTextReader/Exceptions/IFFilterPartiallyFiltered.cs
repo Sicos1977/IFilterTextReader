@@ -30,17 +30,25 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when the file is partially filtered
+    ///     Raised when the file is partially filtered
     /// </summary>
     [Serializable]
     public class IFFilterPartiallyFiltered : Exception
     {
-        internal IFFilterPartiallyFiltered(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFilterPartiallyFiltered(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFFilterPartiallyFiltered() { }
+        internal IFFilterPartiallyFiltered()
+        {
+        }
 
-        internal IFFilterPartiallyFiltered(string message) : base(message) { }
+        internal IFFilterPartiallyFiltered(string message) : base(message)
+        {
+        }
 
-        internal IFFilterPartiallyFiltered(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFilterPartiallyFiltered(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

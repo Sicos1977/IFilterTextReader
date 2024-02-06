@@ -30,17 +30,25 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when there is no IFilter installed for a file type
+    ///     Raised when there is no IFilter installed for a file type
     /// </summary>
     [Serializable]
     public class IFFilterNotFound : Exception
     {
-        internal IFFilterNotFound(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFilterNotFound(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFFilterNotFound() { }
+        internal IFFilterNotFound()
+        {
+        }
 
-        internal IFFilterNotFound(string message) : base(message) { }
+        internal IFFilterNotFound(string message) : base(message)
+        {
+        }
 
-        internal IFFilterNotFound(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFilterNotFound(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

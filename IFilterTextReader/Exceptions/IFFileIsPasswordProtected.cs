@@ -30,17 +30,25 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when an IFilter can not read the file because it is password protected
+    ///     Raised when an IFilter can not read the file because it is password protected
     /// </summary>
     [Serializable]
     public class IFFileIsPasswordProtected : Exception
     {
-        internal IFFileIsPasswordProtected(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFileIsPasswordProtected(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFFileIsPasswordProtected() { }
+        internal IFFileIsPasswordProtected()
+        {
+        }
 
-        internal IFFileIsPasswordProtected(string message) : base(message) { }
+        internal IFFileIsPasswordProtected(string message) : base(message)
+        {
+        }
 
-        internal IFFileIsPasswordProtected(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFileIsPasswordProtected(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

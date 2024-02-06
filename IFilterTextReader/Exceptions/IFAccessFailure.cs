@@ -30,17 +30,25 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when a file or IFilter cannot be accessed 
+    ///     Raised when a file or IFilter cannot be accessed
     /// </summary>
     [Serializable]
     public class IFAccessFailure : Exception
     {
-        internal IFAccessFailure(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFAccessFailure(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFAccessFailure() { }
+        internal IFAccessFailure()
+        {
+        }
 
-        internal IFAccessFailure(string message) : base(message) { }
+        internal IFAccessFailure(string message) : base(message)
+        {
+        }
 
-        internal IFAccessFailure(string message, Exception innerException) : base(message, innerException) { }
+        internal IFAccessFailure(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

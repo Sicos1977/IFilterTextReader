@@ -30,17 +30,25 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when the file to process is not in the format the IFilter would expect it to be
+    ///     Raised when the file to process is not in the format the IFilter would expect it to be
     /// </summary>
     [Serializable]
     public class IFUnknownFormat : Exception
     {
-        internal IFUnknownFormat(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFUnknownFormat(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFUnknownFormat() { }
+        internal IFUnknownFormat()
+        {
+        }
 
-        internal IFUnknownFormat(string message) : base(message) { }
+        internal IFUnknownFormat(string message) : base(message)
+        {
+        }
 
-        internal IFUnknownFormat(string message, Exception innerException) : base(message, innerException) { }
+        internal IFUnknownFormat(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

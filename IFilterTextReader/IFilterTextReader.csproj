@@ -22,6 +22,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <UserSecretsId>8d951fff-38d3-48f4-b5d9-eb5f969b2e95</UserSecretsId>
     <PackageTags>office ifilter pdf word excel powerpoint</PackageTags>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

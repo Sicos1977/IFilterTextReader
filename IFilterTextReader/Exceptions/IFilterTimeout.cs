@@ -30,18 +30,26 @@ using System.Runtime.Serialization;
 namespace IFilterTextReader.Exceptions
 {
     /// <summary>
-    /// Raised when the <see cref="FilterReaderTimeout.TimeoutWithException"/> is set and the IFilter times 
-    /// out before reading to the end of the file
+    ///     Raised when the <see cref="FilterReaderTimeout.TimeoutWithException" /> is set and the IFilter times
+    ///     out before reading to the end of the file
     /// </summary>
     [Serializable]
     public class IFFilterTimeout : Exception
     {
-        internal IFFilterTimeout(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        internal IFFilterTimeout(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
 
-        internal IFFilterTimeout() { }
+        internal IFFilterTimeout()
+        {
+        }
 
-        internal IFFilterTimeout(string message) : base(message) { }
+        internal IFFilterTimeout(string message) : base(message)
+        {
+        }
 
-        internal IFFilterTimeout(string message, Exception innerException) : base(message, innerException) { }
+        internal IFFilterTimeout(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }
