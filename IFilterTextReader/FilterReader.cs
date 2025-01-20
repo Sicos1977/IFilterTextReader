@@ -1147,7 +1147,7 @@ public class FilterReader : TextReader
                         throw new IFFilterPartiallyFiltered("The file was to large to filter completely");
 
                     case NativeMethods.IFilterReturnCode.FILTER_E_ACCESS:
-                        throw new IFAccessFailure("Could not acces IFilter object, invalid file");
+                        throw new IFAccessFailure("Could not access IFilter object, invalid file");
 
                     case NativeMethods.IFilterReturnCode.FILTER_E_TOO_BIG:
                         throw new IFFileToLarge("The file is to large to filter");
