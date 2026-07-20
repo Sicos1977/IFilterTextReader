@@ -31,6 +31,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using IFilterTextReader.Exceptions;
+using IFilterTextReader.Helpers;
 
 // ReSharper disable LocalizableElement
 // ReSharper disable FunctionComplexityOverflow
@@ -829,6 +830,7 @@ public class FilterReader : TextReader
             // Ignore
         }
 
+        _textReader?.Dispose();
         _fileStream?.Dispose();
 
         _stopwatch = null;
@@ -910,6 +912,21 @@ public class FilterReader : TextReader
     ///     Collection of metadata properties extracted from file
     /// </summary>
     public readonly Dictionary<string, List<object>> MetaDataProperties = new();
+    // Add these fields to the Fields region (around line 836)
+    /// <summary>
+    ///     When true, use direct text reading instead of IFilter
+    /// </summary>
+    private readonly bool _useDirectTextReading;
+
+    /// <summary>
+    ///     The detected encoding when using direct text reading
+    /// </summary>
+    private Encoding _detectedEncoding;
+
+    /// <summary>
+    ///     StreamReader for direct text reading
+    /// </summary>
+    private StreamReader _textReader;
     #endregion
 
     #region Constructor en Destructor
@@ -926,8 +943,8 @@ public class FilterReader : TextReader
     ///     <see cref="FilterReaderOptions" />
     /// </param>
     public FilterReader(string fileName,
-        string extension = "",
-        FilterReaderOptions filterReaderOptions = null)
+    string extension = "",
+    FilterReaderOptions filterReaderOptions = null)
     {
         try
         {
@@ -935,7 +952,6 @@ public class FilterReader : TextReader
                 _options = filterReaderOptions;
 
             _fileName = fileName;
-            _fileStream = File.OpenRead(fileName);
 
             if (string.IsNullOrWhiteSpace(extension))
             {
@@ -948,6 +964,31 @@ public class FilterReader : TextReader
                         extension = fileInfo.Extension;
                 }
             }
+
+            // For plain text files with encoding detection enabled, use direct reading
+            if (_options.UseEncodingDetection &&
+                (extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) ||
+                 extension.Equals(".log", StringComparison.OrdinalIgnoreCase) ||
+                 extension.Equals(".csv", StringComparison.OrdinalIgnoreCase)))
+            {
+                _useDirectTextReading = true;
+
+                // Detect encoding using a separate stream
+                using (var detectionStream = File.OpenRead(fileName))
+                {
+                    _detectedEncoding = EncodingDetector.DetectEncoding(detectionStream);
+                }
+
+                // Open a fresh stream for reading with the detected encoding
+                _fileStream = File.OpenRead(fileName);
+
+                // Use detectEncodingFromByteOrderMarks: false because we already detected the exact encoding
+                // This prevents StreamReader from trying to re-detect and potentially using a different encoding
+                _textReader = new StreamReader(_fileStream, _detectedEncoding, detectEncodingFromByteOrderMarks: false);
+                return;
+            }
+
+            _fileStream = File.OpenRead(fileName);
 
             _filter = FilterLoader.LoadAndInitIFilter(
                 _fileStream,
@@ -1073,6 +1114,44 @@ public class FilterReader : TextReader
     /// </exception>
     public override int Read(char[] buffer, int index, int count)
     {
+        // Handle direct text reading for encoding-detected files
+        if (_useDirectTextReading)
+        {
+            if (_textReader == null || Timeout())
+                return 0;
+
+            // Check if we have leftover characters from ReadLine's buffer management
+            if (_charsLeftFromLastRead != null)
+            {
+                var charsToCopy = Math.Min(_charsLeftFromLastRead.Length, count);
+                Array.Copy(_charsLeftFromLastRead, 0, buffer, index, charsToCopy);
+
+                if (charsToCopy < _charsLeftFromLastRead.Length)
+                {
+                    // Still have characters left after copying
+                    var remaining = new char[_charsLeftFromLastRead.Length - charsToCopy];
+                    Array.Copy(_charsLeftFromLastRead, charsToCopy, remaining, 0, remaining.Length);
+                    _charsLeftFromLastRead = remaining;
+                }
+                else
+                {
+                    // Used all leftover characters
+                    _charsLeftFromLastRead = null;
+                }
+
+                return charsToCopy;
+            }
+
+            try
+            {
+                return _textReader.Read(buffer, index, count);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
         var breakChar = string.Empty;
 
         if (buffer == null)
@@ -1317,6 +1396,15 @@ public class FilterReader : TextReader
         }
 
         return charsRead;
+    }
+
+    /// <summary>
+    /// Reads text file with proper encoding detection
+    /// </summary>
+    private static string ReadTextFileWithEncoding(string fileName)
+    {
+        var encoding = EncodingDetector.DetectEncoding(fileName);
+        return File.ReadAllText(fileName, encoding);
     }
     #endregion
 }

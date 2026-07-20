@@ -1,18 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net47</TargetFrameworks>
     <AssemblyVersion>1.7.11.0</AssemblyVersion>
     <FileVersion>1.7.11.0</FileVersion>
     <Version>1.7.11</Version>
-    <Description>C# implementation of an IFilter to get text from any kind of file</Description>
+    <Description>C# implementation of an IFilter to get text from any kind of file with support for UTF-8 and Shift-JIS encodings</Description>
     <Product>IFilterTextReader</Product>
     <Company />
     <Authors>Kees van Spelde</Authors>
-    <Copyright>Copyright 2013-2023 Kees van Spelde</Copyright>
+    <Copyright>Copyright 2013-2024 Kees van Spelde</Copyright>
     <PackageProjectUrl>https://github.com/Sicos1977/IFilterTextReader</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>    
-    <PackageReleaseNotes>- Updated nuget packages</PackageReleaseNotes>
+    <PackageReleaseNotes>- Added encoding detection support for UTF-8 and Shift-JIS files
+- Fixed Japanese, Chinese, and Korean text extraction from plain text files
+- Added UseEncodingDetection option to FilterReaderOptions
+- Improved multi-byte character handling</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -20,7 +23,7 @@
     <AssemblyOriginatorKeyFile>IFilterTextReader.snk</AssemblyOriginatorKeyFile>
     <PackageIcon>icon.png</PackageIcon>
     <UserSecretsId>8d951fff-38d3-48f4-b5d9-eb5f969b2e95</UserSecretsId>
-    <PackageTags>office ifilter pdf word excel powerpoint</PackageTags>
+    <PackageTags>office ifilter pdf word excel powerpoint japanese shift-jis utf8 encoding</PackageTags>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

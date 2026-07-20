@@ -1,4 +1,4 @@
-﻿//
+//
 // FilterReaderOptions.cs
 //
 // Author: Kees van Spelde <sicos2002@hotmail.com>
@@ -49,6 +49,7 @@ public class FilterReaderOptions
         DoCleanUpCharacters = true;
         WordBreakSeparator = "-";
         ChunkTypeSeparator = " ";
+        UseEncodingDetection = false;
     }
     #endregion
 
@@ -103,5 +104,16 @@ public class FilterReaderOptions
     ///     The separator that is used between different chunk types
     /// </summary>
     public string ChunkTypeSeparator { get; set; }
+
+    /// <summary>
+    ///     When set to <c>true</c>, uses encoding detection for plain text files (.txt, .log)
+    ///     to properly handle UTF-8 and Shift-JIS encoded files. Default set to <c>false</c>
+    /// </summary>
+    /// <remarks>
+    ///     This option bypasses IFilter for plain text files and uses direct file reading
+    ///     with automatic encoding detection to correctly handle multi-byte characters
+    ///     (e.g., Japanese, Chinese, Korean) that may not be properly detected by IFilter.
+    /// </remarks>
+    public bool UseEncodingDetection { get; set; }
     #endregion
 }

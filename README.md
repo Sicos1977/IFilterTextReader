@@ -12,6 +12,32 @@ In Visual Studio's Package Manager Console, simply enter the following command:
 
     Install-Package IFilterTextReader
 
+Known Limitations
+====================
+
+Japanese and Multi-byte Character Encoding Issues
+
+**Problem**: When extracting text from files encoded in UTF-8 or Shift-JIS, Japanese 
+characters may appear as mathematical symbols or garbled text.
+
+**Root Cause**: This is a limitation of the underlying Windows IFilter implementations, 
+which may incorrectly detect the encoding of plain text files. UTF-16 encoded files 
+work correctly because the BOM (Byte Order Mark) helps IFilter identify the encoding.
+
+**Workaround**: 
+- Use UTF-16 (with BOM) encoding for text files containing Japanese characters
+- For existing UTF-8/Shift-JIS files, consider enabling the `UseEncodingDetection` 
+  option in `FilterReaderOptions` (if available)
+
+**Affected Encodings**:
+- UTF-8 (without BOM)
+- Shift-JIS (SJIS)
+- Other multi-byte encodings
+
+**Working Encodings**:
+- UTF-16 LE (with BOM)
+- UTF-16 BE (with BOM)
+
 ## License Information
 
 IFilterTextReader is Copyright (C)2013-2024 Kees van Spelde (Magic-Sessions) and is licensed under the MIT license:
